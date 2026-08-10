@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opinion: 2023 NFL Draft Winners and Losers — Robi Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-primary: #000000;
+      --bg-secondary: #0a0a0a;
+      --bg-card: #111111;
+      --bg-card-hover: #1a1a1a;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #92d2ff;
+      --accent-hover: #b0e0ff;
+      --accent-glow: rgba(146, 210, 255, 0.25);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --nav-height: 72px;
+      --max-width: 1280px;
+      --transition: 0.2s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── Navigation ── */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: var(--nav-height);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .logo span { color: var(--text-secondary); font-weight: 500; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      list-style: none;
+    }
+
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000000;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+
+    .btn-block { width: 100%; }
+
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    /* ── Nav Dropdowns ── */
+    .nav-links > li { position: relative; }
+
+    .nav-links > li > a,
+    .nav-hub-link {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color var(--transition);
+    }
+
+    .nav-links > li > a:hover,
+    .nav-hub-link:hover,
+    .nav-hub-link.active {
+      color: var(--text-primary);
+    }
+
+    .nav-dropdown-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .nav-hub-link {
+      position: relative;
+    }
+
+    .nav-hub-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .nav-dropdown-toggle {
+      background: none;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 0;
+      color: var(--text-secondary);
+      line-height: 1;
+    }
+
+    .nav-dropdown-toggle:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-chevron {
+      font-size: 0.55rem;
+      opacity: 0.7;
+      transition: transform var(--transition);
+      line-height: 1;
+    }
+
+    .nav-item.has-dropdown:hover .nav-chevron,
+    .nav-item.has-dropdown.open .nav-chevron {
+      transform: rotate(180deg);
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 520px;
+      max-width: 640px;
+      padding: 20px;
+      background: rgba(10, 10, 10, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-hover);
+      border-radius: var(--radius-md);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(146, 210, 255, 0.06);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        visibility 0s linear 0.2s;
+      z-index: 200;
+    }
+
+    .nav-dropdown::before {
+      content: '';
+      position: absolute;
+      top: -16px;
+      left: 0;
+      right: 0;
+      height: 16px;
+    }
+
+    .nav-item.has-dropdown:hover .nav-dropdown,
+    .nav-item.has-dropdown.open .nav-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%);
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        visibility 0s linear 0s;
+    }
+
+    .dropdown-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .dropdown-grid-2 { grid-template-columns: 1fr 1fr; }
+
+    .dropdown-heading {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dropdown-divisions {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .dropdown-subheading {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .dropdown-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .dropdown-list a {
+      display: block;
+      padding: 5px 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-radius: 4px;
+      transition: all var(--transition);
+    }
+
+    .dropdown-list a:hover {
+      color: var(--text-primary);
+      background: rgba(146, 210, 255, 0.08);
+    }
+
+    .dropdown-list.compact {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px 12px;
+    }
+
+    .dropdown-list.single-col {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+
+    .dropdown-hub-link {
+      display: block;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      transition: color var(--transition);
+    }
+
+    .dropdown-hub-link:hover { color: var(--accent-hover); }
+
+    /* ── Mobile Nav Panel ── */
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: var(--nav-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 16px 24px 32px;
+        background: rgba(0, 0, 0, 0.97);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        overflow-y: auto;
+        border-top: 1px solid var(--border);
+      }
+
+      .nav.nav-open .nav-links { display: flex; }
+
+      .nav-links > li {
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav-links > li > a {
+        display: flex;
+        width: 100%;
+        padding: 14px 0;
+        font-size: 1rem;
+      }
+
+      .nav-dropdown-trigger {
+        display: flex;
+        width: 100%;
+        padding: 14px 0;
+        font-size: 1rem;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .nav-hub-link.active::after { display: none; }
+
+      .nav-dropdown::before { display: none; }
+
+      .nav-dropdown {
+        position: static;
+        transform: none;
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+        padding: 0 0 16px;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        display: none;
+      }
+
+      .nav-item.has-dropdown.open .nav-dropdown { display: block; }
+
+      .nav-item.has-dropdown:hover .nav-dropdown {
+        transform: none;
+      }
+
+      .dropdown-grid-2 { grid-template-columns: 1fr; }
+
+      .dropdown-list.compact { grid-template-columns: 1fr; }
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+      padding: calc(var(--nav-height) + 32px) 24px 24px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .page-header h1 {
+      font-size: clamp(1.75rem, 3vw, 2.25rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .page-header p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    /* ── 3-Column Editorial Layout ── */
+    .hub {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+      display: grid;
+      grid-template-columns: 220px 1fr 280px;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* ── Sidebar Widgets ── */
+    .widget {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .widget:last-child { margin-bottom: 0; }
+
+    .widget-header {
+      padding: 14px 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .widget-body { padding: 8px 0; }
+
+    .sidebar-link {
+      display: block;
+      padding: 10px 16px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-link:hover {
+      color: var(--text-primary);
+      background: rgba(146, 210, 255, 0.06);
+      border-left-color: var(--accent);
+    }
+
+    .subscribe-card {
+      padding: 20px 16px;
+      text-align: center;
+    }
+
+    .subscribe-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .subscribe-card p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .league-shortcuts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 16px 16px;
+    }
+
+    .league-pill {
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+
+    .league-pill:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .league-pill.active {
+      background: rgba(146, 210, 255, 0.12);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Center Column ── */
+    .lead-story {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 28px;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+
+    .lead-story:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .lead-story-image {
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+    }
+
+    .lead-story-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .lead-story:hover .lead-story-image img {
+      transform: scale(1.03);
+    }
+
+    .lead-story-body {
+      padding: 24px 28px 28px;
+    }
+
+    .story-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(146, 210, 255, 0.12);
+      border: 1px solid rgba(146, 210, 255, 0.25);
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .lead-story-body h2 {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      transition: color var(--transition);
+    }
+
+    .lead-story:hover .lead-story-body h2 {
+      color: var(--accent-hover);
+    }
+
+    .lead-story-body .subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 18px;
+    }
+
+    .author-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .author-meta .dot {
+      width: 3px;
+      height: 3px;
+      background: var(--text-muted);
+      border-radius: 50%;
+    }
+
+    .author-meta strong {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .news-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .news-row {
+      display: grid;
+      grid-template-columns: 140px minmax(0, 1fr);
+      gap: 16px;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+
+    .news-row:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+    }
+
+    .news-row-thumb {
+      aspect-ratio: 4 / 3;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .news-row-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .news-row-body h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 6px;
+      transition: color var(--transition);
+    }
+
+    .news-row:hover .news-row-body h3 {
+      color: var(--accent-hover);
+    }
+
+    .news-row-body p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-row-meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* ── Storylines Section ── */
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .analysis-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+
+    .analysis-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+
+    .analysis-card-image {
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+    }
+
+    .analysis-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .analysis-card-body {
+      padding: 14px 16px 18px;
+    }
+
+    .analysis-card-body h4 {
+      font-size: 0.875rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      transition: color var(--transition);
+    }
+
+    .analysis-card:hover .analysis-card-body h4 {
+      color: var(--accent-hover);
+    }
+
+    .analysis-card-body span {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Right Sidebar ── */
+    .headline-list {
+      list-style: none;
+    }
+
+    .headline-list li {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .headline-list li:last-child { border-bottom: none; }
+
+    .headline-list a {
+      display: block;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+
+    .headline-list a:hover {
+      color: var(--accent-hover);
+      background: rgba(146, 210, 255, 0.04);
+    }
+
+    .trending-item {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+      cursor: pointer;
+    }
+
+    .trending-item:last-child { border-bottom: none; }
+
+    .trending-item:hover {
+      background: rgba(146, 210, 255, 0.04);
+    }
+
+    .trending-thumb {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .trending-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .trending-body h4 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      transition: color var(--transition);
+    }
+
+    .trending-item:hover .trending-body h4 {
+      color: var(--accent-hover);
+    }
+
+    .trending-body span {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 72px 24px 32px;
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr repeat(3, 1fr);
+      gap: 48px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .footer-brand p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 16px;
+      max-width: 280px;
+      line-height: 1.65;
+    }
+
+    .footer-col h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-col a {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      transition: color var(--transition);
+    }
+
+    .footer-col a:hover { color: var(--text-primary); }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-top: 32px;
+    }
+
+    .footer-bottom p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 16px;
+    }
+
+    .footer-social a {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      transition: all var(--transition);
+    }
+
+    .footer-social a:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1100px) {
+      .hub {
+        grid-template-columns: 200px 1fr;
+      }
+
+      .hub-right {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .hub-right .widget { margin-bottom: 0; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: block; }
+
+      .hub {
+        grid-template-columns: 1fr;
+        padding-top: 24px;
+      }
+
+      .hub-left { display: none; }
+
+      .hub-right {
+        grid-template-columns: 1fr;
+      }
+
+      .news-row {
+        grid-template-columns: 100px minmax(0, 1fr);
+      }
+
+      .analysis-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-top {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .footer-top { grid-template-columns: 1fr; gap: 36px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+  
+    /* ── Article Page ── */
+    .article-wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: calc(var(--nav-height) + 40px) 24px 80px;
+    }
+
+    .article-breadcrumb {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .article-breadcrumb a {
+      color: var(--text-secondary);
+      transition: color var(--transition);
+    }
+
+    .article-breadcrumb a:hover { color: var(--accent); }
+
+    .article-hero {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 32px;
+      border: 1px solid var(--border-hover);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+    }
+
+    .article-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .article-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(146, 210, 255, 0.12);
+      border: 1px solid rgba(146, 210, 255, 0.25);
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .article-title {
+      font-size: clamp(2rem, 4vw, 2.75rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .article-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .article-meta strong { color: var(--text-secondary); }
+
+    .article-meta .dot {
+      width: 3px;
+      height: 3px;
+      background: var(--text-muted);
+      border-radius: 50%;
+    }
+
+    .article-body {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: var(--text-secondary);
+    }
+
+    .article-body p {
+      margin-bottom: 1.4em;
+    }
+
+    .article-body em {
+      color: var(--text-primary);
+      font-style: italic;
+    }
+
+    .article-body a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .article-body a:hover { color: var(--accent-hover); }
+
+    .article-footer-note {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+  </style>
+  <link rel="stylesheet" href="../../assets/score-ticker.css" />
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="../../index.html" class="logo">
+        <img src="../../assets/logo.png" alt="Robi Report" class="logo-img" />
+        Robi <span>Report</span>
+      </a>
+            <ul class="nav-links">
+        <li><a href="../../index.html">Home</a></li>
+        <li class="nav-item has-dropdown">
+                    <div class="nav-dropdown-trigger">
+            <a href="../../nba.html" class="nav-hub-link">NBA</a>
+            <button type="button" class="nav-dropdown-toggle" aria-expanded="false" aria-label="Toggle NBA menu"><span class="nav-chevron">▾</span></button>
+          </div>
+          <div class="nav-dropdown">
+            <a href="../../nba.html" class="dropdown-hub-link">NBA Hub →</a>
+            <div class="dropdown-grid dropdown-grid-2">
+              <div class="dropdown-group">
+                <h4 class="dropdown-heading">Eastern Conference</h4>
+                <div class="dropdown-divisions">
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">Atlantic</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Boston Celtics</a></li>
+                      <li><a href="#">Brooklyn Nets</a></li>
+                      <li><a href="#">New York Knicks</a></li>
+                      <li><a href="#">Philadelphia 76ers</a></li>
+                      <li><a href="#">Toronto Raptors</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">Central</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Chicago Bulls</a></li>
+                      <li><a href="#">Cleveland Cavaliers</a></li>
+                      <li><a href="#">Detroit Pistons</a></li>
+                      <li><a href="#">Indiana Pacers</a></li>
+                      <li><a href="#">Milwaukee Bucks</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">Southeast</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Atlanta Hawks</a></li>
+                      <li><a href="#">Charlotte Hornets</a></li>
+                      <li><a href="#">Miami Heat</a></li>
+                      <li><a href="#">Orlando Magic</a></li>
+                      <li><a href="#">Washington Wizards</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="dropdown-group">
+                <h4 class="dropdown-heading">Western Conference</h4>
+                <div class="dropdown-divisions">
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">Northwest</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Denver Nuggets</a></li>
+                      <li><a href="#">Minnesota Timberwolves</a></li>
+                      <li><a href="#">Oklahoma City Thunder</a></li>
+                      <li><a href="#">Portland Trail Blazers</a></li>
+                      <li><a href="#">Utah Jazz</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">Pacific</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Golden State Warriors</a></li>
+                      <li><a href="#">LA Clippers</a></li>
+                      <li><a href="#">Los Angeles Lakers</a></li>
+                      <li><a href="#">Phoenix Suns</a></li>
+                      <li><a href="#">Sacramento Kings</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">Southwest</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Dallas Mavericks</a></li>
+                      <li><a href="#">Houston Rockets</a></li>
+                      <li><a href="#">Memphis Grizzlies</a></li>
+                      <li><a href="#">New Orleans Pelicans</a></li>
+                      <li><a href="#">San Antonio Spurs</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+                <li class="nav-item has-dropdown">
+                    <div class="nav-dropdown-trigger">
+            <a href="../../wnba.html" class="nav-hub-link">WNBA</a>
+            <button type="button" class="nav-dropdown-toggle" aria-expanded="false" aria-label="Toggle WNBA menu"><span class="nav-chevron">▾</span></button>
+          </div>
+          <div class="nav-dropdown">
+            <a href="../../wnba.html" class="dropdown-hub-link">WNBA Hub →</a>
+            <ul class="dropdown-list compact">
+              <li><a href="#">Atlanta Dream</a></li>
+              <li><a href="#">Chicago Sky</a></li>
+              <li><a href="#">Connecticut Sun</a></li>
+              <li><a href="#">Dallas Wings</a></li>
+              <li><a href="#">Golden State Valkyries</a></li>
+              <li><a href="#">Indiana Fever</a></li>
+              <li><a href="#">Las Vegas Aces</a></li>
+              <li><a href="#">Los Angeles Sparks</a></li>
+              <li><a href="#">Minnesota Lynx</a></li>
+              <li><a href="#">New York Liberty</a></li>
+              <li><a href="#">Phoenix Mercury</a></li>
+              <li><a href="#">Portland Fire</a></li>
+              <li><a href="#">Seattle Storm</a></li>
+              <li><a href="#">Toronto Tempo</a></li>
+              <li><a href="#">Washington Mystics</a></li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item has-dropdown">
+                    <div class="nav-dropdown-trigger">
+            <a href="../../nfl.html" class="nav-hub-link" active>NFL</a>
+            <button type="button" class="nav-dropdown-toggle" aria-expanded="false" aria-label="Toggle NFL menu"><span class="nav-chevron">▾</span></button>
+          </div>
+          <div class="nav-dropdown">
+            <a href="../../nfl.html" class="dropdown-hub-link">NFL Hub →</a>
+            <div class="dropdown-grid dropdown-grid-2">
+              <div class="dropdown-group">
+                <h4 class="dropdown-heading">AFC</h4>
+                <div class="dropdown-divisions">
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">East</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Buffalo Bills</a></li>
+                      <li><a href="#">Miami Dolphins</a></li>
+                      <li><a href="#">New England Patriots</a></li>
+                      <li><a href="#">New York Jets</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">North</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Baltimore Ravens</a></li>
+                      <li><a href="#">Cincinnati Bengals</a></li>
+                      <li><a href="#">Cleveland Browns</a></li>
+                      <li><a href="#">Pittsburgh Steelers</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">South</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Houston Texans</a></li>
+                      <li><a href="#">Indianapolis Colts</a></li>
+                      <li><a href="#">Jacksonville Jaguars</a></li>
+                      <li><a href="#">Tennessee Titans</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">West</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Denver Broncos</a></li>
+                      <li><a href="#">Kansas City Chiefs</a></li>
+                      <li><a href="#">Las Vegas Raiders</a></li>
+                      <li><a href="#">Los Angeles Chargers</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="dropdown-group">
+                <h4 class="dropdown-heading">NFC</h4>
+                <div class="dropdown-divisions">
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">East</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Dallas Cowboys</a></li>
+                      <li><a href="#">New York Giants</a></li>
+                      <li><a href="#">Philadelphia Eagles</a></li>
+                      <li><a href="#">Washington Commanders</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">North</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Chicago Bears</a></li>
+                      <li><a href="#">Detroit Lions</a></li>
+                      <li><a href="#">Green Bay Packers</a></li>
+                      <li><a href="#">Minnesota Vikings</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">South</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Atlanta Falcons</a></li>
+                      <li><a href="#">Carolina Panthers</a></li>
+                      <li><a href="#">New Orleans Saints</a></li>
+                      <li><a href="#">Tampa Bay Buccaneers</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">West</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Arizona Cardinals</a></li>
+                      <li><a href="#">Los Angeles Rams</a></li>
+                      <li><a href="#">San Francisco 49ers</a></li>
+                      <li><a href="#">Seattle Seahawks</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li><a href="../../ufc.html">UFC</a></li>
+        <li><a href="../../boxing.html">Boxing</a></li>
+        <li class="nav-item has-dropdown">
+                    <div class="nav-dropdown-trigger">
+            <a href="../../soccer.html" class="nav-hub-link">Soccer</a>
+            <button type="button" class="nav-dropdown-toggle" aria-expanded="false" aria-label="Toggle Soccer menu"><span class="nav-chevron">▾</span></button>
+          </div>
+          <div class="nav-dropdown">
+            <a href="../../soccer.html" class="dropdown-hub-link">Soccer Hub →</a>
+            <ul class="dropdown-list single-col">
+              <li><a href="#">Premier League</a></li>
+              <li><a href="#">La Liga</a></li>
+              <li><a href="#">Serie A</a></li>
+              <li><a href="#">Bundesliga</a></li>
+              <li><a href="#">Ligue 1</a></li>
+              <li><a href="#">MLS</a></li>
+              <li><a href="#">UEFA Champions League</a></li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item has-dropdown">
+                    <div class="nav-dropdown-trigger">
+            <a href="../../mlb.html" class="nav-hub-link">MLB</a>
+            <button type="button" class="nav-dropdown-toggle" aria-expanded="false" aria-label="Toggle MLB menu"><span class="nav-chevron">▾</span></button>
+          </div>
+          <div class="nav-dropdown">
+            <a href="../../mlb.html" class="dropdown-hub-link">MLB Hub →</a>
+            <div class="dropdown-grid dropdown-grid-2">
+              <div class="dropdown-group">
+                <h4 class="dropdown-heading">American League</h4>
+                <div class="dropdown-divisions">
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">East</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Baltimore Orioles</a></li>
+                      <li><a href="#">Boston Red Sox</a></li>
+                      <li><a href="#">New York Yankees</a></li>
+                      <li><a href="#">Tampa Bay Rays</a></li>
+                      <li><a href="#">Toronto Blue Jays</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">Central</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Chicago White Sox</a></li>
+                      <li><a href="#">Cleveland Guardians</a></li>
+                      <li><a href="#">Detroit Tigers</a></li>
+                      <li><a href="#">Kansas City Royals</a></li>
+                      <li><a href="#">Minnesota Twins</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">West</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Houston Astros</a></li>
+                      <li><a href="#">Los Angeles Angels</a></li>
+                      <li><a href="#">Oakland Athletics</a></li>
+                      <li><a href="#">Seattle Mariners</a></li>
+                      <li><a href="#">Texas Rangers</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="dropdown-group">
+                <h4 class="dropdown-heading">National League</h4>
+                <div class="dropdown-divisions">
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">East</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Atlanta Braves</a></li>
+                      <li><a href="#">Miami Marlins</a></li>
+                      <li><a href="#">New York Mets</a></li>
+                      <li><a href="#">Philadelphia Phillies</a></li>
+                      <li><a href="#">Washington Nationals</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">Central</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Chicago Cubs</a></li>
+                      <li><a href="#">Cincinnati Reds</a></li>
+                      <li><a href="#">Milwaukee Brewers</a></li>
+                      <li><a href="#">Pittsburgh Pirates</a></li>
+                      <li><a href="#">St. Louis Cardinals</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown-division">
+                    <span class="dropdown-subheading">West</span>
+                    <ul class="dropdown-list">
+                      <li><a href="#">Arizona Diamondbacks</a></li>
+                      <li><a href="#">Colorado Rockies</a></li>
+                      <li><a href="#">Los Angeles Dodgers</a></li>
+                      <li><a href="#">San Diego Padres</a></li>
+                      <li><a href="#">San Francisco Giants</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li><a href="../../standard-of-greatness.html"><span class="nav-sog-full">Standard of Greatness</span><span class="nav-sog-short">SOG</span></a></li>
+        <li><a href="../../about.html">About</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="https://www.youtube.com/@RobiReportt?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Subscribe</a>
+        <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+
+    <main class="article-wrap">
+    <nav class="article-breadcrumb" aria-label="Breadcrumb">
+      <a href="../../index.html">Home</a> / <a href="../../nfl.html">NFL</a> / Opinion
+    </nav>
+      <span class="article-tag">Opinion · NFL</span>
+      <h1 class="article-title">Opinion: 2023 NFL Draft Winners and Losers</h1>
+      <div class="article-meta">
+        <strong>Matthew Robi</strong>
+        <span class="dot"></span>
+        <time datetime="2023-05-03">May 03, 2023</time>
+        <span class="dot"></span>
+        <span>4 min read</span>
+      </div>
+      <figure class="article-hero">
+        <img src="https://static.wixstatic.com/media/5535a3_1241fbf8c7d64640adbdc6b57b89d056~mv2.jpg/v1/fill/w_1200,h_630,al_c,q_90/5535a3_1241fbf8c7d64640adbdc6b57b89d056~mv2.jpg" alt="Opinion: 2023 NFL Draft Winners and Losers" />
+      </figure>
+      <div class="article-body">
+        <p>Texans: The Texans had one of the most aggressive first rounds I have ever seen.</p>
+        <p>After all the smoke about Houston not wanting to take a quarterback, they took the dynamic C.J.</p>
+        <p>Stroud 2nd overall out of Ohio State.</p>
+        <p>And just minutes later we saw the Texans logo back on our screens as they pulled off a trade with the Cardinals to get back to 3rd overall, and selected the most promising defensive player in the draft, Will Anderson Jr.</p>
+        <p>Adding the likes of Stroud and Anderson makes them winners coming out of the draft.</p>
+        <p>Eagles: The Philadelphia Eagles have done it again.</p>
+        <p>General Manager Howie Roseman has shown a penchant for taking Georgia defenders in the past two drafts, getting a haul of Jalen Carter, Nolan Smith, and Kelee Ringo.</p>
+        <p>Any reasonable GM should be keeping an eye out for the athletes that have been a part of the championship Georgia defenses from the past few seasons.</p>
+        <p>Other than the Georgia players, the Eagles selected great value with Tyler Steen, Sydney Brown, Tanner McKee, and Moro Ojomo.</p>
+        <p>The Eagles further solidify themselves as the class of the NFC.</p>
+        <p>Colts: While the Texans and Eagles caught all of the headlines, I believe that the Colts had the best draft class in 2023.</p>
+        <p>Anthony Richardson is an incredibly polarizing prospect, some experts believe he will flop, and others are predicting he may be the best quarterback in the league in five years.</p>
+        <p>I personally believe in the latter, if the Colts develop him correctly.</p>
+        <p>However, AR should under no circumstances play a snap this season, he is not yet ready.</p>
+        <p>That is why the Colts selecting him was surprising, the media believed that Levis was the surefire pick for the Colts, but to win the Quarterback lottery, one must buy a ticket.</p>
+        <p>Additionally, Julius Brents, Josh Downs, Adetomiwa Adeboware, and Darius Rush are all incredible and likely instant starters for the Colts.</p>
+        <p>An incredible haul for the Colts.</p>
+        <p>Seahawks: The past two draft classes for Pete Carroll and John Schnieder have reflected a shift to the best player available philosophy.</p>
+        <p>While fans were clamoring for defensive line help in the first round, the way the board fell, the Seahawks made great selections.</p>
+        <p>Devon Witherspoon and Jaxon Smith-Njigba are soon-to-be starters and contributors.</p>
+        <p>While many decried the selection of running back Zach Charbonnet out of UCLA in the second round, he is a fantastic player.</p>
+        <p>They further bolstered their running back room with Kenny McIntosh in the 7th round.</p>
+        <p>The other theme of the Seahawks draft class is character.</p>
+        <p>Derrick Hall was Auburn&#x27;s captain that kept the team together through a tumultuous 2022, Olusegun Oluwatimi was the leader of the potent Michigan running game.</p>
+        <p>Kirby Smart called Kenny McIntosh a BAMF.</p>
+        <p>With Russell Wilson having been gone for a full season now, the Seattle Seahawks have continued to lay the foundation for the team&#x27;s future.</p>
+        <p>Lions: Sometimes teams are able to take advantage of the draft board, while others get taken advantage of by the draft board.</p>
+        <p>After Devon Witherspoon was selected one pick before the Lions, they were forced to trade down for a low return.</p>
+        <p>Jahmyr Gibbs is an incredible player and will be a fantastic pro, but in a deep running back class, it is hard to sell selecting one with the 12th overall pick after having already signed David Montgomery.</p>
+        <p>Jack Campbell is a stiff off-ball linebacker, otherwise known as a dying breed in the modern NFL.</p>
+        <p>Hendon Hooker is coming off an ACL injury and is 25 years old.</p>
+        <p>That is 3 years younger than Jared Goff!</p>
+        <p>The Lions came into this draft with a great deal of capital and a chance to expand on their 2022 season.</p>
+        <p>The Detroit Lions meowed rather than roared. 49ers: The 49ers were once again unable to escape the NFC Championship.</p>
+        <p>With another year of their core getting older and more expensive, the 49ers need to maximize their limited draft capital.</p>
+        <p>They did the opposite.</p>
+        <p>The 49ers took a kicker in the 3rd round.</p>
+        <p>Ji&#x27;Ayir Brown is a stud safety, but other than that, their draft class screams &quot;Just Another Guy&quot;.</p>
+        <p>The 49ers lost their starting right tackle and they did not select an offensive lineman.</p>
+        <p>The quest for six will not be completed with a draft class like this.</p>
+        <p>Will Levis: Day 1 of the NFL draft had to be the worst night of Will Levis&#x27; life.</p>
+        <p>After long being projected to the Colts at 4th overall, he fell out of the first round.</p>
+        <p>Everyone got this one wrong.</p>
+        <p>His reactions throughout the night with the ESPN and NFL Network cameras pointing at him were painful to watch.</p>
+        <p>What one insider said was that when a player unexpectedly falls as Levis did, teams start second-guessing their evaluations and convince themselves not to take him.</p>
+        <p>I am certain 20+ teams had a first-round grade on Levis.</p>
+        <p>But his fall became a self-perpetuating cycle.</p>
+        <p>While the media got his draft projection wrong, they did not get his talent wrong.</p>
+        <p>Will Levis will be a good NFL quarterback in Tennessee.</p>
+        <p>Reach reporter Robert Jokinen at robbyjokinen@msn.com .</p>
+        <p>Twitter: @westcoastdraft .</p>
+      </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="../../index.html" class="logo">
+            <img src="../../assets/logo.png" alt="Robi Report" class="logo-img" />
+            Robi <span>Report</span>
+          </a>
+          <p>Independent sports and media coverage. Built for fans who want more than the box score.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Content</h4>
+          <ul>
+            <li><a href="#">Latest News</a></li>
+            <li><a href="#">Analysis</a></li>
+            <li><a href="#">Podcasts</a></li>
+            <li><a href="#">Video</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Leagues</h4>
+          <ul>
+            <li><a href="../../nfl.html">NFL</a></li>
+            <li><a href="../../nba.html">NBA</a></li>
+            <li><a href="../../wnba.html">WNBA</a></li>
+            <li><a href="../../mlb.html">MLB</a></li>
+            <li><a href="../../soccer.html">Soccer</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Advertise</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Robi Report. All rights reserved.</p>
+        <div class="footer-social">
+          <a href="https://x.com/RobiReport" target="_blank" rel="noopener noreferrer" aria-label="Twitter">X</a>
+          <a href="https://www.instagram.com/robireport/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">Ig</a>
+          <a href="https://www.youtube.com/@RobiReportt" target="_blank" rel="noopener noreferrer" aria-label="YouTube">Yt</a>
+          <a href="https://www.tiktok.com/@robireport" target="_blank" rel="noopener noreferrer" aria-label="TikTok">Tk</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<script>
+    (function () {
+      const nav = document.querySelector('.nav');
+      const toggle = document.querySelector('.nav-toggle');
+      const dropdownItems = document.querySelectorAll('.nav-item.has-dropdown');
+
+      if (toggle && nav) {
+        toggle.addEventListener('click', () => {
+          nav.classList.toggle('nav-open');
+          toggle.setAttribute('aria-expanded', nav.classList.contains('nav-open'));
+        });
+      }
+
+      dropdownItems.forEach((item) => {
+        const toggle = item.querySelector('.nav-dropdown-toggle');
+        if (!toggle) return;
+        let closeTimer = null;
+
+        const openDropdown = () => {
+          if (window.innerWidth <= 900) return;
+          clearTimeout(closeTimer);
+          dropdownItems.forEach((i) => {
+            if (i !== item) {
+              i.classList.remove('open');
+              const t = i.querySelector('.nav-dropdown-toggle');
+              if (t) t.setAttribute('aria-expanded', 'false');
+            }
+          });
+          item.classList.add('open');
+          toggle.setAttribute('aria-expanded', 'true');
+        };
+
+        const scheduleClose = () => {
+          if (window.innerWidth <= 900) return;
+          clearTimeout(closeTimer);
+          closeTimer = setTimeout(() => {
+            item.classList.remove('open');
+            toggle.setAttribute('aria-expanded', 'false');
+          }, 200);
+        };
+
+        toggle.addEventListener('click', (e) => {
+          if (window.innerWidth > 900) return;
+          e.preventDefault();
+          e.stopPropagation();
+          clearTimeout(closeTimer);
+          const isOpen = item.classList.contains('open');
+          dropdownItems.forEach((i) => i.classList.remove('open'));
+          if (!isOpen) item.classList.add('open');
+          toggle.setAttribute('aria-expanded', String(!isOpen));
+        });
+
+        item.addEventListener('mouseenter', openDropdown);
+        item.addEventListener('mouseleave', scheduleClose);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-item.has-dropdown')) {
+          dropdownItems.forEach((i) => {
+            i.classList.remove('open');
+            const t = i.querySelector('.nav-dropdown-toggle');
+            if (t) t.setAttribute('aria-expanded', 'false');
+          });
+        }
+      });
+    })();
+  </script>
+</body>
+
+</body>
+</html>

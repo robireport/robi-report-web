@@ -1,0 +1,135 @@
+/* ── Articles feed (shared) ── */
+.articles-feed-header {
+  margin-bottom: 32px;
+}
+
+.articles-feed-header h2 {
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.hub-center .articles-feed-header {
+  margin-bottom: 28px;
+}
+
+.featured.articles-feed .articles-feed-header {
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 40px;
+}
+
+.articles-feed-grid {
+  margin-bottom: 48px;
+}
+
+/* ── Articles empty state (fallback) ── */
+.articles-empty {
+  width: 100%;
+}
+
+.articles-empty-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-lg);
+  padding: clamp(32px, 5vw, 56px);
+  text-align: center;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+}
+
+.articles-empty-card h3 {
+  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+  color: var(--text-primary);
+}
+
+.articles-empty-card p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 560px;
+  margin: 0 auto 28px;
+}
+
+.articles-empty-card .btn {
+  display: inline-flex;
+}
+
+.featured.articles-feed {
+  padding-top: 80px;
+}
+
+.featured.articles-feed .articles-empty {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.hub-center .articles-empty {
+  min-height: 280px;
+}
+
+@media (max-width: 640px) {
+  .articles-empty-card {
+    padding: 28px 20px;
+  }
+}
+
+/* ── Article card layout (hub news rows + feed cards) ── */
+.news-row {
+  display: block;
+}
+
+.news-row-link {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 16px;
+  width: 100%;
+  color: inherit;
+}
+
+.news-row-thumb {
+  flex-shrink: 0;
+}
+
+.news-row-body {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.news-row-body h3,
+.news-row-body p {
+  max-width: none;
+}
+
+.news-row-meta {
+  white-space: nowrap;
+}
+
+.card-body {
+  min-width: 0;
+  width: 100%;
+}
+
+.card-meta {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.card-body h3,
+.card-body p {
+  max-width: none;
+}
+
+@media (max-width: 768px) {
+  .news-row-link {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+}
