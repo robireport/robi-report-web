@@ -927,9 +927,6 @@
     }
 
     @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .nav-toggle { display: block; }
-
       .hub {
         grid-template-columns: 1fr;
         padding-top: 24px;
@@ -1071,6 +1068,7 @@
 
   </style>
   <link rel="stylesheet" href="../../assets/score-ticker.css" />
+  <link rel="stylesheet" href="../../assets/nav-mobile.css" />
 </head>
 <body>
 
@@ -1386,17 +1384,20 @@
         </li>
         <li><a href="../../standard-of-greatness.html"><span class="nav-sog-full">Standard of Greatness</span><span class="nav-sog-short">SOG</span></a></li>
         <li><a href="../../about.html">About</a></li>
+        <li class="nav-mobile-subscribe"><a href="https://www.youtube.com/@RobiReportt?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn btn-primary nav-mobile-subscribe-btn">Subscribe</a></li>
       </ul>
       <div class="nav-actions">
         <a href="https://www.youtube.com/@RobiReportt?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Subscribe</a>
-        <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <button type="button" class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+          <span class="nav-toggle-bar" aria-hidden="true">&#9776;</span>
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
       </div>
     </div>
   </nav>
+  <div class="nav-mobile-backdrop" aria-hidden="true"></div>
 
 
     <main class="article-wrap">
@@ -1523,20 +1524,13 @@
       const toggle = document.querySelector('.nav-toggle');
       const dropdownItems = document.querySelectorAll('.nav-item.has-dropdown');
 
-      if (toggle && nav) {
-        toggle.addEventListener('click', () => {
-          nav.classList.toggle('nav-open');
-          toggle.setAttribute('aria-expanded', nav.classList.contains('nav-open'));
-        });
-      }
-
       dropdownItems.forEach((item) => {
         const toggle = item.querySelector('.nav-dropdown-toggle');
         if (!toggle) return;
         let closeTimer = null;
 
         const openDropdown = () => {
-          if (window.innerWidth <= 900) return;
+          if (window.innerWidth <= 768) return;
           clearTimeout(closeTimer);
           dropdownItems.forEach((i) => {
             if (i !== item) {
@@ -1550,24 +1544,13 @@
         };
 
         const scheduleClose = () => {
-          if (window.innerWidth <= 900) return;
+          if (window.innerWidth <= 768) return;
           clearTimeout(closeTimer);
           closeTimer = setTimeout(() => {
             item.classList.remove('open');
             toggle.setAttribute('aria-expanded', 'false');
           }, 200);
         };
-
-        toggle.addEventListener('click', (e) => {
-          if (window.innerWidth > 900) return;
-          e.preventDefault();
-          e.stopPropagation();
-          clearTimeout(closeTimer);
-          const isOpen = item.classList.contains('open');
-          dropdownItems.forEach((i) => i.classList.remove('open'));
-          if (!isOpen) item.classList.add('open');
-          toggle.setAttribute('aria-expanded', String(!isOpen));
-        });
 
         item.addEventListener('mouseenter', openDropdown);
         item.addEventListener('mouseleave', scheduleClose);
@@ -1584,6 +1567,7 @@
       });
     })();
   </script>
+  <script src="../../assets/nav-mobile.js"></script>
 </body>
 
 </body>
