@@ -233,6 +233,21 @@
   display: block;
 }
 
+.form-error {
+  display: none;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.form-error.is-visible {
+  display: block;
+}
+
 .contact-form .btn-primary {
   align-self: flex-start;
   margin-top: 4px;

@@ -814,7 +814,14 @@
         <div class="form-success" id="form-success" role="status">
           Thanks for reaching out! We'll be in touch soon.
         </div>
-        <form class="contact-form" id="contact-form" novalidate>
+        <div class="form-error" id="form-error" role="alert"></div>
+        <form
+          class="contact-form"
+          id="contact-form"
+          action="https://formspree.io/f/matthew.robi@robireport.com"
+          method="POST"
+        >
+          <input type="hidden" name="_subject" value="Robi Report — Contact form" />
           <div class="form-row">
             <label for="contact-name">Name</label>
             <input type="text" id="contact-name" name="name" required autocomplete="name" placeholder="Your name" />
@@ -895,24 +902,7 @@
     </div>
   </footer>
 
-  
-  <script>
-    (function () {
-      const form = document.getElementById('contact-form');
-      const success = document.getElementById('form-success');
-      if (!form) return;
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (!form.checkValidity()) {
-          form.reportValidity();
-          return;
-        }
-        form.reset();
-        if (success) success.classList.add('is-visible');
-      });
-    })();
-  </script>
-
+  <script src="assets/contact-form.js"></script>
   <script src="assets/nav-mobile.js"></script>
   <script src="assets/score-ticker.js"></script>
 </body>
