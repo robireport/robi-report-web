@@ -9,7 +9,6 @@
 }
 
 @media (max-width: 768px) {
-  /* backdrop-filter on .nav creates a containing block that clips fixed children */
   .nav {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -102,73 +101,6 @@
     width: 100%;
     padding: 14px 0;
     font-size: 1rem;
-  }
-
-  .nav-dropdown-trigger {
-    display: flex;
-    width: 100%;
-    padding: 14px 0 8px;
-    font-size: 1rem;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .nav-dropdown-toggle {
-    display: none;
-  }
-
-  .nav-hub-link.active::after {
-    display: none;
-  }
-
-  .nav-dropdown::before {
-    display: none;
-  }
-
-  .nav-dropdown {
-    position: static;
-    transform: none;
-    min-width: 0;
-    max-width: none;
-    width: 100%;
-    padding: 0 0 12px 12px;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    display: block;
-  }
-
-  .nav-item.has-dropdown:hover .nav-dropdown {
-    transform: none;
-  }
-
-  .dropdown-grid,
-  .dropdown-grid-2 {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .dropdown-list.compact {
-    grid-template-columns: 1fr;
-  }
-
-  .dropdown-heading {
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-  }
-
-  .dropdown-list a {
-    padding: 8px 10px;
-    font-size: 0.875rem;
-  }
-
-  .dropdown-hub-link {
-    margin-bottom: 10px;
-    padding-bottom: 8px;
   }
 
   .nav-mobile-subscribe {

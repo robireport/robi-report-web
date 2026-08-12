@@ -11,7 +11,6 @@
   var navInner = nav && nav.querySelector('.nav-inner');
   var navActions = nav && nav.querySelector('.nav-actions');
   var navLinks = nav && nav.querySelector('.nav-links');
-  var dropdownItems = document.querySelectorAll('.nav-item.has-dropdown');
 
   if (!nav || !toggle || !navLinks || !navInner || !navActions) return;
 
@@ -44,11 +43,6 @@
     }
     document.body.classList.remove('nav-menu-open');
     restoreMenuPanel();
-    dropdownItems.forEach(function (item) {
-      item.classList.remove('open');
-      var t = item.querySelector('.nav-dropdown-toggle');
-      if (t) t.setAttribute('aria-expanded', 'false');
-    });
   }
 
   function openNav() {
