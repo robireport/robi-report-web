@@ -16,6 +16,11 @@
     var defaultLabel = submitBtn ? submitBtn.textContent : '';
     var topicField = form.querySelector('[name="topic"]');
     var subjectField = form.querySelector('[name="_subject"]');
+    var honeyField = form.querySelector('[name="_honey"]');
+
+    if (honeyField && honeyField.value) {
+      return;
+    }
 
     if (topicField && subjectField) {
       var topicLabel = topicField.options[topicField.selectedIndex];
@@ -30,17 +35,32 @@
       submitBtn.textContent = 'Sending…';
     }
 
+    var payload = {
+      name: form.querySelector('[name="name"]').value,
+      email: form.querySelector('[name="email"]').value,
+      topic: form.querySelector('[name="topic"]').value,
+      message: form.querySelector('[name="message"]').value,
+      _subject: subjectField ? subjectField.value : 'Robi Report — Contact form',
+      _template: 'table',
+    };
+
     fetch(form.action, {
       method: 'POST',
-      body: new FormData(form),
-      headers: { Accept: 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(payload),
     })
       .then(function (response) {
-        if (!response.ok) {
-          return response.json().then(function (data) {
-            throw new Error(data.error || 'Unable to send message. Please try again.');
-          });
-        }
+        return response.json().then(function (data) {
+          if (!response.ok) {
+            throw new Error(data.message || 'Unable to send message. Please try again.');
+          }
+          return data;
+        });
+      })
+      .then(function () {
         form.reset();
         if (success) success.classList.add('is-visible');
       })
