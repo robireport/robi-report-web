@@ -380,6 +380,46 @@
       margin-bottom: 64px;
     }
 
+    /* ── Browse by League ── */
+    .league-nav {
+      padding: 56px 24px 0;
+      background: var(--bg-primary);
+    }
+
+    .league-nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .league-nav h2 {
+      font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .league-nav-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .league-pill {
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+
+    .league-pill:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
     .stat-item strong {
       display: block;
       font-size: 1.75rem;
@@ -847,6 +887,22 @@
     </div>
   </section>
 
+  <!-- Browse by League -->
+  <section class="league-nav" id="browse-leagues" aria-labelledby="browse-leagues-heading">
+    <div class="league-nav-inner">
+      <h2 id="browse-leagues-heading">Browse by League</h2>
+      <nav class="league-nav-pills" aria-label="Sports league hubs">
+        <a href="nba.html" class="league-pill">NBA</a>
+        <a href="wnba.html" class="league-pill">WNBA</a>
+        <a href="nfl.html" class="league-pill">NFL</a>
+        <a href="ufc.html" class="league-pill">UFC</a>
+        <a href="boxing.html" class="league-pill">Boxing</a>
+        <a href="soccer.html" class="league-pill">Soccer</a>
+        <a href="mlb.html" class="league-pill">MLB</a>
+      </nav>
+    </div>
+  </section>
+
   <!-- Featured Content -->
   <section class="featured articles-feed" id="latest-articles">
     <div class="articles-feed-header">
@@ -1204,6 +1260,8 @@
             <li><a href="wnba.html">WNBA</a></li>
             <li><a href="mlb.html">MLB</a></li>
             <li><a href="soccer.html">Soccer</a></li>
+            <li><a href="ufc.html">UFC</a></li>
+            <li><a href="boxing.html">Boxing</a></li>
           </ul>
         </div>
         <div class="footer-col">
