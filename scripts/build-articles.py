@@ -5,7 +5,13 @@ from __future__ import annotations
 
 import sys
 
-from article_lib import ROOT, iter_source_articles, sync_all_articles, sync_article
+from article_lib import (
+    ROOT,
+    iter_source_articles,
+    sync_all_articles,
+    sync_article,
+    write_redirect_map,
+)
 
 
 def main() -> int:
@@ -34,6 +40,9 @@ def main() -> int:
 
     for path in synced:
         print(f'Synced {path.relative_to(ROOT).as_posix()}')
+
+    redirects_path = write_redirect_map()
+    print(f'Wrote {redirects_path.relative_to(ROOT).as_posix()}')
 
     print(f'Done. {len(synced)} index file(s) updated.')
     return 0

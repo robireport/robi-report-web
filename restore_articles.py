@@ -10,7 +10,7 @@ ARTICLES_DIR = ROOT / 'articles'
 SCRIPTS = ROOT / 'scripts'
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
-from article_lib import is_source_article, sync_all_articles
+from article_lib import is_source_article, sync_all_articles, write_redirect_map
 
 HUBS = {
     'nba.html': 'nba',
@@ -344,6 +344,9 @@ def main() -> None:
 
     synced = sync_all_articles()
     print(f'Synced {len(synced)} article index file(s) for GitHub Pages')
+
+    redirects_path = write_redirect_map()
+    print(f'Updated {redirects_path.relative_to(ROOT).as_posix()}')
 
     print('Done.')
 
