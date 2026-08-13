@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redirecting — Robi Report</title>
+  <script>
+    (function () {
+      var loc = window.location;
+      var path = loc.pathname;
+
+      if (path.length > 1 && path.endsWith('/')) {
+        path = path.slice(0, -1);
+      }
+
+      var segment = path.split('/').pop() || '';
+      if (segment && segment.indexOf('.') === -1) {
+        loc.replace(path + '.html' + loc.search + loc.hash);
+        return;
+      }
+
+      if (path.indexOf('/post/') !== -1) {
+        loc.replace('/' + loc.search + loc.hash);
+        return;
+      }
+
+      loc.replace('/' + loc.search + loc.hash);
+    })();
+  </script>
+  <meta http-equiv="refresh" content="0;url=/" />
+</head>
+<body>
+  <p>Redirecting… <a href="/">Go to Robi Report</a></p>
+</body>
+</html>

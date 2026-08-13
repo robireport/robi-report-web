@@ -1,0 +1,10 @@
+{
+  "name": "robi-report-web",
+  "private": true,
+  "description": "Robi Report static site",
+  "scripts": {
+    "build:articles": "python scripts/build-articles.py",
+    "build": "python scripts/build-articles.py",
+    "new-article": "python scripts/new-article.py"
+  }
+}

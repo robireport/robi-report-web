@@ -2,10 +2,15 @@
 """Restore real article feeds from articles/ HTML files."""
 import html
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
 ARTICLES_DIR = ROOT / 'articles'
+SCRIPTS = ROOT / 'scripts'
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+from article_lib import is_source_article, sync_all_articles
 
 HUBS = {
     'nba.html': 'nba',
@@ -315,8 +320,8 @@ def main() -> None:
     all_articles: dict[str, dict] = {}
     by_sport: dict[str, list[dict]] = {}
 
-    for path in sorted(ARTICLES_DIR.rglob('*.html')):
-        if path.name == 'template.html':
+    for path in sorted(ARTICLES_DIR.glob('*/*.html')):
+        if not is_source_article(path):
             continue
         article = parse_article(path)
         all_articles[article['rel']] = article
@@ -336,6 +341,9 @@ def main() -> None:
 
     patch_sog(all_articles)
     print('Restored standard-of-greatness.html article grid')
+
+    synced = sync_all_articles()
+    print(f'Synced {len(synced)} article index file(s) for GitHub Pages')
 
     print('Done.')
 
