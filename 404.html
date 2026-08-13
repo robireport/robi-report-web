@@ -3,27 +3,52 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Page not found — Robi Report</title>
+  <title>Robi Report</title>
   <style>
-    body {
+    html, body {
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
       background: #000;
       color: #fff;
       font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
       padding: 24px;
     }
-    .wrap { max-width: 520px; text-align: center; }
-    h1 { font-size: 1.5rem; margin: 0 0 12px; }
-    p { color: #a1a1aa; line-height: 1.6; margin: 0 0 20px; }
-    a {
+
+    #not-found {
+      display: none;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    html.show-not-found #not-found {
+      display: block;
+    }
+
+    #not-found h1 {
+      font-size: 1.5rem;
+      margin: 0 0 12px;
+    }
+
+    #not-found p {
+      color: #a1a1aa;
+      line-height: 1.6;
+      margin: 0 0 20px;
+    }
+
+    #not-found a {
       color: #92d2ff;
       text-decoration: none;
       font-weight: 600;
     }
-    a:hover { text-decoration: underline; }
+
+    #not-found a:hover {
+      text-decoration: underline;
+    }
   </style>
   <script>
     (function () {
@@ -41,8 +66,7 @@
         loc.replace(target + loc.search + loc.hash);
       }
 
-      function tryRedirectMap(redirects) {
-        var path = normalizePath(loc.pathname);
+      function tryRedirectMap(redirects, path) {
         if (redirects[path]) {
           redirectTo(redirects[path]);
           return true;
@@ -54,36 +78,48 @@
         return false;
       }
 
-      function fallbackRedirect() {
-        var path = normalizePath(loc.pathname);
-        var segment = path.split('/').pop() || '';
+      function loadRedirects() {
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', '/assets/article-redirects.json', false);
+          xhr.send(null);
+          if (xhr.status >= 200 && xhr.status < 300) {
+            return JSON.parse(xhr.responseText);
+          }
+        } catch (error) {
+          /* fall through */
+        }
+        return {};
+      }
 
+      function showNotFound() {
+        document.documentElement.classList.add('show-not-found');
+        document.title = 'Page not found — Robi Report';
+      }
+
+      function resolve() {
+        var path = normalizePath(loc.pathname);
+        var redirects = loadRedirects();
+
+        if (tryRedirectMap(redirects, path)) {
+          return;
+        }
+
+        var segment = path.split('/').pop() || '';
         if (segment && segment.indexOf('.') === -1) {
           redirectTo(path + '.html');
           return;
         }
 
-        document.title = 'Page not found — Robi Report';
+        showNotFound();
       }
 
-      fetch('/assets/article-redirects.json', { cache: 'no-store' })
-        .then(function (response) {
-          if (!response.ok) throw new Error('redirect map unavailable');
-          return response.json();
-        })
-        .then(function (redirects) {
-          if (!tryRedirectMap(redirects)) {
-            fallbackRedirect();
-          }
-        })
-        .catch(function () {
-          fallbackRedirect();
-        });
+      resolve();
     })();
   </script>
 </head>
 <body>
-  <div class="wrap">
+  <div id="not-found">
     <h1>Page not found</h1>
     <p>That link may be outdated. Try the homepage or search for the story there.</p>
     <p><a href="/">Back to Robi Report</a></p>
