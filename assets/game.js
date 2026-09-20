@@ -123,7 +123,19 @@
     return { indices, labels: filtered.length ? filtered : labels.slice(0, 11) };
   }
 
-  function renderPlayerTable(statBlock, preferBasketball) {
+  function renderPlayerName(row, linkPlayers) {
+    const name = row.athlete?.displayName || row.athlete?.shortName || '—';
+    const athleteId = row.athlete?.id;
+
+    if (!linkPlayers || !athleteId || name === '—') {
+      return escapeHtml(name);
+    }
+
+    const href = `player.html?id=${encodeURIComponent(athleteId)}&gameId=${encodeURIComponent(gameId)}&sport=${encodeURIComponent(sport)}`;
+    return `<a href="${escapeHtml(href)}" class="player-profile-link">${escapeHtml(name)}</a>`;
+  }
+
+  function renderPlayerTable(statBlock, preferBasketball, linkPlayers) {
     const labels = statBlock.labels || statBlock.names || [];
     const athletes = statBlock.athletes || [];
     if (!athletes.length) return '';
@@ -144,11 +156,10 @@
     function renderRows(rows) {
       return rows
         .map((row) => {
-          const name = row.athlete?.displayName || row.athlete?.shortName || '—';
           let stats = row.stats || [];
           if (colFilter) stats = colFilter.map((i) => stats[i] ?? '—');
           const cells = stats.map((v) => `<td>${escapeHtml(v)}</td>`).join('');
-          return `<tr><td class="player-name">${escapeHtml(name)}</td>${cells}</tr>`;
+          return `<tr><td class="player-name">${renderPlayerName(row, linkPlayers)}</td>${cells}</tr>`;
         })
         .join('');
     }
@@ -168,9 +179,8 @@
     if (dnp.length) {
       html += dnp
         .map((row) => {
-          const name = row.athlete?.displayName || '—';
           const reason = row.reason?.shortName || row.reason?.description || 'DNP';
-          return `<tr><td class="player-name dnp" colspan="${displayLabels.length + 1}">${escapeHtml(name)} — ${escapeHtml(reason)}</td></tr>`;
+          return `<tr><td class="player-name dnp" colspan="${displayLabels.length + 1}">${renderPlayerName(row, linkPlayers)} — ${escapeHtml(reason)}</td></tr>`;
         })
         .join('');
     }
@@ -179,7 +189,7 @@
     return html;
   }
 
-  function renderTeamBoxscore(teamGroup, preferBasketball) {
+  function renderTeamBoxscore(teamGroup, preferBasketball, linkPlayers) {
     const team = teamGroup.team || {};
     const logo = getTeamLogo(team);
     const statsBlocks = teamGroup.statistics || [];
@@ -187,7 +197,7 @@
 
     let tableHtml = '';
     if (playerBlock?.athletes?.length) {
-      tableHtml = renderPlayerTable(playerBlock, preferBasketball);
+      tableHtml = renderPlayerTable(playerBlock, preferBasketball, linkPlayers);
     } else {
       tableHtml = '<div class="boxscore-empty">Player stats not yet available for this game.</div>';
     }
@@ -324,10 +334,11 @@
     const header = data.header || {};
     const comp = header.competitions?.[0] || data.boxscore?.teams?.[0]?.competition || {};
     const preferBasketball = cfg.category === 'basketball';
+    const linkPlayers = sport === 'nba' || sport === 'wnba';
 
     const playerGroups = data.boxscore?.players || [];
     const boxscoreHtml = playerGroups.length
-      ? playerGroups.map((g) => renderTeamBoxscore(g, preferBasketball)).join('')
+      ? playerGroups.map((g) => renderTeamBoxscore(g, preferBasketball, linkPlayers)).join('')
       : '<div class="boxscore-empty">Box score will be available once the game begins.</div>';
 
     const awayName = comp.competitors?.find((c) => c.homeAway === 'away')?.team?.displayName || 'Away';

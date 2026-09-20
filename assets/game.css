@@ -320,6 +320,15 @@
   text-overflow: ellipsis;
 }
 
+.boxscore-table .player-profile-link {
+  color: inherit;
+  transition: color var(--transition);
+}
+
+.boxscore-table .player-profile-link:hover {
+  color: var(--accent);
+}
+
 .boxscore-table .dnp {
   color: var(--text-muted);
   font-style: italic;
