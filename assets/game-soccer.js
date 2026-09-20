@@ -1,7 +1,7 @@
 (function (global) {
   'use strict';
 
-  const { escapeHtml } = global.GameShared;
+  const { escapeHtml, getGameStatus, extractSoccerRosters } = global.GameShared;
 
   const POSITION_GROUPS = [
     { key: 'forwards', title: 'Forwards' },
@@ -282,9 +282,36 @@
     </ul>`;
   }
 
-  function renderLineupSidebar(data) {
-    const rosters = data.rosters || [];
-    if (!rosters.length) return '';
+  function getEmptyStatsMessage(comp, rosters) {
+    const { isFinal, isLive, isScheduled } = getGameStatus(comp);
+    if (rosters.length) return '';
+
+    if (isFinal) {
+      return 'Player stats are unavailable for this match.';
+    }
+    if (isLive) {
+      return 'Player stats will populate as the match progresses.';
+    }
+    if (isScheduled) {
+      return 'Player stats will be available closer to kickoff.';
+    }
+    return 'Player stats are not yet available for this match.';
+  }
+
+  function renderLineupSidebar(data, comp) {
+    const rosters = extractSoccerRosters(data);
+    const { isFinal, isLive } = getGameStatus(comp);
+    if (!rosters.length) {
+      if (!isFinal && !isLive) return '';
+      return `
+        <div class="soccer-lineup-widget widget soccer-lineup-widget--empty">
+          <div class="widget-header">Formations &amp; Lineups</div>
+          <div class="widget-body soccer-lineup-body">
+            <p class="soccer-subs-empty">Lineup data is unavailable for this match.</p>
+          </div>
+        </div>
+      `;
+    }
 
     const subs = parseSubstitutions(data.keyEvents);
     const teams = rosters.map((r, i) => ({
@@ -342,7 +369,7 @@
     return `
       <div class="soccer-lineup-widget widget" id="soccer-lineup-widget">
         <div class="widget-header soccer-lineup-header">
-          <span>Lineups</span>
+          <span>Formations &amp; Lineups</span>
           <div class="soccer-lineup-tabs" role="tablist">${teamOptions}</div>
         </div>
         <div class="widget-body soccer-lineup-body">${panels}</div>
@@ -350,38 +377,55 @@
     `;
   }
 
-  function initLineupSidebar(root) {
-    const widget = root?.querySelector('#soccer-lineup-widget');
-    if (!widget) return;
+  function initLineupSidebar() {
+    const mount = document.getElementById('game-lineup-sidebar');
+    if (!mount) return;
 
-    widget.querySelectorAll('.soccer-lineup-tab').forEach((tab) => {
-      tab.addEventListener('click', () => {
-        const teamId = tab.dataset.teamId;
-        widget.querySelectorAll('.soccer-lineup-tab').forEach((t) => {
-          const active = t === tab;
-          t.classList.toggle('is-active', active);
-          t.setAttribute('aria-pressed', active ? 'true' : 'false');
-        });
-        widget.querySelectorAll('.soccer-lineup-panel').forEach((panel) => {
-          panel.classList.toggle('hidden', panel.dataset.teamPanel !== teamId);
-        });
+    if (mount.dataset.lineupBound === 'true') return;
+    mount.dataset.lineupBound = 'true';
+
+    mount.addEventListener('click', (event) => {
+      const tab = event.target.closest('.soccer-lineup-tab');
+      if (!tab) return;
+
+      const widget = mount.querySelector('#soccer-lineup-widget');
+      if (!widget) return;
+
+      const teamId = tab.dataset.teamId;
+      widget.querySelectorAll('.soccer-lineup-tab').forEach((t) => {
+        const active = t === tab;
+        t.classList.toggle('is-active', active);
+        t.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      widget.querySelectorAll('.soccer-lineup-panel').forEach((panel) => {
+        panel.classList.toggle('hidden', panel.dataset.teamPanel !== teamId);
       });
     });
   }
 
   function renderMain({ data, comp, sport, gameId, els }) {
-    const rosters = data.rosters || [];
+    const rosters = extractSoccerRosters(data);
     const subMaps = buildSubMinuteMaps(parseSubstitutions(data.keyEvents));
-    const boxscoreHtml = rosters.length
+    const emptyMessage = getEmptyStatsMessage(comp, rosters);
+    const tablesHtml = rosters.length
       ? rosters.map((entry) => renderTeamBoxscore(entry, subMaps)).join('')
-      : '<div class="boxscore-empty">Box score will be available once lineups are confirmed.</div>';
+      : `<div class="boxscore-empty">${escapeHtml(emptyMessage)}</div>`;
+
+    const boxscoreHtml = `
+      <section class="game-view-card soccer-player-stats">
+        <div class="game-view-card-header">
+          <h2>Player Stats</h2>
+        </div>
+        <div class="soccer-player-stats-body">${tablesHtml}</div>
+      </section>
+    `;
 
     const videos = global.VideoSidebar ? global.VideoSidebar.collectFromSummary(data) : [];
     const videoTitle = global.VideoSidebar
       ? global.VideoSidebar.buildGameVideoTitle(comp)
       : 'GAME HIGHLIGHTS';
     const videoHtml = global.VideoSidebar ? global.VideoSidebar.render(videos, videoTitle) : '';
-    const lineupHtml = renderLineupSidebar(data);
+    const lineupHtml = renderLineupSidebar(data, comp);
 
     const mainEl = document.getElementById('game-main');
     const videoSidebarEl = document.getElementById('game-video-sidebar');
@@ -391,8 +435,10 @@
     if (lineupSidebarEl) lineupSidebarEl.innerHTML = lineupHtml;
     if (videoSidebarEl) videoSidebarEl.innerHTML = videoHtml;
     if (global.VideoSidebar) global.VideoSidebar.init(els.content);
-    initLineupSidebar(els.content);
+
+    initLineupSidebar();
   }
 
-  global.GameSoccer = { renderMain };
+  initLineupSidebar();
+  global.GameSoccer = { renderMain, initLineupSidebar };
 })(window);

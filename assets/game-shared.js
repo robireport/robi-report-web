@@ -83,6 +83,39 @@
     return header.competitions?.[0] || data.boxscore?.teams?.[0]?.competition || {};
   }
 
+  function getGameStatus(comp) {
+    const status = comp?.status || {};
+    const statusType = status.type || {};
+    const state = statusType.state || '';
+    const detail = String(statusType.shortDetail || statusType.detail || '').toUpperCase();
+    const isFinal =
+      statusType.completed === true ||
+      state === 'post' ||
+      detail === 'FT' ||
+      detail.includes('FULL TIME') ||
+      detail.includes('FINAL');
+    const isLive = state === 'in';
+    const isScheduled = state === 'pre' || state === 'scheduled' || (!isFinal && !isLive && state !== 'post');
+    return { status, statusType, state, detail, isFinal, isLive, isScheduled };
+  }
+
+  function hasGameSummaryData(data) {
+    if (!data || typeof data !== 'object') return false;
+    if (data.header || data.boxscore) return true;
+    if (Array.isArray(data.rosters) && data.rosters.length) return true;
+    return false;
+  }
+
+  function extractSoccerRosters(data) {
+    if (Array.isArray(data?.rosters) && data.rosters.length) {
+      return data.rosters;
+    }
+    if (Array.isArray(data?.boxscore?.rosters) && data.boxscore.rosters.length) {
+      return data.boxscore.rosters;
+    }
+    return [];
+  }
+
   function buildSummaryUrl(cfg, id) {
     return `https://site.api.espn.com/apis/site/v2/sports/${cfg.category}/${cfg.league}/summary?event=${id}`;
   }
@@ -259,12 +292,22 @@
         const res = await fetch(buildSummaryUrl(cfg, gameId));
         if (!res.ok) throw new Error(`ESPN API returned ${res.status}`);
         const data = await res.json();
-        if (!data.header && !data.boxscore) throw new Error('No game data found for this event.');
+        if (!hasGameSummaryData(data)) throw new Error('No game data found for this event.');
 
         const comp = getCompetition(data);
         hideLoading();
         mountShell({ data, cfg, comp, sport, gameId, activeTab });
-        renderMain({ data, cfg, comp, sport, gameId, els });
+
+        const ctx = { data, cfg, comp, sport, gameId, els, activeTab };
+        if (
+          sport === 'soccer' &&
+          activeTab === 'boxscore' &&
+          global.GameSoccer?.renderMain
+        ) {
+          global.GameSoccer.renderMain(ctx);
+        } else {
+          renderMain(ctx);
+        }
 
         const ticker = document.getElementById('score-ticker');
         if (ticker) {
@@ -293,6 +336,9 @@
     escapeHtml,
     getCompetitors,
     getCompetition,
+    getGameStatus,
+    hasGameSummaryData,
+    extractSoccerRosters,
     renderHero,
     renderInfoSidebar,
     initGamePage,
