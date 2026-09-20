@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
-  <title>NBA — Robi Report</title>
+  <title>Shop — Robi Report</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -28,15 +28,18 @@
       --accent: #92d2ff;
       --accent-hover: #b0e0ff;
       --accent-glow: rgba(146, 210, 255, 0.25);
+      --gradient-hero: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #000a12 100%);
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
       --nav-height: 72px;
-      --max-width: 1280px;
+      --max-width: 1200px;
       --transition: 0.2s ease;
     }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -46,8 +49,15 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
 
     /* ── Navigation ── */
     .nav {
@@ -89,7 +99,10 @@
       flex-shrink: 0;
     }
 
-    .logo span { color: var(--text-secondary); font-weight: 500; }
+    .logo span {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
 
     .nav-links {
       display: flex;
@@ -119,6 +132,15 @@
       font-family: inherit;
     }
 
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      color: var(--text-primary);
+    }
+
     .btn-primary {
       background: var(--accent);
       color: #000000;
@@ -129,7 +151,21 @@
       box-shadow: 0 0 24px var(--accent-glow);
     }
 
-    .btn-block { width: 100%; }
+    .btn-outline {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-hover);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .btn-lg {
+      padding: 14px 28px;
+      font-size: 0.95rem;
+    }
 
     .nav-toggle {
       display: none;
@@ -190,436 +226,347 @@
       }
     }
 
-/* ── Page Header ── */
-    .page-header {
-      padding: calc(var(--nav-height) + var(--ticker-height) + 32px) 24px 24px;
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border);
+/* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      padding: calc(var(--nav-height) + var(--ticker-height) + 80px) 24px 100px;
+      background: var(--gradient-hero);
+      position: relative;
+      overflow: hidden;
     }
 
-    .page-header-inner {
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .hero-inner {
       max-width: var(--max-width);
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
 
-    .page-header h1 {
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .hero-content h1 {
+      max-width: none;
+    }
+
+    .hero-content .hero-desc {
+      max-width: none;
+    }
+
+    .hero-content .hero-actions {
+      margin-bottom: 0;
+    }
+
+    .hero-video-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .hero-video-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-hover);
+      box-shadow:
+        0 24px 48px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(146, 210, 255, 0.08);
+      background: var(--bg-card);
+    }
+
+    .hero-video-wrapper iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 48px;
+      margin-top: 64px;
+      padding-top: 48px;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(146, 210, 255, 0.12);
+      border: 1px solid rgba(146, 210, 255, 0.25);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-hover);
+      margin-bottom: 28px;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.75rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 800px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, #b8e4ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 540px;
+      margin-bottom: 40px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 64px;
+    }
+
+    .stat-item strong {
+      display: block;
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .stat-item span {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ── Featured Section ── */
+    .featured {
+      padding: 100px 24px;
+      background: var(--bg-secondary);
+    }
+
+    .section-header {
+      max-width: var(--max-width);
+      margin: 0 auto 48px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .section-header h2 {
       font-size: clamp(1.75rem, 3vw, 2.25rem);
       font-weight: 800;
       letter-spacing: -0.02em;
     }
 
-    .page-header p {
+    .section-header p {
       color: var(--text-secondary);
       font-size: 0.95rem;
-      margin-top: 4px;
+      margin-top: 6px;
     }
 
-    /* ── 3-Column Editorial Layout ── */
-    .hub {
+    .section-link {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: gap var(--transition);
+    }
+
+    .section-link:hover {
+      gap: 10px;
+    }
+
+    .content-grid {
       max-width: var(--max-width);
       margin: 0 auto;
-      padding: 32px 24px 80px;
       display: grid;
-      grid-template-columns: 220px 1fr 280px;
-      gap: 32px;
-      align-items: start;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
     }
 
-    /* ── Sidebar Widgets ── */
-    .widget {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-
-    .widget:last-child { margin-bottom: 0; }
-
-    .widget-header {
-      padding: 14px 16px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .widget-body { padding: 8px 0; }
-
-    .sidebar-link {
-      display: block;
-      padding: 10px 16px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      transition: all var(--transition);
-      border-left: 3px solid transparent;
-    }
-
-    .sidebar-link:hover {
-      color: var(--text-primary);
-      background: rgba(146, 210, 255, 0.06);
-      border-left-color: var(--accent);
-    }
-
-    .subscribe-card {
-      padding: 20px 16px;
-      text-align: center;
-    }
-
-    .subscribe-card h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .subscribe-card p {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-      line-height: 1.5;
-    }
-
-    .league-shortcuts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 12px 16px 16px;
-    }
-
-    .league-pill {
-      padding: 6px 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      color: var(--text-secondary);
-      transition: all var(--transition);
-    }
-
-    .league-pill:hover {
-      border-color: var(--accent);
-      color: var(--text-primary);
-    }
-
-    .league-pill.active {
-      background: rgba(146, 210, 255, 0.12);
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    /* ── Center Column ── */
-    .lead-story {
+    .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       overflow: hidden;
-      margin-bottom: 28px;
       transition: all var(--transition);
       cursor: pointer;
     }
 
-    .lead-story:hover {
+    .card:hover {
+      background: var(--bg-card-hover);
       border-color: var(--border-hover);
+      transform: translateY(-4px);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     }
 
-    .lead-story > a {
+    .card > a {
       display: block;
       color: inherit;
     }
 
-    .lead-story-image {
-      aspect-ratio: 16 / 9;
+    .card-featured {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .card-image {
+      position: relative;
+      aspect-ratio: 16 / 10;
       overflow: hidden;
     }
 
-    .lead-story-image img {
+    .card-featured .card-image {
+      aspect-ratio: 16 / 9;
+    }
+
+    .card-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       transition: transform 0.4s ease;
     }
 
-    .lead-story:hover .lead-story-image img {
-      transform: scale(1.03);
+    .card:hover .card-image img {
+      transform: scale(1.05);
     }
 
-    .lead-story-body {
-      padding: 24px 28px 28px;
-    }
-
-    .story-tag {
-      display: inline-block;
+    .card-tag {
+      position: absolute;
+      top: 14px;
+      left: 14px;
       padding: 4px 10px;
-      background: rgba(146, 210, 255, 0.12);
-      border: 1px solid rgba(146, 210, 255, 0.25);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
       border-radius: 100px;
       font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: var(--accent);
-      margin-bottom: 14px;
+      color: var(--text-primary);
     }
 
-    .lead-story-body h2 {
-      font-size: clamp(1.5rem, 2.5vw, 2rem);
-      font-weight: 800;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-      transition: color var(--transition);
+    .card-tag.live {
+      background: rgba(146, 210, 255, 0.9);
+      color: #000000;
     }
 
-    .lead-story:hover .lead-story-body h2 {
-      color: var(--accent-hover);
+    .card-body {
+      padding: 20px 22px 24px;
+      min-width: 0;
+      width: 100%;
     }
 
-    .lead-story-body .subtitle {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      line-height: 1.65;
-      margin-bottom: 18px;
-    }
-
-    .author-meta {
+    .card-meta {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 10px;
+      flex-wrap: nowrap;
+      white-space: nowrap;
     }
 
-    .author-meta .dot {
+    .card-meta .dot {
       width: 3px;
       height: 3px;
       background: var(--text-muted);
       border-radius: 50%;
     }
 
-    .author-meta strong {
-      color: var(--text-secondary);
-      font-weight: 600;
-    }
-
-    .news-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-bottom: 36px;
-    }
-
-    .news-row {
-      display: block;
-      padding: 16px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      transition: all var(--transition);
-      cursor: pointer;
-    }
-
-    .news-row-link {
-      display: grid;
-      grid-template-columns: 140px minmax(0, 1fr);
-      gap: 16px;
-      width: 100%;
-      color: inherit;
-    }
-
-    .news-row:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-hover);
-    }
-
-    .news-row-thumb {
-      aspect-ratio: 4 / 3;
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-    }
-
-    .news-row-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .news-row-body h3 {
-      font-size: 0.95rem;
+    .card-body h3 {
+      font-size: 1.05rem;
       font-weight: 700;
-      line-height: 1.35;
-      margin-bottom: 6px;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
       transition: color var(--transition);
     }
 
-    .news-row:hover .news-row-body h3 {
+    .card:hover .card-body h3 {
       color: var(--accent-hover);
     }
 
-    .news-row-body p {
-      font-size: 0.8rem;
+    .card-featured .card-body h3 {
+      font-size: 1.35rem;
+    }
+
+    .card-body p {
+      font-size: 0.85rem;
       color: var(--text-secondary);
-      line-height: 1.5;
+      line-height: 1.55;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
 
-    .news-row-meta {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      margin-top: 8px;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-
-    /* ── Storylines Section ── */
-    .section-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .analysis-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-
-    .analysis-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      transition: all var(--transition);
-      cursor: pointer;
-    }
-
-    .analysis-card:hover {
-      border-color: var(--border-hover);
-      transform: translateY(-2px);
-    }
-
-    .analysis-card-image {
-      aspect-ratio: 16 / 10;
-      overflow: hidden;
-    }
-
-    .analysis-card-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .analysis-card-body {
-      padding: 14px 16px 18px;
-    }
-
-    .analysis-card-body h4 {
-      font-size: 0.875rem;
-      font-weight: 700;
-      line-height: 1.35;
-      margin-bottom: 4px;
-      transition: color var(--transition);
-    }
-
-    .analysis-card:hover .analysis-card-body h4 {
-      color: var(--accent-hover);
-    }
-
-    .analysis-card-body span {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
-    /* ── Right Sidebar ── */
-    .headline-list {
-      list-style: none;
-    }
-
-    .headline-list li {
-      border-bottom: 1px solid var(--border);
-    }
-
-    .headline-list li:last-child { border-bottom: none; }
-
-    .headline-list a {
-      display: block;
-      padding: 12px 16px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      line-height: 1.4;
-      color: var(--text-secondary);
-      transition: all var(--transition);
-    }
-
-    .headline-list a:hover {
-      color: var(--accent-hover);
-      background: rgba(146, 210, 255, 0.04);
-    }
-
-    .trending-item {
-      display: grid;
-      grid-template-columns: 64px 1fr;
-      gap: 12px;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      transition: background var(--transition);
-      cursor: pointer;
-    }
-
-    .trending-item:last-child { border-bottom: none; }
-
-    .trending-item:hover {
-      background: rgba(146, 210, 255, 0.04);
-    }
-
-    .trending-thumb {
-      aspect-ratio: 1;
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-    }
-
-    .trending-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .trending-body h4 {
-      font-size: 0.8rem;
-      font-weight: 600;
-      line-height: 1.35;
-      margin-bottom: 4px;
-      transition: color var(--transition);
-    }
-
-    .trending-item:hover .trending-body h4 {
-      color: var(--accent-hover);
-    }
-
-    .trending-body span {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
 
     /* ── Footer ── */
     .footer {
       padding: 72px 24px 32px;
       background: var(--bg-primary);
-      border-top: 1px solid var(--border);
     }
 
     .footer-inner {
@@ -665,7 +612,9 @@
       transition: color var(--transition);
     }
 
-    .footer-col a:hover { color: var(--text-primary); }
+    .footer-col a:hover {
+      color: var(--text-primary);
+    }
 
     .footer-bottom {
       display: flex;
@@ -708,39 +657,19 @@
     }
 
     /* ── Responsive ── */
-    @media (max-width: 1100px) {
-      .hub {
-        grid-template-columns: 200px 1fr;
-      }
-
-      .hub-right {
-        grid-column: 1 / -1;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-      }
-
-      .hub-right .widget { margin-bottom: 0; }
-    }
-
-    @media (max-width: 768px) {
-      .hub {
+    @media (max-width: 900px) {
+      .hero-grid {
         grid-template-columns: 1fr;
-        padding-top: 24px;
+        gap: 40px;
       }
 
-      .hub-left { display: none; }
-
-      .hub-right {
-        grid-template-columns: 1fr;
+      .content-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
 
-      .news-row-link {
-        grid-template-columns: 100px minmax(0, 1fr);
-      }
-
-      .analysis-grid {
-        grid-template-columns: 1fr;
+      .card-featured {
+        grid-column: span 2;
+        grid-row: span 1;
       }
 
       .footer-top {
@@ -749,14 +678,46 @@
     }
 
     @media (max-width: 640px) {
-      .footer-top { grid-template-columns: 1fr; gap: 36px; }
-      .footer-bottom { flex-direction: column; align-items: flex-start; }
+
+      .nav-toggle {
+        display: block;
+      }
+
+      .hero {
+        padding-top: calc(var(--nav-height) + var(--ticker-height) + 48px);
+      }
+
+      .hero-stats {
+        gap: 32px;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card-featured {
+        grid-column: span 1;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .footer-top {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
   <link rel="stylesheet" href="assets/score-ticker.css" />
   <link rel="stylesheet" href="assets/nav-mobile.css" />
-  <link rel="stylesheet" href="assets/articles-empty.css" />
-  <link rel="stylesheet" href="assets/game.css" />
+  <link rel="stylesheet" href="assets/shop.css" />
 </head>
 <body>
 
@@ -777,7 +738,7 @@
         <li><a href="soccer.html">Soccer</a></li>
         <li><a href="mlb.html">MLB</a></li>
         <li><a href="standard-of-greatness.html"><span class="nav-sog-full">Standard of Greatness</span><span class="nav-sog-short">SOG</span></a></li>
-        <li><a href="shop.html">Shop</a></li>
+        <li><a href="shop.html" class="active">Shop</a></li>
         <li><a href="about.html">About</a></li>
         <li class="nav-mobile-subscribe"><a href="https://www.youtube.com/@RobiReportt?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn btn-primary nav-mobile-subscribe-btn">Subscribe</a></li>
       </ul>
@@ -806,25 +767,102 @@
   </div>
 
 
-  <main class="game-page" id="game-app">
-    <div class="game-loading" id="game-loading">
-      <div class="game-spinner"></div>
-      <p>Loading game summary…</p>
-      <div class="game-skeleton">
-        <div class="sk-hero"></div>
-        <div class="sk-grid">
-          <div class="sk-block"></div>
-          <div class="sk-block"></div>
+  <!-- Shop Hero -->
+  <section class="shop-hero">
+    <div class="shop-hero-inner">
+      <span class="shop-badge">Official Merch</span>
+      <h1>Robi Report Shop</h1>
+      <p>Rep Seattle basketball culture with exclusive Robi Report gear — built for fans who love the game.</p>
+    </div>
+  </section>
+
+  <!-- Product #1 -->
+  <section class="shop-product" id="seattle-loves-ball-hat">
+    <div class="shop-product-inner">
+      <div class="shop-preview">
+        <div class="shop-preview-frame">
+          <img
+            id="hat-preview"
+            src="assets/shop/green-hat-face.png"
+            alt="Seattle Loves Ball Robi Report Hat — Green"
+            width="800"
+            height="800"
+          />
+          <div class="color-picker" role="group" aria-label="Choose hat color">
+            <span class="color-picker-label">Color</span>
+            <button
+              type="button"
+              class="color-swatch color-swatch--green is-active"
+              data-color="green"
+              aria-label="Green hat"
+              aria-pressed="true"
+            ></button>
+            <button
+              type="button"
+              class="color-swatch color-swatch--blue"
+              data-color="blue"
+              aria-label="Blue hat"
+              aria-pressed="false"
+            ></button>
+          </div>
         </div>
       </div>
+
+      <div class="shop-details">
+        <p class="shop-tagline">Product #1</p>
+        <h2>Seattle Loves Ball Robi Report Hat</h2>
+        <p class="shop-description">
+          The official Robi Report cap celebrating Seattle&apos;s basketball culture. Structured fit with
+          embroidered &ldquo;Seattle Loves Ball&rdquo; front graphic, cross detail on the side, and your choice
+          of green or blue brim. Limited run — rep the city and the coverage.
+        </p>
+        <p class="shop-price">$35.00</p>
+        <ul class="shop-features">
+          <li>Adjustable snapback fit</li>
+          <li>Premium structured crown with flat brim</li>
+          <li>Available in Green or Blue</li>
+          <li>Ships from Tacoma, WA</li>
+        </ul>
+        <a href="#" id="buy-now-btn" class="btn btn-primary btn-lg">Buy Now</a>
+      </div>
     </div>
-    <div class="game-error hidden" id="game-error">
-      <h2>Unable to load this game</h2>
-      <p id="game-error-msg">Check the URL and try again.</p>
-      <a href="index.html" class="btn btn-primary">Back to Home</a>
+  </section>
+
+  <!-- Product Gallery -->
+  <section class="shop-gallery" aria-labelledby="gallery-heading">
+    <div class="shop-gallery-inner">
+      <div class="shop-gallery-header">
+        <h2 id="gallery-heading">Gallery</h2>
+        <p>Every angle of the Seattle Loves Ball hat — plus shots from the Robi Report community.</p>
+      </div>
+      <div class="shop-gallery-grid">
+        <figure class="gallery-item">
+          <img id="gallery-face" src="assets/shop/green-hat-face.png" alt="Front view — Green hat" width="800" height="800" />
+          <figcaption class="gallery-caption">Face of the hat</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img id="gallery-side" src="assets/shop/green-hat-side.png" alt="Side view — Green hat" width="800" height="800" />
+          <figcaption class="gallery-caption">Side of the hat</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img id="gallery-back" src="assets/shop/green-hat-back.png" alt="Back view — Green hat" width="800" height="800" />
+          <figcaption class="gallery-caption">Back of the hat</figcaption>
+        </figure>
+        <figure class="gallery-item gallery-item--wide">
+          <img src="assets/shop/hat-grid-composite.png" alt="Seattle Loves Ball hat — all angles" width="1200" height="675" loading="lazy" />
+          <figcaption class="gallery-caption">All angles</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/shop/kd-x-rr.png" alt="Kevin Durant wearing the Seattle Loves Ball Robi Report hat" width="800" height="800" loading="lazy" />
+          <figcaption class="gallery-caption">Kevin Durant</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/shop/jsn-flaujae-x-rr.png" alt="JSN and Flau'jae Johnson wearing the Seattle Loves Ball Robi Report hat" width="800" height="800" loading="lazy" />
+          <figcaption class="gallery-caption">JSN &amp; Flau&apos;jae Johnson</figcaption>
+        </figure>
+      </div>
     </div>
-    <div class="game-content hidden" id="game-content"></div>
-  </main>
+  </section>
 
 <!-- Footer -->
   <footer class="footer">
@@ -880,9 +918,9 @@
     </div>
   </footer>
 
+  <script src="assets/shop.js"></script>
   <script src="assets/nav-mobile.js"></script>
   <script src="assets/score-ticker.js"></script>
-  <script src="assets/game.js"></script>
 </body>
 </html>
 
