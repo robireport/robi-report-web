@@ -132,18 +132,47 @@
   line-height: 1.35;
 }
 
-.catalog-card-price {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-top: auto;
-  padding-top: 4px;
-}
-
 .catalog-card-swatches {
   display: flex;
   gap: 6px;
-  margin-top: 4px;
+  margin-top: 2px;
+}
+
+.catalog-pricing {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.catalog-pricing .sale-badge {
+  padding: 3px 8px;
+  font-size: 0.62rem;
+  flex-shrink: 0;
+}
+
+.catalog-card-price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+}
+
+.catalog-pricing .product-price-original {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #888888;
+  text-decoration: line-through;
+}
+
+.catalog-pricing .product-price-sale {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
 .catalog-swatch {
@@ -155,6 +184,14 @@
 
 .catalog-swatch--green { background: #1b5e3a; }
 .catalog-swatch--blue { background: #1e4a7a; }
+
+.catalog-card--placeholder .catalog-card-price {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: auto;
+  padding-top: 10px;
+}
 
 .catalog-card--placeholder {
   opacity: 0.55;
