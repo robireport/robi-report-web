@@ -8,6 +8,8 @@ import json
 import re
 from pathlib import Path
 
+from seo_lib import apply_seo, normalize_rel_path
+
 ROOT = Path(__file__).resolve().parent.parent
 ARTICLES_DIR = ROOT / 'articles'
 REDIRECTS_FILE = ROOT / 'assets' / 'article-redirects.json'
@@ -112,7 +114,10 @@ def sync_article(source: Path) -> Path:
     index_path = source.parent / source.stem / 'index.html'
     index_path.parent.mkdir(parents=True, exist_ok=True)
     content = source.read_text(encoding='utf-8')
-    index_path.write_text(source_to_index_content(content), encoding='utf-8')
+    source_rel = normalize_rel_path(source)
+    source.write_text(apply_seo(content, source_rel), encoding='utf-8')
+    index_content = apply_seo(source_to_index_content(content), normalize_rel_path(index_path))
+    index_path.write_text(index_content, encoding='utf-8')
     return index_path
 
 

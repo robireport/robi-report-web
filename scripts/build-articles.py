@@ -12,6 +12,7 @@ from article_lib import (
     sync_article,
     write_redirect_map,
 )
+from seo_lib import write_site_redirects
 
 
 def main() -> int:
@@ -43,6 +44,9 @@ def main() -> int:
 
     redirects_path = write_redirect_map()
     print(f'Wrote {redirects_path.relative_to(ROOT).as_posix()}')
+
+    site_redirects_path = write_site_redirects()
+    print(f'Wrote {site_redirects_path.relative_to(ROOT).as_posix()}')
 
     print(f'Done. {len(synced)} index file(s) updated.')
     return 0

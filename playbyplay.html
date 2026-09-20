@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Robi Report" />
   <title>Play-by-Play — Robi Report</title>
   <script>
     (function () {
@@ -11,6 +13,14 @@
       window.location.replace('game.html?' + params.toString());
     })();
   </script>
+  <script id="robi-www-redirect">
+    (function () {
+      if (location.hostname === 'www.robireport.com') {
+        location.replace('https://robireport.com' + location.pathname + location.search + location.hash);
+      }
+    })();
+  </script>
+  <link rel="canonical" href="https://robireport.com/game.html?view=playbyplay" />
 </head>
 <body></body>
 </html>
