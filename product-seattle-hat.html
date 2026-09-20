@@ -799,7 +799,9 @@
           </button>
         </div>
         <div class="product-carousel-wrap">
-          <div class="product-carousel" id="product-carousel" role="region" aria-label="Product images — swipe to browse">
+          <div class="product-carousel-shell">
+            <button type="button" class="carousel-nav carousel-prev" id="carousel-prev" aria-label="Previous image">&#8249;</button>
+            <div class="product-carousel" id="product-carousel" role="region" aria-label="Product images — swipe to browse">
             <div class="product-carousel-track" id="product-carousel-track">
               <button type="button" class="product-carousel-slide" data-image="face" aria-label="Front view — click to zoom">
                 <img src="assets/shop/green-hat-face.png" alt="Front view — Seattle Loves Ball hat" width="800" height="800" />
@@ -820,6 +822,8 @@
                 <img src="assets/shop/jsn-flaujae-x-rr.png" alt="JSN and Flau'jae Johnson wearing the Seattle Loves Ball hat" width="800" height="800" />
               </button>
             </div>
+            </div>
+            <button type="button" class="carousel-nav carousel-next" id="carousel-next" aria-label="Next image">&#8250;</button>
           </div>
           <div class="carousel-indicators" id="carousel-indicators" aria-hidden="true">
             <span class="carousel-dot is-active"></span>
@@ -829,7 +833,8 @@
             <span class="carousel-dot"></span>
             <span class="carousel-dot"></span>
           </div>
-          <span class="product-viewer-hint" aria-hidden="true">Swipe to browse · Click to zoom</span>
+          <span class="product-viewer-hint product-viewer-hint--desktop" aria-hidden="true">Use arrows or click to zoom</span>
+          <span class="product-viewer-hint product-viewer-hint--mobile" aria-hidden="true">Swipe to browse · Click to zoom</span>
         </div>
       </div>
 
@@ -856,7 +861,13 @@
       <div class="product-info">
         <p class="product-info-category">Headwear · Product #1</p>
         <h1>Seattle Loves Ball Robi Report Hat</h1>
-        <p class="product-info-price">$35.00</p>
+        <div class="product-pricing">
+          <span class="sale-badge">Sale</span>
+          <p class="product-info-price">
+            <span class="product-price-original">$50.00</span>
+            <span class="product-price-sale">$35.00</span>
+          </p>
+        </div>
         <p class="product-info-description">
           The official Robi Report cap celebrating Seattle&apos;s basketball culture. Structured fit with
           embroidered &ldquo;Seattle Loves Ball&rdquo; front graphic, cross detail on the side, and your choice
