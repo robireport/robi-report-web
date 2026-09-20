@@ -198,7 +198,7 @@
     const { away, home } = getCompetitors(comp);
     const awayAbbr = away?.team?.abbreviation || away?.team?.shortDisplayName || 'AWY';
     const homeAbbr = home?.team?.abbreviation || home?.team?.shortDisplayName || 'HME';
-    return `${awayAbbr} @ ${homeAbbr} Videos`;
+    return `${awayAbbr} @ ${homeAbbr} VIDEOS`;
   }
 
   function getCompetitors(comp) {
