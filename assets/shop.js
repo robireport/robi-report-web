@@ -17,6 +17,8 @@
   var lightboxBackdrop = document.getElementById('lightbox-backdrop');
   var lightboxContent = document.getElementById('lightbox-content');
   var lightboxCounter = document.getElementById('lightbox-counter');
+  var carouselPrev = document.getElementById('carousel-prev');
+  var carouselNext = document.getElementById('carousel-next');
   var dots = document.querySelectorAll('.carousel-dot');
 
   var imageKeys = ['face', 'side', 'back', 'composite', 'kd', 'jsn'];
@@ -257,6 +259,20 @@
       setColor(swatch.dataset.color);
     });
   });
+
+  if (carouselPrev) {
+    carouselPrev.addEventListener('click', function (e) {
+      e.stopPropagation();
+      navigateLightbox(-1);
+    });
+  }
+
+  if (carouselNext) {
+    carouselNext.addEventListener('click', function (e) {
+      e.stopPropagation();
+      navigateLightbox(1);
+    });
+  }
 
   if (lightboxClose) {
     lightboxClose.addEventListener('click', closeLightbox);
