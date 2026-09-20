@@ -798,7 +798,7 @@
             <img src="assets/shop/jsn-flaujae-x-rr.png" alt="" width="72" height="72" />
           </button>
         </div>
-        <div class="product-viewer">
+        <button type="button" class="product-viewer" id="product-viewer-btn" aria-label="View full-size product image">
           <img
             id="product-viewer-img"
             src="assets/shop/green-hat-face.png"
@@ -806,7 +806,8 @@
             width="800"
             height="800"
           />
-        </div>
+          <span class="product-viewer-hint" aria-hidden="true">Click to zoom</span>
+        </button>
       </div>
 
       <div class="product-info">
@@ -852,43 +853,16 @@
     </div>
   </section>
 
-  <!-- Lifestyle Gallery -->
-  <section class="product-gallery" aria-labelledby="gallery-heading">
-    <div class="product-gallery-inner">
-      <div class="product-gallery-header">
-        <h2 id="gallery-heading">Gallery</h2>
-        <p>Every angle of the Seattle Loves Ball hat — plus shots from the Robi Report community.</p>
-      </div>
-      <div class="product-gallery-grid">
-        <figure class="gallery-item">
-          <img id="gallery-face" src="assets/shop/green-hat-face.png" alt="Front view — Green hat" width="800" height="800" />
-          <figcaption class="gallery-caption">Face of the hat</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img id="gallery-side" src="assets/shop/green-hat-side.png" alt="Side view — Green hat" width="800" height="800" />
-          <figcaption class="gallery-caption">Side of the hat</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img id="gallery-back" src="assets/shop/green-hat-back.png" alt="Back view — Green hat" width="800" height="800" />
-          <figcaption class="gallery-caption">Back of the hat</figcaption>
-        </figure>
-        <figure class="gallery-item gallery-item--wide">
-          <img src="assets/shop/hat-grid-composite.png" alt="Seattle Loves Ball hat — all angles" width="1200" height="675" loading="lazy" />
-          <figcaption class="gallery-caption">Combined angles</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/shop/kd-x-rr.png" alt="Kevin Durant wearing the Seattle Loves Ball Robi Report hat" width="800" height="800" loading="lazy" />
-          <figcaption class="gallery-caption">Kevin Durant</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/shop/jsn-flaujae-x-rr.png" alt="JSN and Flau'jae Johnson wearing the Seattle Loves Ball Robi Report hat" width="800" height="800" loading="lazy" />
-          <figcaption class="gallery-caption">JSN &amp; Flau&apos;jae Johnson</figcaption>
-        </figure>
-      </div>
-    </div>
-  </section>
-
   <div id="cart-toast" class="cart-toast" role="status" aria-live="polite"></div>
+
+  <!-- Image Lightbox -->
+  <div id="image-lightbox" class="image-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Product image preview">
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Close image preview">&times;</button>
+    <div class="lightbox-backdrop" id="lightbox-backdrop"></div>
+    <div class="lightbox-content">
+      <img id="lightbox-img" src="" alt="" />
+    </div>
+  </div>
 
 <!-- Footer -->
   <footer class="footer">
