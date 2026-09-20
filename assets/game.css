@@ -335,6 +335,20 @@
   border-bottom: 1px solid var(--border);
 }
 
+.boxscore-category + .boxscore-category {
+  border-top: 1px solid var(--border);
+}
+
+.boxscore-category .boxscore-group-title {
+  margin: 0;
+}
+
+.boxscore-category-empty {
+  padding: 16px 18px;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
 .boxscore-table-wrap {
   overflow-x: auto;
   scrollbar-width: thin;
@@ -417,7 +431,8 @@
   gap: 20px;
 }
 
-.game-video-sidebar-mount {
+.game-video-sidebar-mount,
+.game-lineup-sidebar-mount {
   width: 100%;
 }
 
