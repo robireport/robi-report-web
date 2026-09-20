@@ -1,0 +1,261 @@
+/* ── Shop Page ── */
+.shop-hero {
+  padding: calc(var(--nav-height) + var(--ticker-height) + 48px) 24px 32px;
+  background: var(--gradient-hero);
+  border-bottom: 1px solid var(--border);
+}
+
+.shop-hero-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.shop-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(146, 210, 255, 0.1);
+  border: 1px solid rgba(146, 210, 255, 0.25);
+  border-radius: 100px;
+  margin-bottom: 16px;
+}
+
+.shop-hero h1 {
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  margin-bottom: 12px;
+}
+
+.shop-hero p {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.shop-product {
+  padding: 56px 24px;
+}
+
+.shop-product-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.shop-preview {
+  position: sticky;
+  top: calc(var(--nav-height) + var(--ticker-height) + 24px);
+}
+
+.shop-preview-frame {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+}
+
+.shop-preview-frame img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  transition: opacity 0.25s ease;
+}
+
+.shop-preview-frame img.is-switching {
+  opacity: 0.65;
+}
+
+.color-picker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.color-picker-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.color-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+
+.color-swatch:hover {
+  transform: scale(1.08);
+}
+
+.color-swatch.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.color-swatch--green {
+  background: #1b5e3a;
+}
+
+.color-swatch--blue {
+  background: #1e4a7a;
+}
+
+.shop-details h2 {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.shop-details .shop-tagline {
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.shop-details .shop-description {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.75;
+  margin-bottom: 28px;
+}
+
+.shop-price {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+}
+
+.shop-features {
+  list-style: none;
+  margin-bottom: 32px;
+}
+
+.shop-features li {
+  position: relative;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  margin-bottom: 10px;
+}
+
+.shop-features li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.shop-gallery {
+  padding: 0 24px 100px;
+}
+
+.shop-gallery-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.shop-gallery-header {
+  margin-bottom: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.shop-gallery-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.shop-gallery-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.shop-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.gallery-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.gallery-item:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.gallery-item--wide {
+  grid-column: span 2;
+}
+
+.gallery-item--wide img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.gallery-caption {
+  padding: 12px 16px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .shop-product-inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .shop-preview {
+    position: static;
+  }
+
+  .shop-gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-item--wide {
+    grid-column: span 1;
+  }
+}

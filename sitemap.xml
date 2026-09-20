@@ -13,6 +13,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://robireport.com/shop.html</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://robireport.com/nba.html</loc>
     <lastmod>2026-08-11</lastmod>
     <changefreq>weekly</changefreq>
