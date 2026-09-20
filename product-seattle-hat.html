@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
-  <title>Shop — Robi Report</title>
+  <title>Seattle Loves Ball Hat — Robi Report Shop</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -738,7 +738,7 @@
         <li><a href="soccer.html">Soccer</a></li>
         <li><a href="mlb.html">MLB</a></li>
         <li><a href="standard-of-greatness.html"><span class="nav-sog-full">Standard of Greatness</span><span class="nav-sog-short">SOG</span></a></li>
-        <li><a href="shop.html" class="active">Shop</a></li>
+        <li><a href="shop.html">Shop</a></li>
         <li><a href="about.html">About</a></li>
         <li class="nav-mobile-subscribe"><a href="https://www.youtube.com/@RobiReportt?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn btn-primary nav-mobile-subscribe-btn">Subscribe</a></li>
       </ul>
@@ -767,73 +767,128 @@
   </div>
 
 
-  <!-- Shop Hero -->
-  <section class="shop-hero">
-    <div class="shop-hero-inner">
-      <span class="shop-badge">Official Merch</span>
-      <h1>Robi Report Shop</h1>
-      <p>Rep Seattle basketball culture with exclusive Robi Report gear — built for fans who love the game.</p>
-    </div>
-  </section>
+  <!-- Breadcrumb -->
+  <nav class="product-breadcrumb" aria-label="Breadcrumb">
+    <a href="shop.html">Shop</a>
+    <span aria-hidden="true">/</span>
+    <span>Seattle Loves Ball Hat</span>
+  </nav>
 
-  <div class="shop-toolbar">
-    <p class="shop-toolbar-count">1 product available · 3 coming soon</p>
-  </div>
+  <!-- Product Detail -->
+  <section class="product-page">
+    <div class="product-page-inner">
+      <div class="product-media">
+        <div class="product-thumbs" role="tablist" aria-label="Product images">
+          <button type="button" class="product-thumb is-active" data-image="face" role="tab" aria-selected="true" aria-label="Front view">
+            <img src="assets/shop/green-hat-face.png" alt="" width="72" height="72" />
+          </button>
+          <button type="button" class="product-thumb" data-image="side" role="tab" aria-selected="false" aria-label="Side view">
+            <img src="assets/shop/green-hat-side.png" alt="" width="72" height="72" />
+          </button>
+          <button type="button" class="product-thumb" data-image="back" role="tab" aria-selected="false" aria-label="Back view">
+            <img src="assets/shop/green-hat-back.png" alt="" width="72" height="72" />
+          </button>
+          <button type="button" class="product-thumb" data-image="composite" role="tab" aria-selected="false" aria-label="All angles">
+            <img src="assets/shop/hat-grid-composite.png" alt="" width="72" height="72" />
+          </button>
+          <button type="button" class="product-thumb" data-image="kd" role="tab" aria-selected="false" aria-label="Kevin Durant">
+            <img src="assets/shop/kd-x-rr.png" alt="" width="72" height="72" />
+          </button>
+          <button type="button" class="product-thumb" data-image="jsn" role="tab" aria-selected="false" aria-label="JSN and Flau'jae Johnson">
+            <img src="assets/shop/jsn-flaujae-x-rr.png" alt="" width="72" height="72" />
+          </button>
+        </div>
+        <div class="product-viewer">
+          <img
+            id="product-viewer-img"
+            src="assets/shop/green-hat-face.png"
+            alt="Seattle Loves Ball Robi Report Hat — Green"
+            width="800"
+            height="800"
+          />
+        </div>
+      </div>
 
-  <!-- Catalog Grid -->
-  <section class="shop-catalog" aria-label="Product catalog">
-    <div class="shop-catalog-inner">
-      <div class="catalog-grid">
-        <a href="product-seattle-hat.html" class="catalog-card">
-          <div class="catalog-card-image">
-            <img src="assets/shop/green-hat-face.png" alt="Seattle Loves Ball Robi Report Hat" width="600" height="600" loading="eager" />
-          </div>
-          <div class="catalog-card-body">
-            <span class="catalog-card-category">Headwear</span>
-            <h2 class="catalog-card-title">Seattle Loves Ball Robi Report Hat</h2>
-            <p class="catalog-card-price">$35.00</p>
-            <div class="catalog-card-swatches" aria-hidden="true">
-              <span class="catalog-swatch catalog-swatch--green"></span>
-              <span class="catalog-swatch catalog-swatch--blue"></span>
-            </div>
-          </div>
-        </a>
+      <div class="product-info">
+        <p class="product-info-category">Headwear · Product #1</p>
+        <h1>Seattle Loves Ball Robi Report Hat</h1>
+        <p class="product-info-price">$35.00</p>
+        <p class="product-info-description">
+          The official Robi Report cap celebrating Seattle&apos;s basketball culture. Structured fit with
+          embroidered &ldquo;Seattle Loves Ball&rdquo; front graphic, cross detail on the side, and your choice
+          of green or blue brim. Limited run — rep the city and the coverage.
+        </p>
 
-        <article class="catalog-card catalog-card--placeholder">
-          <div class="catalog-card-image">
-            <span class="catalog-placeholder-label">Coming Soon</span>
-          </div>
-          <div class="catalog-card-body">
-            <span class="catalog-card-category">Apparel</span>
-            <h2 class="catalog-card-title">Robi Report Tee — Black</h2>
-            <p class="catalog-card-price">—</p>
-          </div>
-        </article>
+        <p class="product-option-label">Color — <span id="color-selected-name" class="color-selected-name">Green</span></p>
+        <div class="color-picker" role="group" aria-label="Choose hat color">
+          <button
+            type="button"
+            class="color-swatch color-swatch--green is-active"
+            data-color="green"
+            aria-label="Green hat"
+            aria-pressed="true"
+          ></button>
+          <button
+            type="button"
+            class="color-swatch color-swatch--blue"
+            data-color="blue"
+            aria-label="Blue hat"
+            aria-pressed="false"
+          ></button>
+        </div>
 
-        <article class="catalog-card catalog-card--placeholder">
-          <div class="catalog-card-image">
-            <span class="catalog-placeholder-label">Coming Soon</span>
-          </div>
-          <div class="catalog-card-body">
-            <span class="catalog-card-category">Apparel</span>
-            <h2 class="catalog-card-title">Seattle Loves Ball Hoodie</h2>
-            <p class="catalog-card-price">—</p>
-          </div>
-        </article>
+        <ul class="product-features">
+          <li>Adjustable snapback fit</li>
+          <li>Premium structured crown with flat brim</li>
+          <li>Available in Green or Blue</li>
+          <li>Ships from Tacoma, WA</li>
+        </ul>
 
-        <article class="catalog-card catalog-card--placeholder">
-          <div class="catalog-card-image">
-            <span class="catalog-placeholder-label">Coming Soon</span>
-          </div>
-          <div class="catalog-card-body">
-            <span class="catalog-card-category">Accessories</span>
-            <h2 class="catalog-card-title">Robi Report Cross Sticker Pack</h2>
-            <p class="catalog-card-price">—</p>
-          </div>
-        </article>
+        <div class="product-actions">
+          <button type="button" id="add-to-cart-btn" class="btn btn-cart btn-lg">Add to Cart</button>
+          <a href="#" id="buy-now-btn" class="btn btn-primary btn-lg">Buy Now</a>
+        </div>
       </div>
     </div>
   </section>
+
+  <!-- Lifestyle Gallery -->
+  <section class="product-gallery" aria-labelledby="gallery-heading">
+    <div class="product-gallery-inner">
+      <div class="product-gallery-header">
+        <h2 id="gallery-heading">Gallery</h2>
+        <p>Every angle of the Seattle Loves Ball hat — plus shots from the Robi Report community.</p>
+      </div>
+      <div class="product-gallery-grid">
+        <figure class="gallery-item">
+          <img id="gallery-face" src="assets/shop/green-hat-face.png" alt="Front view — Green hat" width="800" height="800" />
+          <figcaption class="gallery-caption">Face of the hat</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img id="gallery-side" src="assets/shop/green-hat-side.png" alt="Side view — Green hat" width="800" height="800" />
+          <figcaption class="gallery-caption">Side of the hat</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img id="gallery-back" src="assets/shop/green-hat-back.png" alt="Back view — Green hat" width="800" height="800" />
+          <figcaption class="gallery-caption">Back of the hat</figcaption>
+        </figure>
+        <figure class="gallery-item gallery-item--wide">
+          <img src="assets/shop/hat-grid-composite.png" alt="Seattle Loves Ball hat — all angles" width="1200" height="675" loading="lazy" />
+          <figcaption class="gallery-caption">Combined angles</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/shop/kd-x-rr.png" alt="Kevin Durant wearing the Seattle Loves Ball Robi Report hat" width="800" height="800" loading="lazy" />
+          <figcaption class="gallery-caption">Kevin Durant</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/shop/jsn-flaujae-x-rr.png" alt="JSN and Flau'jae Johnson wearing the Seattle Loves Ball Robi Report hat" width="800" height="800" loading="lazy" />
+          <figcaption class="gallery-caption">JSN &amp; Flau&apos;jae Johnson</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <div id="cart-toast" class="cart-toast" role="status" aria-live="polite"></div>
 
 <!-- Footer -->
   <footer class="footer">
@@ -889,6 +944,7 @@
     </div>
   </footer>
 
+  <script src="assets/shop.js"></script>
   <script src="assets/nav-mobile.js"></script>
   <script src="assets/score-ticker.js"></script>
 </body>
