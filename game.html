@@ -824,7 +824,17 @@
       <p id="game-error-msg">Check the URL and try again.</p>
       <a href="index.html" class="btn btn-primary">Back to Home</a>
     </div>
-    <div class="game-content hidden" id="game-content"></div>
+    <div class="game-content hidden" id="game-content">
+      <div id="game-hero"></div>
+      <div id="game-tabs"></div>
+      <div class="game-layout">
+        <div class="game-main" id="game-main"></div>
+        <aside class="game-sidebar" id="game-sidebar">
+          <div id="game-video-sidebar" class="game-video-sidebar-mount" aria-live="polite"></div>
+          <div id="game-info-sidebar"></div>
+        </aside>
+      </div>
+    </div>
   </main>
 
 <!-- Footer -->
@@ -883,8 +893,10 @@
 
   <script src="assets/nav-mobile.js"></script>
   <script src="assets/score-ticker.js"></script>
+  <script src="assets/game-nav.js"></script>
+  <script src="assets/game-shared.js"></script>
   <script src="assets/video-sidebar.js"></script>
-  <script src="assets/game.js"></script>
+  <script src="assets/game-router.js"></script>
 </body>
 </html>
 
