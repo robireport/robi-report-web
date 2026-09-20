@@ -36,22 +36,16 @@ VIDEO_SCHEMA_RE = re.compile(
     r'\s*<script\s+type="application/ld\+json"\s+id="robi-video-schema"[^>]*>.*?</script>\s*',
     re.S | re.I,
 )
-IFRAME_EMBED_RE = re.compile(
-    r'<iframe\b[^>]*\bsrc="https?://(?:www\.)?youtube\.com/embed/([^"?/]+)[^"]*"[^>]*\btitle="([^"]*)"',
+IFRAME_TAG_RE = re.compile(
+    r'<iframe\b[^>]*\bsrc="https?://(?:www\.)?youtube\.com/embed/([^"?/]+)[^"]*"[^>]*>',
     re.I,
 )
-DATA_VIDEO_RE = re.compile(
-    r'data-video="([A-Za-z0-9_-]+)"\s+data-title="([^"]*)"',
+BUTTON_VIDEO_RE = re.compile(
+    r'<button\b[^>]*\bdata-video="([A-Za-z0-9_-]+)"[^>]*>',
     re.I,
 )
-LOCAL_VIDEO_RE = re.compile(
-    r'<video\b[^>]*>(?:\s*<source\s+src="([^"]+\.mp4)"[^>]*>)?',
-    re.S | re.I,
-)
-VIDEO_ARIA_RE = re.compile(
-    r'<video\b[^>]*\baria-label="([^"]*)"',
-    re.I,
-)
+LOCAL_VIDEO_TAG_RE = re.compile(r'<video\b[^>]*>.*?</video>', re.S | re.I)
+DEFAULT_UPLOAD_DATE = '2024-01-01T00:00:00+00:00'
 
 # Known YouTube IDs with uploadDate + description overrides for Search Console.
 YOUTUBE_METADATA: dict[str, dict[str, str]] = {
@@ -187,8 +181,40 @@ def write_site_redirects() -> Path:
     return target
 
 
+def _extract_attr(tag: str, attr: str) -> str:
+    match = re.search(rf'\b{re.escape(attr)}="([^"]*)"', tag, re.I)
+    return html.unescape(match.group(1)).strip() if match else ''
+
+
+def format_upload_date(value: str) -> str:
+    """Normalize dates to ISO 8601 with timezone for Google VideoObject schema."""
+    cleaned = (value or '').strip()
+    if not cleaned:
+        return DEFAULT_UPLOAD_DATE
+
+    if 'T' in cleaned:
+        if cleaned.endswith('Z'):
+            return cleaned[:-1] + '+00:00'
+        if re.search(r'[+-]\d{2}:\d{2}$', cleaned):
+            return cleaned
+        return f'{cleaned}+00:00'
+
+    if re.fullmatch(r'\d{4}-\d{2}-\d{2}', cleaned):
+        return f'{cleaned}T00:00:00+00:00'
+
+    return DEFAULT_UPLOAD_DATE
+
+
+def _normalize_video_name(name: str, video_id: str = '') -> str:
+    title = re.sub(r'\s+', ' ', html.unescape(name)).strip()
+    title = re.sub(r'\s*[—-]\s*Robi Report\s*$', '', title, flags=re.I)
+    if title:
+        return title
+    return f'Robi Report video {video_id}' if video_id else 'Robi Report video'
+
+
 def _default_description(name: str) -> str:
-    cleaned = re.sub(r'\s+', ' ', html.unescape(name)).strip(' —-')
+    cleaned = _normalize_video_name(name)
     if cleaned.lower().endswith('robi report'):
         return f'{cleaned}. Independent sports analysis and original video from Robi Report.'
     return f'{cleaned} — independent sports analysis and original video from Robi Report.'
@@ -198,17 +224,29 @@ def _youtube_thumbnail(video_id: str) -> str:
     return f'https://i.ytimg.com/vi/{video_id}/hqdefault.jpg'
 
 
-def _video_object_youtube(video_id: str, name: str) -> dict[str, Any]:
+def _video_object_youtube(
+    video_id: str,
+    name: str,
+    *,
+    description: str = '',
+    upload_date: str = '',
+) -> dict[str, Any]:
     meta = YOUTUBE_METADATA.get(video_id, {})
-    title = html.unescape(name).strip() or f'Robi Report video {video_id}'
-    description = meta.get('description') or _default_description(title)
-    upload_date = meta.get('uploadDate', '2024-01-01')
+    title = _normalize_video_name(name, video_id)
+    resolved_description = (
+        description
+        or meta.get('description')
+        or _default_description(title)
+    )
+    resolved_upload_date = format_upload_date(
+        upload_date or meta.get('uploadDate', DEFAULT_UPLOAD_DATE)
+    )
 
     return {
         '@type': 'VideoObject',
         'name': title,
-        'description': description,
-        'uploadDate': upload_date,
+        'description': resolved_description,
+        'uploadDate': resolved_upload_date,
         'thumbnailUrl': _youtube_thumbnail(video_id),
         'embedUrl': f'https://www.youtube.com/embed/{video_id}',
         'contentUrl': f'https://www.youtube.com/watch?v={video_id}',
@@ -223,20 +261,32 @@ def _video_object_youtube(video_id: str, name: str) -> dict[str, Any]:
     }
 
 
-def _video_object_local(src: str, name: str) -> dict[str, Any]:
+def _video_object_local(
+    src: str,
+    name: str,
+    *,
+    description: str = '',
+    upload_date: str = '',
+) -> dict[str, Any]:
     rel_src = src.lstrip('/')
     meta = LOCAL_VIDEO_METADATA.get(rel_src, {})
-    title = meta.get('name') or html.unescape(name).strip() or 'Robi Report video'
-    description = meta.get('description') or _default_description(title)
-    upload_date = meta.get('uploadDate', '2024-01-01')
+    title = _normalize_video_name(meta.get('name') or name)
+    resolved_description = (
+        description
+        or meta.get('description')
+        or _default_description(title)
+    )
+    resolved_upload_date = format_upload_date(
+        upload_date or meta.get('uploadDate', DEFAULT_UPLOAD_DATE)
+    )
     content_url = f'{SITE_ORIGIN}/{rel_src}'
     thumbnail = meta.get('thumbnailUrl', PUBLISHER_LOGO)
 
     return {
         '@type': 'VideoObject',
         'name': title,
-        'description': description,
-        'uploadDate': upload_date,
+        'description': resolved_description,
+        'uploadDate': resolved_upload_date,
         'thumbnailUrl': thumbnail,
         'contentUrl': content_url,
         'publisher': {
@@ -254,25 +304,65 @@ def extract_video_objects(page_html: str, rel_path: str) -> list[dict[str, Any]]
     videos: list[dict[str, Any]] = []
     seen_ids: set[str] = set()
 
-    for video_id, title in IFRAME_EMBED_RE.findall(page_html):
+    for match in IFRAME_TAG_RE.finditer(page_html):
+        iframe_tag = match.group(0)
+        video_id = match.group(1)
         if video_id in {'videoseries'} or video_id in seen_ids:
             continue
-        seen_ids.add(video_id)
-        videos.append(_video_object_youtube(video_id, title))
 
-    for video_id, title in DATA_VIDEO_RE.findall(page_html):
+        title = _extract_attr(iframe_tag, 'title')
+        description = _extract_attr(iframe_tag, 'data-description')
+        upload_date = _extract_attr(iframe_tag, 'data-upload-date')
+
+        seen_ids.add(video_id)
+        videos.append(
+            _video_object_youtube(
+                video_id,
+                title,
+                description=description,
+                upload_date=upload_date,
+            )
+        )
+
+    for match in BUTTON_VIDEO_RE.finditer(page_html):
+        button_tag = match.group(0)
+        video_id = match.group(1)
         if video_id in seen_ids:
             continue
-        seen_ids.add(video_id)
-        videos.append(_video_object_youtube(video_id, title))
 
-    for match in LOCAL_VIDEO_RE.finditer(page_html):
-        src = match.group(1)
+        title = _extract_attr(button_tag, 'data-title')
+        description = _extract_attr(button_tag, 'data-description')
+        upload_date = _extract_attr(button_tag, 'data-upload-date')
+
+        seen_ids.add(video_id)
+        videos.append(
+            _video_object_youtube(
+                video_id,
+                title,
+                description=description,
+                upload_date=upload_date,
+            )
+        )
+
+    for video_tag in LOCAL_VIDEO_TAG_RE.findall(page_html):
+        src = _extract_attr(video_tag, 'data-content-url')
+        if not src:
+            source_match = re.search(r'<source\s+src="([^"]+\.mp4)"', video_tag, re.I)
+            src = source_match.group(1) if source_match else ''
         if not src or not src.endswith('.mp4'):
             continue
-        aria = VIDEO_ARIA_RE.search(match.group(0))
-        label = aria.group(1) if aria else ''
-        videos.append(_video_object_local(src, label))
+
+        label = _extract_attr(video_tag, 'aria-label')
+        description = _extract_attr(video_tag, 'data-description')
+        upload_date = _extract_attr(video_tag, 'data-upload-date')
+        videos.append(
+            _video_object_local(
+                src,
+                label,
+                description=description,
+                upload_date=upload_date,
+            )
+        )
 
     return videos
 

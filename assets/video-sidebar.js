@@ -31,6 +31,93 @@
     }
   }
 
+  const PUBLISHER_LOGO = 'https://robireport.com/assets/Squared%20logo.png';
+  const DEFAULT_UPLOAD_DATE = '2024-01-01T00:00:00+00:00';
+
+  function formatUploadDate(value) {
+    const cleaned = String(value || '').trim();
+    if (!cleaned) return DEFAULT_UPLOAD_DATE;
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) {
+      return `${cleaned}T00:00:00+00:00`;
+    }
+
+    try {
+      const date = new Date(cleaned);
+      if (Number.isNaN(date.getTime())) return DEFAULT_UPLOAD_DATE;
+      return date.toISOString().replace(/\.\d{3}Z$/, '+00:00');
+    } catch (_) {
+      return DEFAULT_UPLOAD_DATE;
+    }
+  }
+
+  function normalizeVideoName(value, fallbackId) {
+    const title = String(value || '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\s*[—-]\s*Robi Report\s*$/i, '');
+    return title || (fallbackId ? `Robi Report video ${fallbackId}` : 'Robi Report video');
+  }
+
+  function defaultVideoDescription(name) {
+    const cleaned = normalizeVideoName(name);
+    if (/robi report\s*$/i.test(cleaned)) {
+      return `${cleaned}. Independent sports analysis and original video from Robi Report.`;
+    }
+    return `${cleaned} — independent sports analysis and original video from Robi Report.`;
+  }
+
+  function buildVideoObject(video) {
+    const name = normalizeVideoName(video.headline, video.id);
+    const description = String(video.description || '').trim() || defaultVideoDescription(name);
+    const uploadDate = formatUploadDate(video.published);
+    const item = {
+      '@type': 'VideoObject',
+      name,
+      description,
+      uploadDate,
+      publisher: {
+        '@type': 'Organization',
+        name: 'Robi Report',
+        logo: {
+          '@type': 'ImageObject',
+          url: PUBLISHER_LOGO,
+        },
+      },
+    };
+
+    if (video.thumbnail) item.thumbnailUrl = video.thumbnail;
+    if (video.webUrl) item.contentUrl = video.webUrl;
+    else if (video.mp4) item.contentUrl = video.mp4;
+    if (video.mp4 || video.hls) item.embedUrl = video.mp4 || video.hls;
+
+    return item;
+  }
+
+  function injectVideoSchema(videos) {
+    const objects = (videos || [])
+      .slice(0, 12)
+      .map(buildVideoObject)
+      .filter((item) => item.name && item.description && item.uploadDate);
+
+    if (!objects.length) return;
+
+    let script = document.getElementById('robi-video-schema');
+    if (!script) {
+      script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = 'robi-video-schema';
+      document.head.appendChild(script);
+    }
+
+    const payload =
+      objects.length === 1
+        ? { '@context': 'https://schema.org', ...objects[0] }
+        : { '@context': 'https://schema.org', '@graph': objects };
+
+    script.textContent = JSON.stringify(payload);
+  }
+
   function getVideoSourceLinks(links) {
     const source = links?.source || {};
     return {
@@ -219,6 +306,8 @@
       `;
     }
 
+    injectVideoSchema(videos);
+
     const first = videos[0];
     const listHtml = videos
       .map((video, index) => {
@@ -239,6 +328,8 @@
               data-hls="${escapeHtml(video.hls)}"
               data-web="${escapeHtml(video.webUrl)}"
               data-duration="${escapeHtml(duration)}"
+              data-published="${escapeHtml(video.published || '')}"
+              data-description="${escapeHtml(video.description || '')}"
             >
               <div class="video-sidebar-item-thumb-wrap">
                 ${thumb}
@@ -397,7 +488,9 @@
     buildGameVideoTitle,
     render: renderVideoSidebar,
     init: initVideoSidebars,
+    injectVideoSchema,
     formatDuration,
     formatTimestamp,
+    formatUploadDate,
   };
 })(window);
