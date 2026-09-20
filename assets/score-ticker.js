@@ -55,6 +55,7 @@
     boxing: {
       url: 'https://site.api.espn.com/apis/site/v2/sports/boxing/scoreboard',
       mode: 'fighter',
+      fallbackOnly: true,
     },
     epl: {
       url: 'https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard',
@@ -63,6 +64,7 @@
   };
 
   const ALL_KEYS = Object.keys(LEAGUES);
+  const COMBAT_LEAGUES = new Set(['ufc', 'boxing']);
   const REFRESH_MS = 60000;
 
   const ticker = document.getElementById('score-ticker');
@@ -151,7 +153,9 @@
     const id = event?.id;
     const sportCode = LEAGUE_SPORT_CODES[leagueKey];
     if (!id || !sportCode) return '';
-    const params = new URLSearchParams({ gameId: id, sport: sportCode });
+    // Boxing has no working ESPN game center; avoid broken routes.
+    if (leagueKey === 'boxing') return '';
+    const params = new URLSearchParams({ gameId: String(id), sport: sportCode });
     return `${getPathPrefix()}game.html?${params.toString()}`;
   }
 
@@ -244,13 +248,37 @@
     if (cache[key]?.fetchedAt && Date.now() - cache[key].fetchedAt < REFRESH_MS - 5000) {
       return cache[key].cards;
     }
+
     const cfg = LEAGUES[key];
-    const res = await fetch(cfg.url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const cards = parseEvents(data, cfg.mode, key);
-    cache[key] = { cards, fetchedAt: Date.now() };
-    return cards;
+
+    if (cfg.fallbackOnly) {
+      cache[key] = { cards: [], fetchedAt: Date.now() };
+      return [];
+    }
+
+    try {
+      const res = await fetch(cfg.url);
+      if (!res.ok) {
+        if (COMBAT_LEAGUES.has(key)) {
+          console.warn(`Combat ticker ${key}: HTTP ${res.status}`);
+          cache[key] = { cards: [], fetchedAt: Date.now() };
+          return [];
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const cards = parseEvents(data, cfg.mode, key);
+      cache[key] = { cards, fetchedAt: Date.now() };
+      return cards;
+    } catch (err) {
+      if (COMBAT_LEAGUES.has(key)) {
+        console.warn(`Combat ticker ${key} fetch failed:`, err);
+        cache[key] = { cards: [], fetchedAt: Date.now() };
+        return [];
+      }
+      throw err;
+    }
   }
 
   function buildSection(leagueKey, cards) {
@@ -275,6 +303,7 @@
         });
         return sections.length ? sections : null;
       }
+
       const cards = await fetchLeague(filter);
       return [buildSection(filter, cards)];
     } catch (err) {
@@ -340,6 +369,11 @@
     return card;
   }
 
+  function getEmptyMessage(leagueKey) {
+    if (COMBAT_LEAGUES.has(leagueKey)) return 'Upcoming Cards / Check Back Soon';
+    return 'No matches scheduled today';
+  }
+
   function renderPlaceholder(message, type) {
     const card = document.createElement('div');
     card.className = `score-card is-${type}`;
@@ -381,7 +415,7 @@
     if (section.cards.length) {
       section.cards.forEach((c) => cardsWrap.appendChild(renderCard(c)));
     } else {
-      cardsWrap.appendChild(renderPlaceholder('No matches scheduled today', 'placeholder'));
+      cardsWrap.appendChild(renderPlaceholder(getEmptyMessage(section.league), 'placeholder'));
     }
 
     wrap.appendChild(cardsWrap);
@@ -395,7 +429,10 @@
       return;
     }
     if (!sections || !sections.length) {
-      track.appendChild(renderPlaceholder('No matches scheduled today', 'placeholder'));
+      const msg = COMBAT_LEAGUES.has(activeFilter)
+        ? 'Upcoming Cards / Check Back Soon'
+        : 'No matches scheduled today';
+      track.appendChild(renderPlaceholder(msg, 'placeholder'));
       return;
     }
     sections.forEach((section) => track.appendChild(renderSection(section)));

@@ -6,10 +6,12 @@
     wnba: { category: 'basketball', league: 'wnba', hub: 'wnba.html', label: 'WNBA' },
     nfl: { category: 'football', league: 'nfl', hub: 'nfl.html', label: 'NFL' },
     mlb: { category: 'baseball', league: 'mlb', hub: 'mlb.html', label: 'MLB' },
-    ufc: { category: 'mma', league: 'ufc', hub: 'ufc.html', label: 'UFC' },
-    boxing: { category: 'boxing', league: 'boxing', hub: 'boxing.html', label: 'Boxing' },
+    ufc: { category: 'mma', league: 'ufc', hub: 'ufc.html', label: 'UFC', combat: true },
+    boxing: { category: 'boxing', league: 'boxing', hub: 'boxing.html', label: 'Boxing', combat: true },
     soccer: { category: 'soccer', league: 'eng.1', hub: 'soccer.html', label: 'Premier League' },
   };
+
+  const COMBAT_SPORTS = new Set(['ufc', 'boxing']);
 
   function escapeHtml(str) {
     return String(str ?? '')
@@ -281,7 +283,11 @@
     }
 
     async function run() {
-      if (!gameId || !SPORT_CONFIG[sport]) {
+      if (!SPORT_CONFIG[sport]) {
+        showError('Missing or invalid URL parameters. Use ?sport=nba&gameId=401705722');
+        return;
+      }
+      if (!gameId && !COMBAT_SPORTS.has(sport)) {
         showError('Missing or invalid URL parameters. Use ?sport=nba&gameId=401705722');
         return;
       }
@@ -289,6 +295,42 @@
       const cfg = SPORT_CONFIG[sport];
 
       try {
+        if (COMBAT_SPORTS.has(sport)) {
+          hideLoading();
+          const tabsEl = document.getElementById('game-tabs');
+          if (tabsEl && global.GameNav) {
+            tabsEl.innerHTML = global.GameNav.renderTabs(activeTab, sport, gameId);
+          }
+          const infoSidebarEl = document.getElementById('game-info-sidebar');
+          if (infoSidebarEl) infoSidebarEl.innerHTML = '';
+
+          if (global.GameCombat) {
+            await global.GameCombat.renderCombatPage({
+              data: null,
+              cfg,
+              comp: {},
+              sport,
+              gameId,
+              els,
+              activeTab,
+            });
+          } else {
+            showError('Check back soon for upcoming cards.');
+          }
+
+          if (global.PlayerLinks) global.PlayerLinks.init(els.content);
+
+          const ticker = document.getElementById('score-ticker');
+          if (ticker) {
+            const tickerSportMap = {
+              ufc: 'ufc',
+              boxing: 'boxing',
+            };
+            if (tickerSportMap[sport]) ticker.dataset.default = tickerSportMap[sport];
+          }
+          return;
+        }
+
         const res = await fetch(buildSummaryUrl(cfg, gameId));
         if (!res.ok) throw new Error(`ESPN API returned ${res.status}`);
         const data = await res.json();
@@ -335,7 +377,9 @@
 
   global.GameShared = {
     SPORT_CONFIG,
+    COMBAT_SPORTS,
     escapeHtml,
+    formatGameTime,
     getCompetitors,
     getCompetition,
     getGameStatus,

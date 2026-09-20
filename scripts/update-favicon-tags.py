@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Point favicon and apple-touch-icon tags at padded icon assets."""
+"""Point favicon and apple-touch-icon tags at root icon assets."""
 
 from __future__ import annotations
 
@@ -8,18 +8,22 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-FAVICON_32 = '/assets/squared-logo-icon-32.png?v=1'
-APPLE_TOUCH_ICON = '/assets/squared-logo-icon-180.png?v=1'
+FAVICON_32 = '/favicon-32x32.png'
+FAVICON_16 = '/favicon-16x16.png'
+FAVICON_ICO = '/favicon.ico'
+APPLE_TOUCH_ICON = '/apple-touch-icon.png'
 
 ICON_BLOCK = re.compile(
     r'\s*<link rel="icon" type="image/png" sizes="32x32" href="[^"]+" />\s*'
-    r'<link rel="shortcut icon" href="[^"]+" type="image/png" />\s*'
-    r'<link rel="apple-touch-icon"[^>]*href="[^"]+"[^>]*/>\s*',
+    r'(?:<link rel="icon" type="image/png" sizes="16x16" href="[^"]+" />\s*)?'
+    r'(?:<link rel="icon" href="[^"]+" sizes="any" />\s*)?'
+    r'(?:<link rel="shortcut icon" href="[^"]+"[^>]*/>\s*)?'
+    r'<link rel="apple-touch-icon"[^>]*/>\s*',
     re.I,
 )
 
 STANDALONE_APPLE_TOUCH = re.compile(
-    r'\s*<link rel="apple-touch-icon"[^>]*href="[^"]+"[^>]*/>\s*',
+    r'\s*<link rel="apple-touch-icon"[^>]*/>\s*',
     re.I,
 )
 
@@ -28,13 +32,14 @@ def build_icon_block() -> str:
     return (
         '\n'
         f'  <link rel="icon" type="image/png" sizes="32x32" href="{FAVICON_32}" />\n'
-        f'  <link rel="shortcut icon" href="{FAVICON_32}" type="image/png" />\n'
-        f'  <link rel="apple-touch-icon" href="{APPLE_TOUCH_ICON}" />\n'
+        f'  <link rel="icon" type="image/png" sizes="16x16" href="{FAVICON_16}" />\n'
+        f'  <link rel="icon" href="{FAVICON_ICO}" sizes="any" />\n'
+        f'  <link rel="apple-touch-icon" sizes="180x180" href="{APPLE_TOUCH_ICON}" />\n'
     )
 
 
 def build_apple_touch_tag() -> str:
-    return f'  <link rel="apple-touch-icon" href="{APPLE_TOUCH_ICON}" />\n'
+    return f'  <link rel="apple-touch-icon" sizes="180x180" href="{APPLE_TOUCH_ICON}" />\n'
 
 
 def update_file(path: Path) -> bool:
@@ -51,12 +56,11 @@ def update_file(path: Path) -> bool:
             path.write_text(updated, encoding='utf-8')
             return True
 
-    # Game view stubs and other minimal heads: insert after apple-mobile-web-app-title.
     marker = '<meta name="apple-mobile-web-app-title" content="Robi Report" />'
     if marker in content and 'rel="apple-touch-icon"' not in content:
         updated = content.replace(
             marker,
-            marker + '\n' + build_apple_touch_tag().rstrip(),
+            marker + '\n' + build_icon_block().rstrip(),
             1,
         )
         path.write_text(updated, encoding='utf-8')

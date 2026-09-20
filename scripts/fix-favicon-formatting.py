@@ -9,8 +9,8 @@ for path in ROOT.rglob('*.html'):
     text = path.read_text(encoding='utf-8')
     updated = text.replace('Robi Report" />  <link', 'Robi Report" />\n  <link')
     updated = updated.replace(
-        'squared-logo-icon-180.png?v=1" />\n<link rel="manifest"',
-        'squared-logo-icon-180.png?v=1" />\n  <link rel="manifest"',
+        'apple-touch-icon.png" />\n<link rel="manifest"',
+        'apple-touch-icon.png" />\n  <link rel="manifest"',
     )
     if updated != text:
         path.write_text(updated, encoding='utf-8')
