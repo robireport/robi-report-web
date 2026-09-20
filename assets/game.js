@@ -213,7 +213,14 @@
     `;
   }
 
-  function renderSidebar(data, comp, cfg) {
+  function renderSidebar(data, comp, cfg, videos) {
+    const videoTitle = window.VideoSidebar
+      ? window.VideoSidebar.buildGameVideoTitle(comp)
+      : 'Game Highlights';
+    const videoHtml = window.VideoSidebar
+      ? window.VideoSidebar.render(videos, videoTitle)
+      : '';
+
     const gi = data.gameInfo || {};
     const venue = gi.venue || comp?.venue || {};
     const city = venue.address?.city;
@@ -233,6 +240,7 @@
 
     return `
       <aside class="game-sidebar">
+        ${videoHtml}
         <div class="game-info-card">
           <h3>Game Information</h3>
           <ul class="game-info-list">
@@ -345,13 +353,17 @@
     const homeName = comp.competitors?.find((c) => c.homeAway === 'home')?.team?.displayName || 'Home';
     document.title = `${awayName} vs ${homeName} — Robi Report`;
 
+    const videos = window.VideoSidebar ? window.VideoSidebar.collectFromSummary(data) : [];
+
     els.content.innerHTML = `
       ${renderHero(data, comp, cfg)}
       <div class="game-layout">
         <div class="game-main">${boxscoreHtml}</div>
-        ${renderSidebar(data, comp, cfg)}
+        ${renderSidebar(data, comp, cfg, videos)}
       </div>
     `;
+
+    if (window.VideoSidebar) window.VideoSidebar.init(els.content);
   }
 
   async function init() {

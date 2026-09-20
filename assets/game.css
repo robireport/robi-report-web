@@ -348,6 +348,10 @@
   gap: 20px;
 }
 
+.game-sidebar .video-sidebar {
+  margin-bottom: 0;
+}
+
 .game-info-card {
   background: var(--bg-card);
   border: 1px solid var(--border);

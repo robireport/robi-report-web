@@ -199,6 +199,12 @@
 }
 
 /* Bio sidebar */
+.player-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .player-bio-list {
   list-style: none;
 }
