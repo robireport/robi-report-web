@@ -113,6 +113,14 @@
   }
 
   function renderMain({ data, cfg, comp, sport, gameId, els }) {
+    if (sport === 'soccer' && window.GameSoccer) {
+      window.GameSoccer.renderMain({ data, cfg, comp, sport, gameId, els });
+      return;
+    }
+
+    const lineupSidebarEl = document.getElementById('game-lineup-sidebar');
+    if (lineupSidebarEl) lineupSidebarEl.innerHTML = '';
+
     const preferBasketball = cfg.category === 'basketball';
     const linkPlayers = sport === 'nba' || sport === 'wnba';
     const playerGroups = data.boxscore?.players || [];
