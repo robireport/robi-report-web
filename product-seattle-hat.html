@@ -798,29 +798,43 @@
             <img src="assets/shop/jsn-flaujae-x-rr.png" alt="" width="72" height="72" />
           </button>
         </div>
-        <button type="button" class="product-viewer" id="product-viewer-btn" aria-label="View full-size product image">
-          <img
-            id="product-viewer-img"
-            src="assets/shop/green-hat-face.png"
-            alt="Seattle Loves Ball Robi Report Hat — Green"
-            width="800"
-            height="800"
-          />
-          <span class="product-viewer-hint" aria-hidden="true">Click to zoom</span>
-        </button>
+        <div class="product-carousel-wrap">
+          <div class="product-carousel" id="product-carousel" role="region" aria-label="Product images — swipe to browse">
+            <div class="product-carousel-track" id="product-carousel-track">
+              <button type="button" class="product-carousel-slide" data-image="face" aria-label="Front view — click to zoom">
+                <img src="assets/shop/green-hat-face.png" alt="Front view — Seattle Loves Ball hat" width="800" height="800" />
+              </button>
+              <button type="button" class="product-carousel-slide" data-image="side" aria-label="Side view — click to zoom">
+                <img src="assets/shop/green-hat-side.png" alt="Side view — Seattle Loves Ball hat" width="800" height="800" />
+              </button>
+              <button type="button" class="product-carousel-slide" data-image="back" aria-label="Back view — click to zoom">
+                <img src="assets/shop/green-hat-back.png" alt="Back view — Seattle Loves Ball hat" width="800" height="800" />
+              </button>
+              <button type="button" class="product-carousel-slide" data-image="composite" aria-label="All angles — click to zoom">
+                <img src="assets/shop/hat-grid-composite.png" alt="All angles — Seattle Loves Ball hat" width="1200" height="675" />
+              </button>
+              <button type="button" class="product-carousel-slide" data-image="kd" aria-label="Kevin Durant — click to zoom">
+                <img src="assets/shop/kd-x-rr.png" alt="Kevin Durant wearing the Seattle Loves Ball hat" width="800" height="800" />
+              </button>
+              <button type="button" class="product-carousel-slide" data-image="jsn" aria-label="JSN and Flau'jae Johnson — click to zoom">
+                <img src="assets/shop/jsn-flaujae-x-rr.png" alt="JSN and Flau'jae Johnson wearing the Seattle Loves Ball hat" width="800" height="800" />
+              </button>
+            </div>
+          </div>
+          <div class="carousel-indicators" id="carousel-indicators" aria-hidden="true">
+            <span class="carousel-dot is-active"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+          </div>
+          <span class="product-viewer-hint" aria-hidden="true">Swipe to browse · Click to zoom</span>
+        </div>
       </div>
 
-      <div class="product-info">
-        <p class="product-info-category">Headwear · Product #1</p>
-        <h1>Seattle Loves Ball Robi Report Hat</h1>
-        <p class="product-info-price">$35.00</p>
-        <p class="product-info-description">
-          The official Robi Report cap celebrating Seattle&apos;s basketball culture. Structured fit with
-          embroidered &ldquo;Seattle Loves Ball&rdquo; front graphic, cross detail on the side, and your choice
-          of green or blue brim. Limited run — rep the city and the coverage.
-        </p>
-
-        <p class="product-option-label">Color — <span id="color-selected-name" class="color-selected-name">Green</span></p>
+      <div class="product-color-mobile">
+        <p class="product-option-label">Color — <span class="color-selected-name">Green</span></p>
         <div class="color-picker" role="group" aria-label="Choose hat color">
           <button
             type="button"
@@ -836,6 +850,37 @@
             aria-label="Blue hat"
             aria-pressed="false"
           ></button>
+        </div>
+      </div>
+
+      <div class="product-info">
+        <p class="product-info-category">Headwear · Product #1</p>
+        <h1>Seattle Loves Ball Robi Report Hat</h1>
+        <p class="product-info-price">$35.00</p>
+        <p class="product-info-description">
+          The official Robi Report cap celebrating Seattle&apos;s basketball culture. Structured fit with
+          embroidered &ldquo;Seattle Loves Ball&rdquo; front graphic, cross detail on the side, and your choice
+          of green or blue brim. Limited run — rep the city and the coverage.
+        </p>
+
+        <div class="product-color-desktop">
+          <p class="product-option-label">Color — <span class="color-selected-name">Green</span></p>
+          <div class="color-picker" role="group" aria-label="Choose hat color">
+            <button
+              type="button"
+              class="color-swatch color-swatch--green is-active"
+              data-color="green"
+              aria-label="Green hat"
+              aria-pressed="true"
+            ></button>
+            <button
+              type="button"
+              class="color-swatch color-swatch--blue"
+              data-color="blue"
+              aria-label="Blue hat"
+              aria-pressed="false"
+            ></button>
+          </div>
         </div>
 
         <ul class="product-features">
