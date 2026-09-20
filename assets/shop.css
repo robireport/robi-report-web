@@ -200,7 +200,7 @@
 }
 
 .product-page {
-  padding: 24px 24px 64px;
+  padding: 24px 24px 100px;
 }
 
 .product-page-inner {
@@ -253,22 +253,53 @@
 }
 
 .product-viewer {
-  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 24px;
+  background: #0a0a0a;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
   aspect-ratio: 1;
+  cursor: zoom-in;
+  position: relative;
+  font-family: inherit;
+  transition: border-color var(--transition);
+}
+
+.product-viewer:hover {
+  border-color: var(--border-hover);
 }
 
 .product-viewer img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
   transition: opacity 0.25s ease;
 }
 
 .product-viewer img.is-switching {
   opacity: 0.6;
+}
+
+.product-viewer-hint {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  pointer-events: none;
 }
 
 .product-info {
@@ -421,74 +452,77 @@
   transform: translateY(0);
 }
 
-/* ── Product Gallery ── */
-.product-gallery {
-  padding: 0 24px 100px;
+/* ── Image Lightbox ── */
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
 }
 
-.product-gallery-inner {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding-top: 48px;
-  border-top: 1px solid var(--border);
+.image-lightbox[hidden] {
+  display: none;
 }
 
-.product-gallery-header {
-  margin-bottom: 28px;
+.lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.product-gallery-header h2 {
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 6px;
+.lightbox-content {
+  position: relative;
+  z-index: 1;
+  width: min(96vw, 1100px);
+  height: min(88vh, 900px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
 }
 
-.product-gallery-header p {
-  color: var(--text-secondary);
-  font-size: 0.92rem;
-}
-
-.product-gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.gallery-item {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  transition: border-color var(--transition);
-}
-
-.gallery-item:hover {
-  border-color: var(--border-hover);
-}
-
-.gallery-item img {
-  width: 100%;
+.lightbox-content img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
-  aspect-ratio: 1;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  border-radius: var(--radius-sm);
 }
 
-.gallery-item--wide {
-  grid-column: span 3;
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 17, 17, 0.9);
+  border: 1px solid var(--border-hover);
+  border-radius: 50%;
+  color: var(--text-primary);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
 }
 
-.gallery-item--wide img {
-  aspect-ratio: 21 / 9;
-  object-fit: cover;
+.lightbox-close:hover {
+  border-color: var(--accent);
+  background: rgba(146, 210, 255, 0.12);
 }
 
-.gallery-caption {
-  padding: 10px 14px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  border-top: 1px solid var(--border);
+body.lightbox-open {
+  overflow: hidden;
 }
 
 @media (max-width: 1100px) {
@@ -512,13 +546,6 @@
     position: static;
   }
 
-  .product-gallery-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .gallery-item--wide {
-    grid-column: span 2;
-  }
 }
 
 @media (max-width: 540px) {
@@ -540,11 +567,4 @@
     gap: 8px;
   }
 
-  .product-gallery-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .gallery-item--wide {
-    grid-column: span 1;
-  }
 }

@@ -2,15 +2,17 @@
   var viewer = document.getElementById('product-viewer-img');
   if (!viewer) return;
 
+  var viewerBtn = document.getElementById('product-viewer-btn');
   var thumbs = document.querySelectorAll('.product-thumb');
   var swatches = document.querySelectorAll('.color-swatch');
   var colorLabel = document.getElementById('color-selected-name');
   var buyBtn = document.getElementById('buy-now-btn');
   var cartBtn = document.getElementById('add-to-cart-btn');
   var toast = document.getElementById('cart-toast');
-  var galleryFace = document.getElementById('gallery-face');
-  var gallerySide = document.getElementById('gallery-side');
-  var galleryBack = document.getElementById('gallery-back');
+  var lightbox = document.getElementById('image-lightbox');
+  var lightboxImg = document.getElementById('lightbox-img');
+  var lightboxClose = document.getElementById('lightbox-close');
+  var lightboxBackdrop = document.getElementById('lightbox-backdrop');
 
   var colors = {
     green: {
@@ -43,10 +45,34 @@
     return staticImages[key];
   }
 
+  function syncLightboxImage() {
+    if (!lightboxImg) return;
+    lightboxImg.src = viewer.src;
+    lightboxImg.alt = viewer.alt;
+  }
+
   function setViewerImage(src, alt) {
     viewer.classList.add('is-switching');
     viewer.src = src;
     viewer.alt = alt;
+    syncLightboxImage();
+  }
+
+  function openLightbox() {
+    if (!lightbox) return;
+    syncLightboxImage();
+    lightbox.hidden = false;
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('lightbox-open');
+    if (lightboxClose) lightboxClose.focus();
+  }
+
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.hidden = true;
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('lightbox-open');
+    if (viewerBtn) viewerBtn.focus();
   }
 
   function updateBuyLink() {
@@ -71,10 +97,6 @@
         if (img) img.src = colors[activeColor][key];
       }
     });
-
-    if (galleryFace) galleryFace.src = colors[activeColor].face;
-    if (gallerySide) gallerySide.src = colors[activeColor].side;
-    if (galleryBack) galleryBack.src = colors[activeColor].back;
 
     if (activeThumbKey === 'face' || activeThumbKey === 'side' || activeThumbKey === 'back') {
       setViewerImage(
@@ -135,6 +157,24 @@
     swatch.addEventListener('click', function () {
       setColor(swatch.dataset.color);
     });
+  });
+
+  if (viewerBtn) {
+    viewerBtn.addEventListener('click', openLightbox);
+  }
+
+  if (lightboxClose) {
+    lightboxClose.addEventListener('click', closeLightbox);
+  }
+
+  if (lightboxBackdrop) {
+    lightboxBackdrop.addEventListener('click', closeLightbox);
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && lightbox && !lightbox.hidden) {
+      closeLightbox();
+    }
   });
 
   if (cartBtn) {
