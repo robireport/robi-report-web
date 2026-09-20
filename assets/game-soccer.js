@@ -113,7 +113,14 @@
     return groups;
   }
 
-  function renderPlayerRow(player, cols, subMaps) {
+  function renderLinkedName(name, athleteId, sport, gameId, options) {
+    if (global.PlayerLinks) {
+      return global.PlayerLinks.renderPlayerName(name, athleteId, sport, gameId, options);
+    }
+    return escapeHtml(name);
+  }
+
+  function renderPlayerRow(player, cols, subMaps, sport, gameId) {
     const name = player.athlete?.displayName || player.athlete?.shortName || '—';
     const jersey = player.jersey ? `#${player.jersey} ` : '';
     const athleteId = player.athlete?.id;
@@ -124,16 +131,17 @@
       : subOutMin
         ? `<span class="soccer-sub-badge out">${escapeHtml(subOutMin)}</span>`
         : '';
+    const nameHtml = renderLinkedName(`${jersey}${name}`, athleteId, sport, gameId);
     const cells = cols.map((col) => `<td>${escapeHtml(getStatValue(player, col))}</td>`).join('');
     return `<tr>
       <td class="player-name">
-        <span class="soccer-player-cell">${escapeHtml(jersey + name)}${subBadge}</span>
+        <span class="soccer-player-cell">${nameHtml}${subBadge}</span>
       </td>
       ${cells}
     </tr>`;
   }
 
-  function renderPositionTable(title, players, cols, subMaps) {
+  function renderPositionTable(title, players, cols, subMaps, sport, gameId) {
     if (!players.length) {
       return `<section class="boxscore-category">
         <h3 class="boxscore-group-title">${escapeHtml(title)}</h3>
@@ -147,7 +155,7 @@
         if (a.starter !== b.starter) return a.starter ? -1 : 1;
         return (a.jersey || 99) - (b.jersey || 99);
       })
-      .map((p) => renderPlayerRow(p, cols, subMaps))
+      .map((p) => renderPlayerRow(p, cols, subMaps, sport, gameId))
       .join('');
 
     return `<section class="boxscore-category">
@@ -161,7 +169,7 @@
     </section>`;
   }
 
-  function renderTeamBoxscore(rosterEntry, subMaps) {
+  function renderTeamBoxscore(rosterEntry, subMaps, sport, gameId) {
     const team = rosterEntry.team || {};
     const logo = getTeamLogo(team);
     const groups = groupPlayers(rosterEntry.roster || []);
@@ -169,7 +177,7 @@
     const tables = POSITION_GROUPS.map(({ key, title }) => {
       const players = groups[key];
       const cols = key === 'goalkeepers' ? GK_COLS : OUTFIELD_COLS;
-      return renderPositionTable(title, players, cols, subMaps);
+      return renderPositionTable(title, players, cols, subMaps, sport, gameId);
     }).join('');
 
     return `
@@ -221,7 +229,7 @@
     return { subInMinutes, subOutMinutes };
   }
 
-  function renderPitchPlayers(starters, subMaps) {
+  function renderPitchPlayers(starters, subMaps, sport, gameId) {
     return starters
       .filter((p) => p.formationPlace && FORMATION_COORDS[p.formationPlace])
       .map((p) => {
@@ -230,17 +238,20 @@
         const lastName = name.split(' ').pop() || name;
         const subbedOut = p.athlete?.id && subMaps?.subOutMinutes?.[p.athlete.id];
         const subbed = subbedOut ? ' is-subbed-out' : '';
+        const nameHtml = renderLinkedName(lastName, p.athlete?.id, sport, gameId, {
+          extraClass: 'soccer-pitch-name-link',
+        });
         return `
           <div class="soccer-pitch-player${subbed}" style="left:${coord.x}%;top:${coord.y}%;" title="${escapeHtml(name)}">
             <span class="soccer-pitch-jersey">${escapeHtml(String(p.jersey || ''))}</span>
-            <span class="soccer-pitch-name">${escapeHtml(lastName)}</span>
+            <span class="soccer-pitch-name">${nameHtml}</span>
           </div>
         `;
       })
       .join('');
   }
 
-  function renderBenchList(roster, subMaps) {
+  function renderBenchList(roster, subMaps, sport, gameId) {
     const bench = (roster || []).filter((p) => !p.starter);
     if (!bench.length) return '<p class="soccer-bench-empty">No bench listed.</p>';
 
@@ -252,13 +263,14 @@
           const tag = subMin
             ? `<span class="soccer-bench-tag in">${escapeHtml(subMin)}</span>`
             : '';
-          return `<li><span class="soccer-bench-num">${escapeHtml(String(p.jersey || '—'))}</span> ${escapeHtml(name)}${tag}</li>`;
+          const nameHtml = renderLinkedName(name, p.athlete?.id, sport, gameId);
+          return `<li><span class="soccer-bench-num">${escapeHtml(String(p.jersey || '—'))}</span> ${nameHtml}${tag}</li>`;
         })
         .join('')}
     </ul>`;
   }
 
-  function renderSubsTimeline(subs, teamName) {
+  function renderSubsTimeline(subs, teamName, sport, gameId) {
     const teamSubs = subs.filter(
       (s) => s.team === teamName || s.text.includes(teamName)
     );
@@ -273,8 +285,8 @@
         <li class="soccer-sub-event">
           <span class="soccer-sub-minute">${escapeHtml(s.minute)}</span>
           <div class="soccer-sub-detail">
-            ${s.playerIn ? `<span class="soccer-sub-in">↑ ${escapeHtml(s.playerIn)}</span>` : ''}
-            ${s.playerOut ? `<span class="soccer-sub-out">↓ ${escapeHtml(s.playerOut)}</span>` : ''}
+            ${s.playerIn ? `<span class="soccer-sub-in">↑ ${renderLinkedName(s.playerIn, s.playerInId, sport, gameId)}</span>` : ''}
+            ${s.playerOut ? `<span class="soccer-sub-out">↓ ${renderLinkedName(s.playerOut, s.playerOutId, sport, gameId)}</span>` : ''}
           </div>
         </li>`
         )
@@ -298,7 +310,7 @@
     return 'Player stats are not yet available for this match.';
   }
 
-  function renderLineupSidebar(data, comp) {
+  function renderLineupSidebar(data, comp, sport, gameId) {
     const rosters = extractSoccerRosters(data);
     const { isFinal, isLive } = getGameStatus(comp);
     if (!rosters.length) {
@@ -350,16 +362,16 @@
             <div class="soccer-pitch-wrap">
               <div class="soccer-pitch" aria-label="Starting formation">
                 <div class="soccer-pitch-markings"></div>
-                ${renderPitchPlayers(starters, subMaps)}
+                ${renderPitchPlayers(starters, subMaps, sport, gameId)}
               </div>
             </div>
             <div class="soccer-lineup-section">
               <h4>Substitutions</h4>
-              ${renderSubsTimeline(subs, t.name)}
+              ${renderSubsTimeline(subs, t.name, sport, gameId)}
             </div>
             <div class="soccer-lineup-section">
               <h4>Bench</h4>
-              ${renderBenchList(t.roster, subMaps)}
+              ${renderBenchList(t.roster, subMaps, sport, gameId)}
             </div>
           </div>
         `;
@@ -408,7 +420,7 @@
     const subMaps = buildSubMinuteMaps(parseSubstitutions(data.keyEvents));
     const emptyMessage = getEmptyStatsMessage(comp, rosters);
     const tablesHtml = rosters.length
-      ? rosters.map((entry) => renderTeamBoxscore(entry, subMaps)).join('')
+      ? rosters.map((entry) => renderTeamBoxscore(entry, subMaps, sport, gameId)).join('')
       : `<div class="boxscore-empty">${escapeHtml(emptyMessage)}</div>`;
 
     const boxscoreHtml = `
@@ -425,7 +437,7 @@
       ? global.VideoSidebar.buildGameVideoTitle(comp)
       : 'GAME HIGHLIGHTS';
     const videoHtml = global.VideoSidebar ? global.VideoSidebar.render(videos, videoTitle) : '';
-    const lineupHtml = renderLineupSidebar(data, comp);
+    const lineupHtml = renderLineupSidebar(data, comp, sport, gameId);
 
     const mainEl = document.getElementById('game-main');
     const videoSidebarEl = document.getElementById('game-video-sidebar');

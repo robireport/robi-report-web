@@ -403,13 +403,29 @@
   text-overflow: ellipsis;
 }
 
-.boxscore-table .player-profile-link {
+.player-profile-link {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
   color: inherit;
+  cursor: pointer;
+  text-align: inherit;
   transition: color var(--transition);
 }
 
-.boxscore-table .player-profile-link:hover {
+.player-profile-link:hover {
   color: var(--accent);
+}
+
+.boxscore-table .player-profile-link {
+  font-weight: 600;
+}
+
+.soccer-pitch-name .player-profile-link {
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .boxscore-table .dnp {
