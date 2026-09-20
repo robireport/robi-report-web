@@ -3,11 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/Squared%20logo.png?v=2" />
-  <link rel="shortcut icon" href="assets/Squared%20logo.png?v=2" type="image/png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/Squared%20logo.png?v=2" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Robi Report" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/Squared%20logo.png?v=3" />
+  <link rel="shortcut icon" href="assets/Squared%20logo.png?v=3" type="image/png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/Squared%20logo.png?v=3" />
   <link rel="manifest" href="site.webmanifest" />
-  <title>Robi Report</title>
+  <script id="robi-www-redirect">
+    (function () {
+      if (location.hostname === 'www.robireport.com') {
+        location.replace('https://robireport.com' + location.pathname + location.search + location.hash);
+      }
+    })();
+  </script>
+<title>Robi Report</title>
   <style>
     html, body {
       margin: 0;
@@ -82,10 +91,10 @@
         return false;
       }
 
-      function loadRedirects() {
+      function loadJson(path) {
         try {
           var xhr = new XMLHttpRequest();
-          xhr.open('GET', '/assets/article-redirects.json', false);
+          xhr.open('GET', path, false);
           xhr.send(null);
           if (xhr.status >= 200 && xhr.status < 300) {
             return JSON.parse(xhr.responseText);
@@ -96,12 +105,28 @@
         return {};
       }
 
+      function loadRedirects() {
+        var redirects = loadJson('/assets/article-redirects.json');
+        var siteRedirects = loadJson('/assets/site-redirects.json');
+        for (var key in siteRedirects) {
+          if (Object.prototype.hasOwnProperty.call(siteRedirects, key)) {
+            redirects[key] = siteRedirects[key];
+          }
+        }
+        return redirects;
+      }
+
       function showNotFound() {
         document.documentElement.classList.add('show-not-found');
         document.title = 'Page not found — Robi Report';
       }
 
       function resolve() {
+        if (loc.hostname === 'www.robireport.com') {
+          redirectTo('https://robireport.com' + loc.pathname);
+          return;
+        }
+
         var path = normalizePath(loc.pathname);
         var redirects = loadRedirects();
 

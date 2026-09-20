@@ -1,0 +1,15 @@
+{
+  "/gamecast": "/game.html?view=gamecast",
+  "/gamecast.html": "/game.html?view=gamecast",
+  "/home": "/",
+  "/home.html": "/",
+  "/index.html": "/",
+  "/playbyplay": "/game.html?view=playbyplay",
+  "/playbyplay.html": "/game.html?view=playbyplay",
+  "/recap": "/game.html?view=recap",
+  "/recap.html": "/game.html?view=recap",
+  "/teamstats": "/game.html?view=teamstats",
+  "/teamstats.html": "/game.html?view=teamstats",
+  "/videos": "/game.html?view=videos",
+  "/videos.html": "/game.html?view=videos"
+}
