@@ -373,7 +373,11 @@
     `;
   }
 
-  function renderBioSidebar(bio) {
+  function renderBioSidebar(bio, videos) {
+    const videoHtml = window.VideoSidebar
+      ? window.VideoSidebar.render(videos, `${bio.name.split(' ').pop() || 'Player'} Highlights`)
+      : '';
+
     const items = [
       ['Height', bio.height],
       ['Weight', bio.weight],
@@ -386,6 +390,7 @@
 
     return `
       <aside class="player-sidebar">
+        ${videoHtml}
         <section class="player-card">
           <div class="player-card-header"><h2>Biography</h2></div>
           <ul class="player-bio-list">
@@ -492,7 +497,7 @@
     `;
   }
 
-  function renderPage({ bio, statsData, gamelogData, summaryData, cfg }) {
+  function renderPage({ bio, statsData, gamelogData, summaryData, cfg, videos }) {
     document.title = `${bio.name} — Robi Report`;
 
     const seasonCard = buildSeasonAveragesCard(statsData);
@@ -545,9 +550,11 @@
             ${gamelogHtml}
           </section>
         </div>
-        ${renderBioSidebar(bio)}
+        ${renderBioSidebar(bio, videos)}
       </div>
     `;
+
+    if (window.VideoSidebar) window.VideoSidebar.init(els.content);
   }
 
   async function init() {
@@ -559,12 +566,15 @@
     const cfg = SPORT_CONFIG[sport];
     const urls = buildUrls(cfg, playerId);
 
-    const [siteAthlete, coreAthlete, statsData, gamelogData, summaryData] = await Promise.all([
+    const newsUrl = `https://site.api.espn.com/apis/site/v2/sports/${cfg.category}/${cfg.league}/news?limit=50`;
+
+    const [siteAthlete, coreAthlete, statsData, gamelogData, summaryData, newsData] = await Promise.all([
       fetchJsonSafe(urls.siteAthlete),
       fetchJsonSafe(urls.coreAthlete),
       fetchJsonSafe(urls.stats),
       fetchJsonSafe(urls.gamelog),
       gameId ? fetchJsonSafe(urls.summary(gameId)) : Promise.resolve(null),
+      fetchJsonSafe(newsUrl),
     ]);
 
     if (!siteAthlete?.athlete && !coreAthlete?.displayName && !coreAthlete?.fullName) {
@@ -573,8 +583,28 @@
     }
 
     const bio = mergeBio(siteAthlete, coreAthlete);
+
+    const recentEventIds = parseGamelog(gamelogData)
+      .rows.slice(0, 3)
+      .map((row) => row.eventId)
+      .filter((id) => id && id !== gameId);
+
+    const extraSummaries = recentEventIds.length
+      ? await Promise.all(recentEventIds.map((id) => fetchJsonSafe(urls.summary(id))))
+      : [];
+
+    const videos = window.VideoSidebar
+      ? await window.VideoSidebar.collectPlayerVideos({
+          bio,
+          athleteId: bio.id,
+          summaryData,
+          extraSummaries: extraSummaries.filter(Boolean),
+          newsData,
+        })
+      : [];
+
     hideLoading();
-    renderPage({ bio, statsData, gamelogData, summaryData, cfg });
+    renderPage({ bio, statsData, gamelogData, summaryData, cfg, videos });
 
     const ticker = document.getElementById('score-ticker');
     if (ticker) {
