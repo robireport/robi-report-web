@@ -736,13 +736,48 @@
   font-size: 0.875rem;
 }
 
+.combat-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.combat-card-segment + .combat-card-segment {
+  border-top: 1px solid var(--border);
+}
+
+.combat-card-segment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background: rgba(146, 210, 255, 0.06);
+  border-bottom: 1px solid var(--border);
+}
+
+.combat-card-segment-header h3 {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.combat-card-segment-count {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .combat-fight-list {
   display: flex;
   flex-direction: column;
 }
 
 .combat-fight-row {
-  padding: 14px 18px;
+  padding: 16px 18px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -750,36 +785,111 @@
   border-bottom: none;
 }
 
-.combat-fight-names {
+.combat-fight-weight {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.combat-fight-matchup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+
+.combat-fight-divider {
+  align-self: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.combat-fighter {
+  min-width: 0;
+}
+
+.combat-fighter-top {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
+  min-width: 0;
 }
 
-.combat-fight-vs {
-  color: var(--text-muted);
-  font-weight: 500;
-  font-size: 0.8rem;
-  text-transform: uppercase;
+.combat-fighter-flag {
+  width: 18px;
+  height: 12px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
-.combat-fight-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 6px;
-  font-size: 0.78rem;
+.combat-fighter-name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+  min-width: 0;
+}
+
+.combat-fighter.is-winner .combat-fighter-name,
+.combat-fighter.is-winner .combat-fighter-link {
+  color: var(--text-primary);
+}
+
+.combat-fighter.is-loser .combat-fighter-name,
+.combat-fighter.is-loser .combat-fighter-link {
   color: var(--text-secondary);
 }
 
-.combat-fight-note {
-  color: var(--accent);
+.combat-fighter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #22c55e;
+  color: #04130a;
+  font-size: 0.62rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.combat-fighter-record {
+  margin-top: 4px;
+  padding-left: 26px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.combat-fighter-link {
+  font-weight: 700;
+}
+
+.combat-fight-result {
+  margin-top: 10px;
+  font-size: 0.82rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.combat-fight-result.is-live {
+  color: #ef4444;
+}
+
+.combat-fight-result.is-final {
+  color: var(--accent);
+}
+
+.combat-fight-result.is-scheduled {
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .combat-fallback-sub {
@@ -791,4 +901,24 @@
 .combat-fallback-sub a {
   color: var(--accent);
   font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .combat-fight-matchup {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .combat-fight-divider {
+    display: none;
+  }
+
+  .combat-fighter + .combat-fighter {
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+  }
+
+  .combat-fighter-record {
+    padding-left: 0;
+  }
 }
