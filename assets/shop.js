@@ -12,7 +12,11 @@
   var lightbox = document.getElementById('image-lightbox');
   var lightboxImg = document.getElementById('lightbox-img');
   var lightboxClose = document.getElementById('lightbox-close');
+  var lightboxPrev = document.getElementById('lightbox-prev');
+  var lightboxNext = document.getElementById('lightbox-next');
   var lightboxBackdrop = document.getElementById('lightbox-backdrop');
+  var lightboxContent = document.getElementById('lightbox-content');
+  var lightboxCounter = document.getElementById('lightbox-counter');
   var dots = document.querySelectorAll('.carousel-dot');
 
   var imageKeys = ['face', 'side', 'back', 'composite', 'kd', 'jsn'];
@@ -51,8 +55,9 @@
   var activeThumbKey = 'face';
   var scrollSyncLock = false;
   var dragStartX = 0;
-  var dragStartScroll = 0;
   var didDrag = false;
+  var lightboxDragStartX = 0;
+  var lightboxDidDrag = false;
 
   function getImageSrc(key) {
     if (key === 'face' || key === 'side' || key === 'back') {
@@ -70,6 +75,12 @@
     var slideKey = key || activeThumbKey;
     lightboxImg.src = getImageSrc(slideKey);
     lightboxImg.alt = altMap[slideKey] || 'Seattle Loves Ball Robi Report Hat';
+  }
+
+  function updateLightboxCounter() {
+    if (!lightboxCounter) return;
+    var index = getSlideIndex(activeThumbKey) + 1;
+    lightboxCounter.textContent = index + ' / ' + imageKeys.length;
   }
 
   function updateDots(index) {
@@ -127,11 +138,21 @@
     }
 
     syncLightboxImage(key);
+    updateLightboxCounter();
+  }
+
+  function navigateLightbox(direction) {
+    var currentIndex = getSlideIndex(activeThumbKey);
+    if (currentIndex < 0) return;
+    var nextIndex = (currentIndex + direction + imageKeys.length) % imageKeys.length;
+    setActiveSlide(imageKeys[nextIndex], true);
   }
 
   function openLightbox(key) {
     if (!lightbox) return;
+    setActiveSlide(key || activeThumbKey, false);
     syncLightboxImage(key || activeThumbKey);
+    updateLightboxCounter();
     lightbox.hidden = false;
     lightbox.setAttribute('aria-hidden', 'false');
     document.body.classList.add('lightbox-open');
@@ -143,6 +164,10 @@
     lightbox.hidden = true;
     lightbox.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('lightbox-open');
+  }
+
+  function isLightboxOpen() {
+    return lightbox && !lightbox.hidden;
   }
 
   function updateBuyLink() {
@@ -205,7 +230,6 @@
 
   carousel.addEventListener('pointerdown', function (e) {
     dragStartX = e.clientX;
-    dragStartScroll = carousel.scrollLeft;
     didDrag = false;
   });
 
@@ -224,7 +248,6 @@
   slides.forEach(function (slide) {
     slide.addEventListener('click', function () {
       if (didDrag) return;
-      setActiveSlide(slide.dataset.image, false);
       openLightbox(slide.dataset.image);
     });
   });
@@ -239,13 +262,56 @@
     lightboxClose.addEventListener('click', closeLightbox);
   }
 
+  if (lightboxPrev) {
+    lightboxPrev.addEventListener('click', function (e) {
+      e.stopPropagation();
+      navigateLightbox(-1);
+    });
+  }
+
+  if (lightboxNext) {
+    lightboxNext.addEventListener('click', function (e) {
+      e.stopPropagation();
+      navigateLightbox(1);
+    });
+  }
+
   if (lightboxBackdrop) {
     lightboxBackdrop.addEventListener('click', closeLightbox);
   }
 
+  if (lightboxContent) {
+    lightboxContent.addEventListener('pointerdown', function (e) {
+      lightboxDragStartX = e.clientX;
+      lightboxDidDrag = false;
+    });
+
+    lightboxContent.addEventListener('pointermove', function (e) {
+      if (Math.abs(e.clientX - lightboxDragStartX) > 8) {
+        lightboxDidDrag = true;
+      }
+    });
+
+    lightboxContent.addEventListener('pointerup', function (e) {
+      if (!isLightboxOpen() || !lightboxDidDrag) return;
+      var delta = e.clientX - lightboxDragStartX;
+      if (Math.abs(delta) >= 50) {
+        navigateLightbox(delta > 0 ? -1 : 1);
+      }
+    });
+  }
+
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && lightbox && !lightbox.hidden) {
+    if (!isLightboxOpen()) return;
+
+    if (e.key === 'Escape') {
       closeLightbox();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      navigateLightbox(-1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      navigateLightbox(1);
     }
   });
 
