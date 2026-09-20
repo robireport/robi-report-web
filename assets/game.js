@@ -48,12 +48,11 @@
     const name = row.athlete?.displayName || row.athlete?.shortName || '—';
     const athleteId = row.athlete?.id;
 
-    if (!linkPlayers || !athleteId || name === '—') {
+    if (!linkPlayers || !window.PlayerLinks) {
       return escapeHtml(name);
     }
 
-    const href = `player.html?id=${encodeURIComponent(athleteId)}&gameId=${encodeURIComponent(gameId)}&sport=${encodeURIComponent(sport)}`;
-    return `<a href="${escapeHtml(href)}" class="player-profile-link">${escapeHtml(name)}</a>`;
+    return window.PlayerLinks.renderPlayerName(name, athleteId, sport, gameId);
   }
 
   function renderPlayerTable(statBlock, preferBasketball, linkPlayers, gameId, sport) {
@@ -221,7 +220,9 @@
     if (lineupSidebarEl) lineupSidebarEl.innerHTML = '';
 
     const preferBasketball = cfg.category === 'basketball';
-    const linkPlayers = sport === 'nba' || sport === 'wnba';
+    const linkPlayers = window.PlayerLinks
+      ? window.PlayerLinks.isLinkableSport(sport)
+      : sport === 'nba' || sport === 'wnba';
     const playerGroups = data.boxscore?.players || [];
     const boxscoreHtml = playerGroups.length
       ? playerGroups.map((g) => renderTeamBoxscore(g, preferBasketball, linkPlayers, gameId, sport)).join('')

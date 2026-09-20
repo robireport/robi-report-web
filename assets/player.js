@@ -4,6 +4,10 @@
   const SPORT_CONFIG = {
     wnba: { category: 'basketball', league: 'wnba', hub: 'wnba.html', label: 'WNBA' },
     nba: { category: 'basketball', league: 'nba', hub: 'nba.html', label: 'NBA' },
+    nfl: { category: 'football', league: 'nfl', hub: 'nfl.html', label: 'NFL' },
+    mlb: { category: 'baseball', league: 'mlb', hub: 'mlb.html', label: 'MLB' },
+    soccer: { category: 'soccer', league: 'eng.1', hub: 'soccer.html', label: 'Premier League' },
+    ufc: { category: 'mma', league: 'ufc', hub: 'ufc.html', label: 'UFC' },
   };
 
   const SEASON_PILL_STATS = ['PTS', 'REB', 'AST', 'STL', 'BLK', 'TO', 'MIN', 'FG%', '3P%', 'FT%'];
@@ -559,7 +563,7 @@
 
   async function init() {
     if (!playerId || !SPORT_CONFIG[sport]) {
-      showError('Missing or invalid URL parameters. Use ?id={playerId}&sport=wnba (optional: &gameId={eventId})');
+      showError('Missing or invalid URL parameters. Use ?id={playerId}&sport=nba|wnba|nfl|mlb|soccer|ufc (optional: &gameId={eventId})');
       return;
     }
 
@@ -608,8 +612,15 @@
 
     const ticker = document.getElementById('score-ticker');
     if (ticker) {
-      if (sport === 'wnba') ticker.dataset.default = 'wnba';
-      if (sport === 'nba') ticker.dataset.default = 'nba';
+      const tickerSportMap = {
+        nba: 'nba',
+        wnba: 'wnba',
+        nfl: 'nfl',
+        mlb: 'mlb',
+        ufc: 'ufc',
+        soccer: 'epl',
+      };
+      if (tickerSportMap[sport]) ticker.dataset.default = tickerSportMap[sport];
     }
   }
 

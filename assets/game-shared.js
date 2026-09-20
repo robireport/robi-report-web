@@ -309,6 +309,8 @@
           renderMain(ctx);
         }
 
+        if (global.PlayerLinks) global.PlayerLinks.init(els.content);
+
         const ticker = document.getElementById('score-ticker');
         if (ticker) {
           const tickerSportMap = {
