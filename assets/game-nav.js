@@ -10,6 +10,14 @@
     { id: 'videos', label: 'Videos', page: 'videos.html', view: 'videos' },
   ];
 
+  const SPORT_TAB_LABELS = {
+    soccer: { boxscore: 'Player Stats' },
+  };
+
+  function getTabLabel(tab, sport) {
+    return SPORT_TAB_LABELS[sport]?.[tab.id] || tab.label;
+  }
+
   function buildTabHref(tab, sport, gameId) {
     const params = new URLSearchParams();
     params.set('sport', sport);
@@ -25,7 +33,8 @@
     const items = TABS.map((tab) => {
       const isActive = tab.id === activeId;
       const href = buildTabHref(tab, sport, gameId);
-      return `<li class="game-tabs-item"><a href="${href}" class="game-tab${isActive ? ' is-active' : ''}"${isActive ? ' aria-current="page"' : ''}>${tab.label}</a></li>`;
+      const label = getTabLabel(tab, sport);
+      return `<li class="game-tabs-item"><a href="${href}" class="game-tab${isActive ? ' is-active' : ''}"${isActive ? ' aria-current="page"' : ''}>${label}</a></li>`;
     }).join('');
 
     return `
@@ -40,6 +49,7 @@
   global.GameNav = {
     TABS,
     buildTabHref,
+    getTabLabel,
     renderTabs,
   };
 })(window);

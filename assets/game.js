@@ -212,7 +212,7 @@
   }
 
   function renderMain({ data, cfg, comp, sport, gameId, els }) {
-    if (sport === 'soccer' && window.GameSoccer) {
+    if ((sport === 'soccer' || cfg?.category === 'soccer') && window.GameSoccer?.renderMain) {
       window.GameSoccer.renderMain({ data, cfg, comp, sport, gameId, els });
       return;
     }
