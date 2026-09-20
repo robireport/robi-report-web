@@ -1,11 +1,11 @@
 (function () {
-  var viewer = document.getElementById('product-viewer-img');
-  if (!viewer) return;
+  var carousel = document.getElementById('product-carousel');
+  if (!carousel) return;
 
-  var viewerBtn = document.getElementById('product-viewer-btn');
+  var slides = document.querySelectorAll('.product-carousel-slide');
   var thumbs = document.querySelectorAll('.product-thumb');
   var swatches = document.querySelectorAll('.color-swatch');
-  var colorLabel = document.getElementById('color-selected-name');
+  var colorLabels = document.querySelectorAll('.color-selected-name');
   var buyBtn = document.getElementById('buy-now-btn');
   var cartBtn = document.getElementById('add-to-cart-btn');
   var toast = document.getElementById('cart-toast');
@@ -13,6 +13,9 @@
   var lightboxImg = document.getElementById('lightbox-img');
   var lightboxClose = document.getElementById('lightbox-close');
   var lightboxBackdrop = document.getElementById('lightbox-backdrop');
+  var dots = document.querySelectorAll('.carousel-dot');
+
+  var imageKeys = ['face', 'side', 'back', 'composite', 'kd', 'jsn'];
 
   var colors = {
     green: {
@@ -35,32 +38,100 @@
     jsn: 'assets/shop/jsn-flaujae-x-rr.png'
   };
 
+  var altMap = {
+    face: 'Front view — Seattle Loves Ball hat',
+    side: 'Side view — Seattle Loves Ball hat',
+    back: 'Back view — Seattle Loves Ball hat',
+    composite: 'All angles — Seattle Loves Ball hat',
+    kd: 'Kevin Durant wearing the Seattle Loves Ball hat',
+    jsn: 'JSN and Flau\'jae Johnson wearing the Seattle Loves Ball hat'
+  };
+
   var activeColor = 'green';
   var activeThumbKey = 'face';
+  var scrollSyncLock = false;
+  var dragStartX = 0;
+  var dragStartScroll = 0;
+  var didDrag = false;
 
-  function getThumbSrc(key) {
+  function getImageSrc(key) {
     if (key === 'face' || key === 'side' || key === 'back') {
       return colors[activeColor][key];
     }
     return staticImages[key];
   }
 
-  function syncLightboxImage() {
+  function getSlideIndex(key) {
+    return imageKeys.indexOf(key);
+  }
+
+  function syncLightboxImage(key) {
     if (!lightboxImg) return;
-    lightboxImg.src = viewer.src;
-    lightboxImg.alt = viewer.alt;
+    var slideKey = key || activeThumbKey;
+    lightboxImg.src = getImageSrc(slideKey);
+    lightboxImg.alt = altMap[slideKey] || 'Seattle Loves Ball Robi Report Hat';
   }
 
-  function setViewerImage(src, alt) {
-    viewer.classList.add('is-switching');
-    viewer.src = src;
-    viewer.alt = alt;
-    syncLightboxImage();
+  function updateDots(index) {
+    dots.forEach(function (dot, i) {
+      dot.classList.toggle('is-active', i === index);
+    });
   }
 
-  function openLightbox() {
+  function updateSlideImages() {
+    ['face', 'side', 'back'].forEach(function (key) {
+      var slideImg = document.querySelector('.product-carousel-slide[data-image="' + key + '"] img');
+      if (slideImg) slideImg.src = colors[activeColor][key];
+
+      var thumb = document.querySelector('.product-thumb[data-image="' + key + '"]');
+      if (thumb) {
+        var thumbImg = thumb.querySelector('img');
+        if (thumbImg) thumbImg.src = colors[activeColor][key];
+      }
+    });
+  }
+
+  function scrollToSlide(key, smooth) {
+    var index = getSlideIndex(key);
+    if (index < 0) return;
+
+    scrollSyncLock = true;
+    var slide = slides[index];
+    if (slide) {
+      carousel.scrollTo({
+        left: slide.offsetLeft,
+        behavior: smooth === false ? 'auto' : 'smooth'
+      });
+    }
+    updateDots(index);
+
+    window.setTimeout(function () {
+      scrollSyncLock = false;
+    }, smooth === false ? 0 : 400);
+  }
+
+  function setActiveSlide(key, shouldScroll) {
+    if (getSlideIndex(key) < 0) return;
+    activeThumbKey = key;
+
+    thumbs.forEach(function (thumb) {
+      var isActive = thumb.dataset.image === key;
+      thumb.classList.toggle('is-active', isActive);
+      thumb.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+
+    updateDots(getSlideIndex(key));
+
+    if (shouldScroll !== false) {
+      scrollToSlide(key, true);
+    }
+
+    syncLightboxImage(key);
+  }
+
+  function openLightbox(key) {
     if (!lightbox) return;
-    syncLightboxImage();
+    syncLightboxImage(key || activeThumbKey);
     lightbox.hidden = false;
     lightbox.setAttribute('aria-hidden', 'false');
     document.body.classList.add('lightbox-open');
@@ -72,7 +143,6 @@
     lightbox.hidden = true;
     lightbox.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('lightbox-open');
-    if (viewerBtn) viewerBtn.focus();
   }
 
   function updateBuyLink() {
@@ -89,25 +159,6 @@
     if (buyBtn) buyBtn.href = mailto;
   }
 
-  function refreshColorDependentImages() {
-    ['face', 'side', 'back'].forEach(function (key) {
-      var thumb = document.querySelector('.product-thumb[data-image="' + key + '"]');
-      if (thumb) {
-        var img = thumb.querySelector('img');
-        if (img) img.src = colors[activeColor][key];
-      }
-    });
-
-    if (activeThumbKey === 'face' || activeThumbKey === 'side' || activeThumbKey === 'back') {
-      setViewerImage(
-        colors[activeColor][activeThumbKey],
-        'Seattle Loves Ball Robi Report Hat — ' + colors[activeColor].label
-      );
-    }
-
-    updateBuyLink();
-  }
-
   function setColor(colorKey) {
     if (!colors[colorKey]) return;
     activeColor = colorKey;
@@ -118,38 +169,63 @@
       swatch.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
 
-    if (colorLabel) colorLabel.textContent = colors[colorKey].label;
-    refreshColorDependentImages();
-  }
-
-  function setActiveThumb(thumb) {
-    var key = thumb.dataset.image;
-    activeThumbKey = key;
-
-    thumbs.forEach(function (t) {
-      t.classList.toggle('is-active', t === thumb);
-      t.setAttribute('aria-selected', t === thumb ? 'true' : 'false');
+    colorLabels.forEach(function (label) {
+      label.textContent = colors[colorKey].label;
     });
 
-    var src = getThumbSrc(key);
-    var altMap = {
-      face: 'Front view',
-      side: 'Side view',
-      back: 'Back view',
-      composite: 'All angles',
-      kd: 'Kevin Durant wearing the hat',
-      jsn: 'JSN and Flau\'jae Johnson wearing the hat'
-    };
-    setViewerImage(src, altMap[key] || 'Seattle Loves Ball Robi Report Hat');
+    updateSlideImages();
+    syncLightboxImage(activeThumbKey);
+    updateBuyLink();
   }
 
-  viewer.addEventListener('load', function () {
-    viewer.classList.remove('is-switching');
+  function syncActiveFromScroll() {
+    if (scrollSyncLock || !slides.length) return;
+
+    var center = carousel.scrollLeft + carousel.clientWidth / 2;
+    var closestKey = activeThumbKey;
+    var closestDistance = Infinity;
+
+    slides.forEach(function (slide) {
+      var slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+      var distance = Math.abs(center - slideCenter);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestKey = slide.dataset.image;
+      }
+    });
+
+    if (closestKey !== activeThumbKey) {
+      setActiveSlide(closestKey, false);
+    }
+  }
+
+  carousel.addEventListener('scroll', function () {
+    window.requestAnimationFrame(syncActiveFromScroll);
+  }, { passive: true });
+
+  carousel.addEventListener('pointerdown', function (e) {
+    dragStartX = e.clientX;
+    dragStartScroll = carousel.scrollLeft;
+    didDrag = false;
+  });
+
+  carousel.addEventListener('pointermove', function (e) {
+    if (Math.abs(e.clientX - dragStartX) > 8) {
+      didDrag = true;
+    }
   });
 
   thumbs.forEach(function (thumb) {
     thumb.addEventListener('click', function () {
-      setActiveThumb(thumb);
+      setActiveSlide(thumb.dataset.image, true);
+    });
+  });
+
+  slides.forEach(function (slide) {
+    slide.addEventListener('click', function () {
+      if (didDrag) return;
+      setActiveSlide(slide.dataset.image, false);
+      openLightbox(slide.dataset.image);
     });
   });
 
@@ -158,10 +234,6 @@
       setColor(swatch.dataset.color);
     });
   });
-
-  if (viewerBtn) {
-    viewerBtn.addEventListener('click', openLightbox);
-  }
 
   if (lightboxClose) {
     lightboxClose.addEventListener('click', closeLightbox);
@@ -191,5 +263,6 @@
   }
 
   setColor('green');
-  if (thumbs.length) setActiveThumb(thumbs[0]);
+  setActiveSlide('face', false);
+  scrollToSlide('face', false);
 })();
