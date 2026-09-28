@@ -6,6 +6,7 @@ from __future__ import annotations
 import sys
 
 from seo_lib import ROOT, apply_seo_file, iter_html_files, write_site_redirects
+from sitemap_lib import write_sitemaps
 
 
 def main() -> int:
@@ -31,6 +32,10 @@ def main() -> int:
         print(f'Done. {len(updated_files)} HTML file(s) updated.')
 
     print(f'Wrote {redirects_path.relative_to(ROOT).as_posix()}')
+
+    sitemap_path, news_path = write_sitemaps()
+    print(f'Wrote {sitemap_path.relative_to(ROOT).as_posix()}')
+    print(f'Wrote {news_path.relative_to(ROOT).as_posix()}')
     return 0
 
 

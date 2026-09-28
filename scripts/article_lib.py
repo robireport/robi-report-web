@@ -65,6 +65,11 @@ def canonical_article_url(source: Path) -> str:
     return f'/articles/{rel.parent.as_posix()}/{rel.stem}/'
 
 
+def public_article_href(source: Path) -> str:
+    rel = source.relative_to(ARTICLES_DIR)
+    return f'articles/{rel.parent.as_posix()}/{rel.stem}/'
+
+
 def build_redirect_map() -> dict[str, str]:
     """Map legacy/title-based slugs to canonical article directory URLs."""
     redirects: dict[str, str] = {}
@@ -107,6 +112,49 @@ def source_to_index_content(content: str) -> str:
     return content.replace('../../', '../../../')
 
 
+def build_related_articles_html(source: Path, limit: int = 3) -> str:
+    category = source.parent.name
+    peers = [
+        candidate
+        for candidate in iter_source_articles()
+        if candidate.parent.name == category and candidate != source
+    ]
+    peers.sort(key=lambda path: path.stat().st_mtime, reverse=True)
+    peers = peers[:limit]
+    if not peers:
+        return ''
+
+    hub_label = HUBS.get(category, ('', category.upper()))[1]
+    items = []
+    for peer in peers:
+        href = public_article_href(peer)
+        title = parse_article_title(peer)
+        items.append(
+            f'          <li><a href="/{href}">{html.escape(title)}</a></li>'
+        )
+
+    return (
+        '\n      <section class="article-related" aria-label="Related articles">\n'
+        f'        <h2>More from {html.escape(hub_label)}</h2>\n'
+        '        <ul>\n'
+        f'{chr(10).join(items)}\n'
+        '        </ul>\n'
+        '      </section>\n'
+    )
+
+
+def inject_related_articles(content: str, source: Path) -> str:
+    if 'class="article-related"' in content:
+        return content
+    block = build_related_articles_html(source)
+    if not block:
+        return content
+    marker = '<footer class="footer">'
+    if marker not in content:
+        return content
+    return content.replace(marker, block + '\n  ' + marker, 1)
+
+
 def sync_article(source: Path) -> Path:
     if not is_source_article(source):
         raise ValueError(f'Not a source article: {source}')
@@ -114,9 +162,17 @@ def sync_article(source: Path) -> Path:
     index_path = source.parent / source.stem / 'index.html'
     index_path.parent.mkdir(parents=True, exist_ok=True)
     content = source.read_text(encoding='utf-8')
-    source_rel = normalize_rel_path(source)
-    source.write_text(apply_seo(content, source_rel), encoding='utf-8')
-    index_content = apply_seo(source_to_index_content(content), normalize_rel_path(index_path))
+    source_rel_path = normalize_rel_path(source)
+    source.write_text(
+        apply_seo(content, source_rel_path, source_path=source),
+        encoding='utf-8',
+    )
+    index_content = apply_seo(
+        source_to_index_content(content),
+        normalize_rel_path(index_path),
+        source_path=source,
+    )
+    index_content = inject_related_articles(index_content, source)
     index_path.write_text(index_content, encoding='utf-8')
     return index_path
 

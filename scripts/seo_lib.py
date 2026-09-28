@@ -6,6 +6,7 @@ from __future__ import annotations
 import html
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +36,29 @@ ARTICLE_ALIAS_REDIRECT_RE = re.compile(
 VIDEO_SCHEMA_RE = re.compile(
     r'\s*<script\s+type="application/ld\+json"\s+id="robi-video-schema"[^>]*>.*?</script>\s*',
     re.S | re.I,
+)
+ARTICLE_SCHEMA_RE = re.compile(
+    r'\s*<script\s+type="application/ld\+json"\s+id="robi-article-schema"[^>]*>.*?</script>\s*',
+    re.S | re.I,
+)
+BREADCRUMB_SCHEMA_RE = re.compile(
+    r'\s*<script\s+type="application/ld\+json"\s+id="robi-breadcrumb-schema"[^>]*>.*?</script>\s*',
+    re.S | re.I,
+)
+META_DESCRIPTION_RE = re.compile(r'\s*<meta\s+name="description"[^>]*/>\s*', re.I)
+META_ROBOTS_RE = re.compile(r'\s*<meta\s+name="robots"[^>]*/>\s*', re.I)
+OG_META_RE = re.compile(r'\s*<meta\s+property="og:[^"]+"[^>]*/>\s*', re.I)
+TWITTER_META_RE = re.compile(r'\s*<meta\s+name="twitter:[^"]+"[^>]*/>\s*', re.I)
+ARTICLE_TITLE_RE = re.compile(r'<h1 class="article-title">(.*?)</h1>', re.S)
+ARTICLE_TAG_RE = re.compile(r'<span class="article-tag">(.*?)</span>', re.S)
+ARTICLE_META_RE = re.compile(r'<div class="article-meta">(.*?)</div>', re.S)
+ARTICLE_HERO_RE = re.compile(
+    r'<figure class="article-hero">\s*<img src="([^"]+)" alt="([^"]*)"',
+    re.S,
+)
+ARTICLE_BODY_FIRST_P_RE = re.compile(
+    r'<div class="article-body">\s*<p>(.*?)</p>',
+    re.S,
 )
 IFRAME_TAG_RE = re.compile(
     r'<iframe\b[^>]*\bsrc="https?://(?:www\.)?youtube\.com/embed/([^"?/]+)[^"]*"[^>]*>',
@@ -426,12 +450,231 @@ def build_meta_refresh(canonical_url: str) -> str:
     return f'  <meta http-equiv="refresh" content="0;url={escaped}" />\n'
 
 
+def _clean_text(value: str) -> str:
+    return re.sub(r'\s+', ' ', html.unescape(value or '')).strip()
+
+
+def _truncate(text: str, limit: int = 160) -> str:
+    if len(text) <= limit:
+        return text
+    trimmed = text[: limit - 3].rsplit(' ', 1)[0]
+    return f'{trimmed}...'
+
+
+def article_category_from_rel(rel_path: str) -> str:
+    match = re.match(r'articles/([^/]+)/', rel_path)
+    return match.group(1) if match else ''
+
+
+def extract_article_metadata(page_html: str) -> dict[str, Any] | None:
+    if 'class="article-title"' not in page_html:
+        return None
+
+    title_match = ARTICLE_TITLE_RE.search(page_html)
+    if not title_match:
+        return None
+
+    headline = _clean_text(title_match.group(1))
+    tag_match = ARTICLE_TAG_RE.search(page_html)
+    tag_raw = _clean_text(tag_match.group(1)) if tag_match else 'News'
+    is_news = bool(re.search(r'\bnews\b', tag_raw, re.I))
+
+    author = 'Robi Report'
+    date_published = ''
+    date_display = ''
+    meta_match = ARTICLE_META_RE.search(page_html)
+    if meta_match:
+        meta_block = meta_match.group(1)
+        author_match = re.search(r'<strong>(.*?)</strong>', meta_block, re.S)
+        time_match = re.search(r'<time datetime="([^"]+)">([^<]*)</time>', meta_block)
+        if author_match:
+            author = _clean_text(author_match.group(1))
+        if time_match:
+            date_published = time_match.group(1).strip()
+            date_display = _clean_text(time_match.group(2))
+
+    hero_match = ARTICLE_HERO_RE.search(page_html)
+    image_url = hero_match.group(1).strip() if hero_match else ''
+    image_alt = _clean_text(hero_match.group(2)) if hero_match else headline
+
+    description = ''
+    body_match = ARTICLE_BODY_FIRST_P_RE.search(page_html)
+    if body_match:
+        description = _truncate(_clean_text(re.sub(r'<[^>]+>', '', body_match.group(1))))
+
+    return {
+        'headline': headline,
+        'description': description,
+        'author': author,
+        'date_published': date_published,
+        'date_display': date_display,
+        'image_url': image_url,
+        'image_alt': image_alt,
+        'story_tag': tag_raw,
+        'is_news': is_news,
+    }
+
+
+def _author_schema(author_name: str) -> dict[str, Any]:
+    if author_name.lower() == 'robi report':
+        return {'@type': 'Organization', 'name': 'Robi Report'}
+    return {'@type': 'Person', 'name': author_name}
+
+
+def build_article_schema_payload(
+    metadata: dict[str, Any],
+    canonical_url: str,
+    *,
+    date_modified: str = '',
+) -> dict[str, Any]:
+    schema_type = 'NewsArticle' if metadata.get('is_news') else 'BlogPosting'
+    published = format_upload_date(metadata.get('date_published', ''))
+    modified = format_upload_date(date_modified or metadata.get('date_published', ''))
+
+    payload: dict[str, Any] = {
+        '@context': 'https://schema.org',
+        '@type': schema_type,
+        'headline': metadata['headline'],
+        'description': metadata.get('description') or metadata['headline'],
+        'datePublished': published,
+        'dateModified': modified,
+        'author': _author_schema(metadata.get('author', 'Robi Report')),
+        'publisher': {
+            '@type': 'Organization',
+            'name': 'Robi Report',
+            'logo': {
+                '@type': 'ImageObject',
+                'url': PUBLISHER_LOGO,
+            },
+        },
+        'mainEntityOfPage': {
+            '@type': 'WebPage',
+            '@id': canonical_url,
+        },
+        'url': canonical_url,
+        'inLanguage': 'en-US',
+    }
+
+    image_url = metadata.get('image_url') or ''
+    if image_url:
+        payload['image'] = [image_url]
+
+    return payload
+
+
+def build_breadcrumb_schema_payload(
+    metadata: dict[str, Any],
+    canonical_url: str,
+    rel_path: str,
+) -> dict[str, Any]:
+    category = article_category_from_rel(rel_path)
+    category_label = category.upper() if category else 'Articles'
+    hub_url = f'{SITE_ORIGIN}/{category}.html' if category else f'{SITE_ORIGIN}/'
+
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+            {
+                '@type': 'ListItem',
+                'position': 1,
+                'name': 'Home',
+                'item': f'{SITE_ORIGIN}/',
+            },
+            {
+                '@type': 'ListItem',
+                'position': 2,
+                'name': category_label,
+                'item': hub_url,
+            },
+            {
+                '@type': 'ListItem',
+                'position': 3,
+                'name': metadata['headline'],
+                'item': canonical_url,
+            },
+        ],
+    }
+
+
+def build_article_head_tags(
+    metadata: dict[str, Any],
+    canonical_url: str,
+) -> str:
+    description = metadata.get('description') or metadata['headline']
+    title = f"{metadata['headline']} — Robi Report"
+    image = metadata.get('image_url') or PUBLISHER_LOGO
+
+    lines = [
+        f'  <meta name="description" content="{html.escape(description, quote=True)}" />',
+        '  <meta name="robots" content="index, follow, max-image-preview:large" />',
+        f'  <meta property="og:type" content="article" />',
+        f'  <meta property="og:site_name" content="Robi Report" />',
+        f'  <meta property="og:title" content="{html.escape(title, quote=True)}" />',
+        f'  <meta property="og:description" content="{html.escape(description, quote=True)}" />',
+        f'  <meta property="og:url" content="{html.escape(canonical_url, quote=True)}" />',
+        f'  <meta property="og:image" content="{html.escape(image, quote=True)}" />',
+        f'  <meta name="twitter:card" content="summary_large_image" />',
+        f'  <meta name="twitter:title" content="{html.escape(title, quote=True)}" />',
+        f'  <meta name="twitter:description" content="{html.escape(description, quote=True)}" />',
+        f'  <meta name="twitter:image" content="{html.escape(image, quote=True)}" />',
+    ]
+
+    if metadata.get('date_published'):
+        published = format_upload_date(metadata['date_published'])
+        lines.append(
+            f'  <meta property="article:published_time" content="{html.escape(published, quote=True)}" />'
+        )
+
+    return '\n'.join(lines) + '\n'
+
+
+def build_article_schema_script(
+    metadata: dict[str, Any],
+    canonical_url: str,
+    rel_path: str,
+    *,
+    date_modified: str = '',
+) -> str:
+    article_payload = build_article_schema_payload(
+        metadata,
+        canonical_url,
+        date_modified=date_modified,
+    )
+    breadcrumb_payload = build_breadcrumb_schema_payload(metadata, canonical_url, rel_path)
+    article_payload.pop('@context', None)
+    breadcrumb_payload.pop('@context', None)
+    graph = {
+        '@context': 'https://schema.org',
+        '@graph': [article_payload, breadcrumb_payload],
+    }
+    json_text = json.dumps(graph, indent=2, ensure_ascii=False)
+    return (
+        f'  <script type="application/ld+json" id="robi-article-schema">\n'
+        f'{json_text}\n'
+        f'  </script>\n'
+    )
+
+
+def _mtime_iso(path: Path | None) -> str:
+    if not path or not path.exists():
+        return ''
+    stamp = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+    return stamp.replace(microsecond=0).isoformat()
+
+
 def _strip_existing_seo(content: str) -> str:
     content = CANONICAL_RE.sub('\n', content)
     content = META_REFRESH_RE.sub('\n', content)
     content = WWW_REDIRECT_RE.sub('\n', content)
     content = ARTICLE_ALIAS_REDIRECT_RE.sub('\n', content)
     content = VIDEO_SCHEMA_RE.sub('\n', content)
+    content = ARTICLE_SCHEMA_RE.sub('\n', content)
+    content = BREADCRUMB_SCHEMA_RE.sub('\n', content)
+    content = META_DESCRIPTION_RE.sub('\n', content)
+    content = META_ROBOTS_RE.sub('\n', content)
+    content = OG_META_RE.sub('\n', content)
+    content = TWITTER_META_RE.sub('\n', content)
     return content
 
 
@@ -452,7 +695,7 @@ def _insert_after_manifest(content: str, block: str) -> str:
     return content[:insert_at] + block + content[insert_at:]
 
 
-def apply_seo(content: str, rel_path: str) -> str:
+def apply_seo(content: str, rel_path: str, *, source_path: Path | None = None) -> str:
     canonical = canonical_url_for_path(rel_path)
     content = _strip_existing_seo(content)
 
@@ -463,6 +706,20 @@ def apply_seo(content: str, rel_path: str) -> str:
         if is_source_article(rel_path):
             head_blocks += build_meta_refresh(canonical)
             head_blocks += build_article_alias_redirect(canonical)
+
+    metadata = extract_article_metadata(content)
+    if metadata and canonical and (is_article_index(rel_path) or is_source_article(rel_path)):
+        modified_iso = _mtime_iso(source_path) if source_path else ''
+        metadata = dict(metadata)
+        if modified_iso:
+            metadata['date_modified'] = modified_iso
+        head_blocks += build_article_head_tags(metadata, canonical)
+        head_blocks += build_article_schema_script(
+            metadata,
+            canonical,
+            rel_path,
+            date_modified=modified_iso,
+        )
 
     video_schema = build_video_schema_script(content, rel_path)
     if video_schema:
@@ -479,8 +736,14 @@ def apply_seo_file(path: Path) -> bool:
     if rel_path == 'articles/template.html':
         return False
 
+    source_path: Path | None = None
+    if is_article_index(rel_path):
+        parts = rel_path.split('/')
+        if len(parts) >= 4:
+            source_path = ROOT / 'articles' / parts[1] / f'{parts[2]}.html'
+
     original = path.read_text(encoding='utf-8')
-    updated = apply_seo(original, rel_path)
+    updated = apply_seo(original, rel_path, source_path=source_path)
     if updated != original:
         path.write_text(updated, encoding='utf-8')
         return True
