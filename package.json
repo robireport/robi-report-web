@@ -5,6 +5,9 @@
   "scripts": {
     "build:articles": "python scripts/build-articles.py",
     "build": "python scripts/build-articles.py",
-    "new-article": "python scripts/new-article.py"
+    "new-article": "python scripts/new-article.py",
+    "seo:apply": "python scripts/apply-seo.py",
+    "seo:verify": "python scripts/verify-seo.py",
+    "publish:articles": "python restore_articles.py && python scripts/apply-seo.py"
   }
 }

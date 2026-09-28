@@ -18,7 +18,9 @@ from article_lib import (
     directory_url,
     source_rel,
     sync_article,
+    write_redirect_map,
 )
+from sitemap_lib import write_sitemaps
 
 TEMPLATE = ARTICLES_DIR / 'template.html'
 
@@ -159,6 +161,8 @@ def main() -> int:
     source.parent.mkdir(parents=True, exist_ok=True)
     source.write_text(rendered, encoding='utf-8')
     index_path = sync_article(source)
+    write_redirect_map()
+    write_sitemaps()
 
     print(f'Created {source_rel(source)}')
     print(f'Synced  {index_path.relative_to(ROOT).as_posix()}')
@@ -167,7 +171,7 @@ def main() -> int:
     print(f'  1. Edit {source_rel(source)} with your full article content')
     print('  2. Run: npm run build:articles')
     print('  3. Run: python restore_articles.py   (refresh homepage + hub feeds)')
-    print('  4. Add the article URL to sitemap.xml if needed')
+    print('  4. Run: npm run seo:verify           (sitemaps regenerate automatically)')
     print('')
     print('Live URLs after deploy:')
     print(f'  https://robireport.com{directory_url(source)}')

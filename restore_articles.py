@@ -10,7 +10,8 @@ ARTICLES_DIR = ROOT / 'articles'
 SCRIPTS = ROOT / 'scripts'
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
-from article_lib import is_source_article, sync_all_articles, write_redirect_map
+from article_lib import is_source_article, public_article_href, sync_all_articles, write_redirect_map
+from sitemap_lib import write_sitemaps
 
 HUBS = {
     'nba.html': 'nba',
@@ -88,6 +89,7 @@ def parse_article(path: Path) -> dict:
     sport = path.parent.name
     return {
         'rel': rel,
+        'href': public_article_href(path),
         'sport': sport,
         'title': title,
         'story_tag': story_tag,
@@ -120,7 +122,7 @@ def lead_html(a: dict) -> str:
     if a['read_time']:
         meta_bits.append(f'<span class="dot"></span><span>{esc(a["read_time"])}</span>')
     return f'''      <article class="lead-story">
-        <a href="{esc(a["rel"])}">
+        <a href="{esc(a["href"])}">
         <div class="lead-story-image">
           <img src="{esc(img)}" alt="{esc(a["alt"])}" />
         </div>
@@ -142,7 +144,7 @@ def news_row_html(a: dict) -> str:
     if a['read_time']:
         meta += f' · {a["read_time"]}'
     return f'''        <article class="news-row">
-          <a href="{esc(a["rel"])}" class="news-row-link">
+          <a href="{esc(a["href"])}" class="news-row-link">
           <div class="news-row-thumb">
             <img src="{esc(img)}" alt="{esc(a["alt"])}" />
           </div>
@@ -165,7 +167,7 @@ def card_html(a: dict, featured: bool = False) -> str:
     if a['date_label']:
         meta_bits.append(f'<span class="dot"></span><span>{esc(a["date_label"])}</span>')
     return f'''      <article class="{cls}">
-        <a href="{esc(a["rel"])}">
+        <a href="{esc(a["href"])}">
         <div class="card-image">
           <img src="{esc(img)}" alt="{esc(a["alt"])}" />
           <span class="card-tag">{esc(a["league"] if not featured else a["story_tag"])}</span>
@@ -243,7 +245,7 @@ def index_featured_html(all_articles: dict[str, dict]) -> str:
     cards = [card_html(ordered[0], featured=True)]
     cards.extend(card_html(a) for a in ordered[1:])
     grid = '\n\n'.join(cards)
-    return f'''  <section class="featured articles-feed" id="featured">
+    return f'''  <section class="featured articles-feed" id="latest-articles">
     <div class="articles-feed-header">
       <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
     </div>
@@ -293,7 +295,7 @@ def patch_index(all_articles: dict[str, dict]) -> None:
     text = path.read_text(encoding='utf-8')
     replacement = index_featured_html(all_articles)
     text = re.sub(
-        r'  <!-- Featured Content -->\s*<section class="featured articles-feed" id="featured">.*?</section>',
+        r'  <!-- Featured Content -->\s*<section class="featured articles-feed" id="(?:featured|latest-articles)">.*?</section>',
         '  <!-- Featured Content -->\n' + replacement,
         text,
         count=1,
@@ -347,6 +349,10 @@ def main() -> None:
 
     redirects_path = write_redirect_map()
     print(f'Updated {redirects_path.relative_to(ROOT).as_posix()}')
+
+    sitemap_path, news_path = write_sitemaps()
+    print(f'Wrote {sitemap_path.relative_to(ROOT).as_posix()}')
+    print(f'Wrote {news_path.relative_to(ROOT).as_posix()}')
 
     print('Done.')
 

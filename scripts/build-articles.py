@@ -13,6 +13,7 @@ from article_lib import (
     write_redirect_map,
 )
 from seo_lib import write_site_redirects
+from sitemap_lib import write_sitemaps
 
 
 def main() -> int:
@@ -47,6 +48,10 @@ def main() -> int:
 
     site_redirects_path = write_site_redirects()
     print(f'Wrote {site_redirects_path.relative_to(ROOT).as_posix()}')
+
+    sitemap_path, news_path = write_sitemaps()
+    print(f'Wrote {sitemap_path.relative_to(ROOT).as_posix()}')
+    print(f'Wrote {news_path.relative_to(ROOT).as_posix()}')
 
     print(f'Done. {len(synced)} index file(s) updated.')
     return 0
