@@ -12,6 +12,7 @@ from pathlib import Path
 from article_lib import iter_source_articles
 from seo_lib import (
     ROOT,
+    SECTION_PAGE_SEO,
     canonical_url_for_path,
     extract_article_metadata,
     normalize_rel_path,
@@ -20,7 +21,9 @@ from sitemap_lib import NEWS_WINDOW, expected_indexable_article_urls
 
 CANONICAL_RE = re.compile(r'<link rel="canonical" href="([^"]+)"', re.I)
 ROBOTS_RE = re.compile(r'<meta name="robots" content="([^"]+)"', re.I)
-ARTICLE_SCHEMA_RE = re.compile(r'id="robi-article-schema"', re.I)
+ARTICLE_SCHEMA_ID_RE = re.compile(r'id="robi-article-schema"', re.I)
+SITE_SCHEMA_ID_RE = re.compile(r'id="robi-site-schema"', re.I)
+HUB_SCHEMA_ID_RE = re.compile(r'id="robi-hub-schema"', re.I)
 META_DESC_RE = re.compile(r'<meta name="description" content="([^"]+)"', re.I)
 INTERNAL_ARTICLE_LINK_RE = re.compile(r'href="(?:/)?articles/[^"]+"')
 
@@ -113,7 +116,7 @@ def verify_articles() -> list[str]:
         if not robots or 'noindex' in robots.group(1).lower():
             errors.append(f'{rel}: missing or blocking robots meta')
 
-        if not ARTICLE_SCHEMA_RE.search(html):
+        if not ARTICLE_SCHEMA_ID_RE.search(html):
             errors.append(f'{rel}: missing article JSON-LD')
 
         category = source.parent.name
@@ -125,6 +128,24 @@ def verify_articles() -> list[str]:
         if peer_count and 'class="article-related"' not in html:
             errors.append(f'{rel}: missing related-articles section')
 
+    return errors
+
+
+def verify_section_pages() -> list[str]:
+    errors: list[str] = []
+    for rel_path in SECTION_PAGE_SEO:
+        path = ROOT / rel_path
+        if not path.exists():
+            errors.append(f'{rel_path}: section page file missing')
+            continue
+        html = path.read_text(encoding='utf-8')
+        if not META_DESC_RE.search(html):
+            errors.append(f'{rel_path}: missing meta description')
+        if rel_path == 'index.html':
+            if not SITE_SCHEMA_ID_RE.search(html):
+                errors.append(f'{rel_path}: missing WebSite/Organization JSON-LD')
+        elif not HUB_SCHEMA_ID_RE.search(html):
+            errors.append(f'{rel_path}: missing hub WebPage/breadcrumb JSON-LD')
     return errors
 
 
@@ -144,6 +165,7 @@ def main() -> int:
         ('robots.txt', verify_robots),
         ('sitemaps', verify_sitemaps),
         ('article metadata', verify_articles),
+        ('section pages', verify_section_pages),
         ('internal links', verify_internal_links),
     ]
 

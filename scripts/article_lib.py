@@ -21,8 +21,8 @@ HUBS = {
     'wnba': ('wnba.html', 'WNBA'),
     'nfl': ('nfl.html', 'NFL'),
     'ufc': ('ufc.html', 'UFC'),
-    'boxing': ('boxing.html', 'BOXING'),
-    'soccer': ('soccer.html', 'SOCCER'),
+    'boxing': ('boxing.html', 'Boxing'),
+    'soccer': ('soccer.html', 'Soccer'),
     'mlb': ('mlb.html', 'MLB'),
 }
 
