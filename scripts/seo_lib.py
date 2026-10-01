@@ -13,6 +13,120 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 SITE_ORIGIN = 'https://robireport.com'
 PUBLISHER_LOGO = f'{SITE_ORIGIN}/assets/Squared%20logo.png'
+YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@RobiReportt'
+
+CATEGORY_HUB_LABELS: dict[str, str] = {
+    'nba': 'NBA',
+    'wnba': 'WNBA',
+    'nfl': 'NFL',
+    'ufc': 'UFC',
+    'boxing': 'Boxing',
+    'soccer': 'Soccer',
+    'mlb': 'MLB',
+}
+
+SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
+    'index.html': {
+        'title': 'Robi Report — Sports News, Analysis & Video',
+        'description': (
+            'Independent sports coverage from Robi Report — news, analysis, and video '
+            'across the NBA, WNBA, NFL, UFC, boxing, soccer, MLB, and more.'
+        ),
+    },
+    'nba.html': {
+        'title': 'Robi Report NBA | NBA News, Analysis & Stories',
+        'description': (
+            'NBA news, analysis, and stories from Robi Report — league trends, player '
+            'coverage, and commentary beyond the box score.'
+        ),
+        'breadcrumb': 'NBA',
+    },
+    'wnba.html': {
+        'title': 'Robi Report WNBA | WNBA News, Analysis & Stories',
+        'description': (
+            'WNBA news, analysis, and stories from Robi Report — game coverage, player '
+            'breakouts, and league storylines.'
+        ),
+        'breadcrumb': 'WNBA',
+    },
+    'nfl.html': {
+        'title': 'Robi Report NFL | NFL News, Analysis & Stories',
+        'description': (
+            'NFL news, analysis, and stories from Robi Report — game recaps, draft takes, '
+            'and commentary across the league.'
+        ),
+        'breadcrumb': 'NFL',
+    },
+    'ufc.html': {
+        'title': 'Robi Report UFC | UFC News, Analysis & Stories',
+        'description': (
+            'UFC news, analysis, and fight coverage from Robi Report — cards, matchups, '
+            'and mixed martial arts storylines.'
+        ),
+        'breadcrumb': 'UFC',
+    },
+    'boxing.html': {
+        'title': 'Robi Report Boxing | Boxing News, Analysis & Stories',
+        'description': (
+            'Boxing news, analysis, and fight coverage from Robi Report — champions, '
+            'matchups, and stories from the ring.'
+        ),
+        'breadcrumb': 'Boxing',
+    },
+    'soccer.html': {
+        'title': 'Robi Report Soccer | Soccer News, Analysis & Stories',
+        'description': (
+            'Soccer news, analysis, and stories from Robi Report — clubs, leagues, and '
+            'global football coverage.'
+        ),
+        'breadcrumb': 'Soccer',
+    },
+    'mlb.html': {
+        'title': 'Robi Report MLB | MLB News, Analysis & Stories',
+        'description': (
+            'MLB news, analysis, and stories from Robi Report — baseball coverage and '
+            'commentary across the league.'
+        ),
+        'breadcrumb': 'MLB',
+    },
+    'standard-of-greatness.html': {
+        'title': 'Robi Report Standard of Greatness | Original Video Series',
+        'description': (
+            "Standard of Greatness — Robi Report's original video series on greatness "
+            'in sports and culture.'
+        ),
+        'breadcrumb': 'Standard of Greatness',
+    },
+    'shop.html': {
+        'title': 'Robi Report Shop | Official Merchandise',
+        'description': (
+            'Shop official Robi Report merchandise — apparel and gear from independent '
+            'sports and media coverage.'
+        ),
+        'breadcrumb': 'Shop',
+    },
+    'about.html': {
+        'title': 'Robi Report About | Team, Contact & Mission',
+        'description': (
+            'About Robi Report — our mission, team, contact information, and how we cover '
+            'sports and media for fans.'
+        ),
+        'breadcrumb': 'About',
+    },
+}
+
+HUB_BREADCRUMB_CSS = """
+    .hub-breadcrumb {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .hub-breadcrumb a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .hub-breadcrumb a:hover { color: var(--accent); }
+"""
 
 GAME_VIEW_STUBS = frozenset({'recap', 'gamecast', 'playbyplay', 'teamstats', 'videos'})
 SKIP_CANONICAL = frozenset({'articles/template.html', '404.html'})
@@ -45,6 +159,15 @@ BREADCRUMB_SCHEMA_RE = re.compile(
     r'\s*<script\s+type="application/ld\+json"\s+id="robi-breadcrumb-schema"[^>]*>.*?</script>\s*',
     re.S | re.I,
 )
+SITE_SCHEMA_RE = re.compile(
+    r'\s*<script\s+type="application/ld\+json"\s+id="robi-site-schema"[^>]*>.*?</script>\s*',
+    re.S | re.I,
+)
+HUB_SCHEMA_RE = re.compile(
+    r'\s*<script\s+type="application/ld\+json"\s+id="robi-hub-schema"[^>]*>.*?</script>\s*',
+    re.S | re.I,
+)
+TITLE_TAG_RE = re.compile(r'<title>[^<]*</title>', re.I)
 META_DESCRIPTION_RE = re.compile(r'\s*<meta\s+name="description"[^>]*/>\s*', re.I)
 META_ROBOTS_RE = re.compile(r'\s*<meta\s+name="robots"[^>]*/>\s*', re.I)
 OG_META_RE = re.compile(r'\s*<meta\s+property="og:[^"]+"[^>]*/>\s*', re.I)
@@ -562,13 +685,164 @@ def build_article_schema_payload(
     return payload
 
 
+def hub_label_for_category(category: str) -> str:
+    if not category:
+        return 'Articles'
+    return CATEGORY_HUB_LABELS.get(category, category.replace('-', ' ').title())
+
+
+def build_organization_node() -> dict[str, Any]:
+    return {
+        '@type': 'Organization',
+        '@id': f'{SITE_ORIGIN}/#organization',
+        'name': 'Robi Report',
+        'url': f'{SITE_ORIGIN}/',
+        'logo': {
+            '@type': 'ImageObject',
+            'url': PUBLISHER_LOGO,
+        },
+        'sameAs': [YOUTUBE_CHANNEL_URL],
+    }
+
+
+def build_website_schema_payload() -> dict[str, Any]:
+    org = build_organization_node()
+    return {
+        '@context': 'https://schema.org',
+        '@graph': [
+            org,
+            {
+                '@type': 'WebSite',
+                '@id': f'{SITE_ORIGIN}/#website',
+                'name': 'Robi Report',
+                'url': f'{SITE_ORIGIN}/',
+                'publisher': {'@id': org['@id']},
+                'inLanguage': 'en-US',
+            },
+        ],
+    }
+
+
+def build_site_schema_script() -> str:
+    json_text = json.dumps(build_website_schema_payload(), indent=2, ensure_ascii=False)
+    return (
+        f'  <script type="application/ld+json" id="robi-site-schema">\n'
+        f'{json_text}\n'
+        f'  </script>\n'
+    )
+
+
+def build_section_breadcrumb_schema(breadcrumb_label: str, page_url: str) -> dict[str, Any]:
+    return {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+            {
+                '@type': 'ListItem',
+                'position': 1,
+                'name': 'Robi Report',
+                'item': f'{SITE_ORIGIN}/',
+            },
+            {
+                '@type': 'ListItem',
+                'position': 2,
+                'name': breadcrumb_label,
+                'item': page_url,
+            },
+        ],
+    }
+
+
+def build_hub_schema_script(
+    breadcrumb_label: str,
+    page_url: str,
+    *,
+    title: str,
+    description: str,
+) -> str:
+    breadcrumb = build_section_breadcrumb_schema(breadcrumb_label, page_url)
+    web_page: dict[str, Any] = {
+        '@type': 'WebPage',
+        '@id': page_url,
+        'url': page_url,
+        'name': title,
+        'description': description,
+        'isPartOf': {'@id': f'{SITE_ORIGIN}/#website'},
+        'about': {'@id': f'{SITE_ORIGIN}/#organization'},
+        'inLanguage': 'en-US',
+        'breadcrumb': breadcrumb,
+    }
+    graph = {
+        '@context': 'https://schema.org',
+        '@graph': [web_page, breadcrumb],
+    }
+    json_text = json.dumps(graph, indent=2, ensure_ascii=False)
+    return (
+        f'  <script type="application/ld+json" id="robi-hub-schema">\n'
+        f'{json_text}\n'
+        f'  </script>\n'
+    )
+
+
+def build_page_head_tags(
+    *,
+    title: str,
+    description: str,
+    canonical_url: str,
+    og_type: str = 'website',
+) -> str:
+    image = PUBLISHER_LOGO
+    lines = [
+        f'  <meta name="description" content="{html.escape(description, quote=True)}" />',
+        '  <meta name="robots" content="index, follow, max-image-preview:large" />',
+        f'  <meta property="og:type" content="{html.escape(og_type, quote=True)}" />',
+        '  <meta property="og:site_name" content="Robi Report" />',
+        f'  <meta property="og:title" content="{html.escape(title, quote=True)}" />',
+        f'  <meta property="og:description" content="{html.escape(description, quote=True)}" />',
+        f'  <meta property="og:url" content="{html.escape(canonical_url, quote=True)}" />',
+        f'  <meta property="og:image" content="{html.escape(image, quote=True)}" />',
+        f'  <meta name="twitter:card" content="summary_large_image" />',
+        f'  <meta name="twitter:title" content="{html.escape(title, quote=True)}" />',
+        f'  <meta name="twitter:description" content="{html.escape(description, quote=True)}" />',
+        f'  <meta name="twitter:image" content="{html.escape(image, quote=True)}" />',
+    ]
+    return '\n'.join(lines) + '\n'
+
+
+def replace_title_tag(content: str, title: str) -> str:
+    tag = f'<title>{html.escape(title)}</title>'
+    if TITLE_TAG_RE.search(content):
+        return TITLE_TAG_RE.sub(tag, content, count=1)
+    return content
+
+
+def ensure_hub_breadcrumb_html(content: str, breadcrumb_label: str) -> str:
+    if 'class="hub-breadcrumb"' in content:
+        return content
+    if 'class="page-header-inner"' not in content:
+        return content
+
+    if '.hub-breadcrumb' not in content:
+        content = content.replace('  </style>', f'{HUB_BREADCRUMB_CSS}  </style>', 1)
+
+    nav = (
+        '      <nav class="hub-breadcrumb" aria-label="Breadcrumb">\n'
+        '        <a href="index.html">Robi Report</a> / '
+        f'<span aria-current="page">{html.escape(breadcrumb_label)}</span>\n'
+        '      </nav>\n'
+    )
+    marker = '    <div class="page-header-inner">\n'
+    if marker in content:
+        return content.replace(marker, marker + nav, 1)
+    return content
+
+
 def build_breadcrumb_schema_payload(
     metadata: dict[str, Any],
     canonical_url: str,
     rel_path: str,
 ) -> dict[str, Any]:
     category = article_category_from_rel(rel_path)
-    category_label = category.upper() if category else 'Articles'
+    category_label = hub_label_for_category(category)
     hub_url = f'{SITE_ORIGIN}/{category}.html' if category else f'{SITE_ORIGIN}/'
 
     return {
@@ -578,7 +852,7 @@ def build_breadcrumb_schema_payload(
             {
                 '@type': 'ListItem',
                 'position': 1,
-                'name': 'Home',
+                'name': 'Robi Report',
                 'item': f'{SITE_ORIGIN}/',
             },
             {
@@ -671,6 +945,8 @@ def _strip_existing_seo(content: str) -> str:
     content = VIDEO_SCHEMA_RE.sub('\n', content)
     content = ARTICLE_SCHEMA_RE.sub('\n', content)
     content = BREADCRUMB_SCHEMA_RE.sub('\n', content)
+    content = SITE_SCHEMA_RE.sub('\n', content)
+    content = HUB_SCHEMA_RE.sub('\n', content)
     content = META_DESCRIPTION_RE.sub('\n', content)
     content = META_ROBOTS_RE.sub('\n', content)
     content = OG_META_RE.sub('\n', content)
@@ -724,6 +1000,27 @@ def apply_seo(content: str, rel_path: str, *, source_path: Path | None = None) -
     video_schema = build_video_schema_script(content, rel_path)
     if video_schema:
         head_blocks += video_schema
+
+    section_cfg = SECTION_PAGE_SEO.get(rel_path)
+    if section_cfg and canonical:
+        title = section_cfg['title']
+        description = section_cfg['description']
+        content = replace_title_tag(content, title)
+        head_blocks += build_page_head_tags(
+            title=title,
+            description=description,
+            canonical_url=canonical,
+        )
+        if rel_path == 'index.html':
+            head_blocks += build_site_schema_script()
+        elif section_cfg.get('breadcrumb'):
+            head_blocks += build_hub_schema_script(
+                section_cfg['breadcrumb'],
+                canonical,
+                title=title,
+                description=description,
+            )
+            content = ensure_hub_breadcrumb_html(content, section_cfg['breadcrumb'])
 
     if not head_blocks.strip():
         return content

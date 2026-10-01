@@ -38,7 +38,77 @@
   }
 }
   </script>
-<title>NBA — Robi Report</title>
+  <meta name="description" content="NBA news, analysis, and stories from Robi Report — league trends, player coverage, and commentary beyond the box score." />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Robi Report" />
+  <meta property="og:title" content="Robi Report NBA | NBA News, Analysis &amp; Stories" />
+  <meta property="og:description" content="NBA news, analysis, and stories from Robi Report — league trends, player coverage, and commentary beyond the box score." />
+  <meta property="og:url" content="https://robireport.com/nba.html" />
+  <meta property="og:image" content="https://robireport.com/assets/Squared%20logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Robi Report NBA | NBA News, Analysis &amp; Stories" />
+  <meta name="twitter:description" content="NBA news, analysis, and stories from Robi Report — league trends, player coverage, and commentary beyond the box score." />
+  <meta name="twitter:image" content="https://robireport.com/assets/Squared%20logo.png" />
+  <script type="application/ld+json" id="robi-hub-schema">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://robireport.com/nba.html",
+      "url": "https://robireport.com/nba.html",
+      "name": "Robi Report NBA | NBA News, Analysis & Stories",
+      "description": "NBA news, analysis, and stories from Robi Report — league trends, player coverage, and commentary beyond the box score.",
+      "isPartOf": {
+        "@id": "https://robireport.com/#website"
+      },
+      "about": {
+        "@id": "https://robireport.com/#organization"
+      },
+      "inLanguage": "en-US",
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Robi Report",
+            "item": "https://robireport.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "NBA",
+            "item": "https://robireport.com/nba.html"
+          }
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Robi Report",
+          "item": "https://robireport.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "NBA",
+          "item": "https://robireport.com/nba.html"
+        }
+      ]
+    }
+  ]
+}
+  </script>
+
+
+
+<title>Robi Report NBA | NBA News, Analysis &amp; Stories</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -816,6 +886,17 @@
       .footer-top { grid-template-columns: 1fr; gap: 36px; }
       .footer-bottom { flex-direction: column; align-items: flex-start; }
     }
+
+    .hub-breadcrumb {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .hub-breadcrumb a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .hub-breadcrumb a:hover { color: var(--accent); }
   </style>
   <link rel="stylesheet" href="assets/score-ticker.css" />
   <link rel="stylesheet" href="assets/nav-mobile.css" />
@@ -872,6 +953,9 @@
   <!-- Page Header -->
   <header class="page-header">
     <div class="page-header-inner">
+      <nav class="hub-breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Robi Report</a> / <span aria-current="page">NBA</span>
+      </nav>
       <h1>NBA</h1>
       <p>Breaking news, analysis, and storylines from around the league</p>
     </div>
