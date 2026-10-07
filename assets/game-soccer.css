@@ -36,8 +36,8 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--accent);
-  background: rgba(146, 210, 255, 0.1);
-  border: 1px solid rgba(146, 210, 255, 0.25);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
   border-radius: 100px;
 }
 
@@ -115,7 +115,7 @@
 .soccer-lineup-tab.is-active {
   color: var(--accent);
   border-color: var(--accent);
-  background: rgba(146, 210, 255, 0.1);
+  background: rgba(16, 185, 129, 0.1);
 }
 
 .soccer-lineup-body {
