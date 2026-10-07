@@ -345,31 +345,13 @@
       }
     }
 
-/* ── Homepage featured video (Jaylen Brown) ── */
-    .home-featured-video {
-      padding: calc(var(--nav-height) + var(--ticker-height) + 24px) 24px 32px;
-      background: var(--gradient-hero);
-    }
-
-    .home-featured-video-inner {
-      max-width: min(920px, 100%);
-      margin: 0 auto;
-    }
-
-    .home-featured-video .hero-video-wrapper {
-      box-shadow:
-        0 16px 40px rgba(15, 23, 42, 0.12),
-        0 0 0 1px rgba(16, 185, 129, 0.1);
-    }
-
     /* ── Hero ── */
     .hero {
-      min-height: auto;
-      padding: 48px 24px 100px;
+      min-height: 100vh;
+      padding: calc(var(--nav-height) + var(--ticker-height) + 80px) 24px 100px;
       background: var(--gradient-hero);
       position: relative;
       overflow: hidden;
-      border-top: 1px solid var(--border);
     }
 
     .hero::before {
@@ -419,9 +401,9 @@
       margin-bottom: 0;
     }
 
-    .hero-video-stack {
-      display: flex;
-      flex-direction: column;
+    .hero-video-grid {
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 20px;
       width: 100%;
     }
@@ -837,19 +819,14 @@
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
-      .home-featured-video {
-        padding-left: 20px;
-        padding-right: 20px;
-        padding-bottom: 28px;
-      }
-
-      .hero {
-        padding-top: 40px;
-      }
-
       .hero-grid {
         grid-template-columns: 1fr;
         gap: 40px;
+      }
+
+      .hero-video-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
       }
 
       .content-grid {
@@ -872,14 +849,14 @@
         display: block;
       }
 
-      .home-featured-video {
-        padding-top: calc(var(--nav-height) + var(--ticker-height) + 20px);
-        padding-bottom: 28px;
+      .hero {
+        padding-top: calc(var(--nav-height) + var(--ticker-height) + 48px);
+        padding-bottom: 72px;
       }
 
-      .hero {
-        padding-top: 40px;
-        padding-bottom: 72px;
+      .hero-video-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
       }
 
       .hero-stats {
@@ -962,23 +939,6 @@
     </div>
   </div>
 
-  <!-- Featured: Jaylen Brown (Standard of Greatness finale) -->
-  <section class="home-featured-video" aria-label="Featured video">
-    <div class="home-featured-video-inner">
-      <div class="hero-video-wrapper">
-        <iframe
-          src="https://www.youtube.com/embed/TdXr8Ka2weo"
-          title="Jaylen Brown: The Price of Thinking For Yourself (EP 6, Series Finale)"
-          data-description="Jaylen Brown: The Price of Thinking For Yourself — the series finale of Robi Report's Standard of Greatness philosophy series."
-          data-upload-date="2025-06-10T00:00:00+00:00"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen
-        ></iframe>
-      </div>
-    </div>
-  </section>
-
   <!-- Hero -->
   <section class="hero">
     <div class="hero-inner">
@@ -995,7 +955,18 @@
           </div>
         </div>
         <div class="hero-video">
-          <div class="hero-video-stack">
+          <div class="hero-video-grid">
+            <div class="hero-video-wrapper">
+              <iframe
+                src="https://www.youtube.com/embed/TdXr8Ka2weo"
+                title="Jaylen Brown: The Price of Thinking For Yourself (EP 6, Series Finale)"
+                data-description="Jaylen Brown: The Price of Thinking For Yourself — the series finale of Robi Report's Standard of Greatness philosophy series."
+                data-upload-date="2025-06-10T00:00:00+00:00"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              ></iframe>
+            </div>
             <div class="hero-video-wrapper">
               <iframe
                 src="https://www.youtube.com/embed/FmJ0Pm0SXXw"
