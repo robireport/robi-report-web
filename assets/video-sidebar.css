@@ -31,7 +31,7 @@
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  background: #000;
+  background: #FFFFFF;
 }
 
 .video-sidebar-video {
@@ -41,7 +41,7 @@
   height: 100%;
   object-fit: cover;
   z-index: 2;
-  background: #000;
+  background: #FFFFFF;
 }
 
 .video-sidebar-video.hidden {
@@ -57,7 +57,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: #000;
+  background: #FFFFFF;
 }
 
 .video-sidebar-poster.hidden {
@@ -164,7 +164,7 @@
   height: 48px;
   border-radius: 6px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(15, 23, 42, 0.04);
   flex-shrink: 0;
 }
 

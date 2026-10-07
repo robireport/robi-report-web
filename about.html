@@ -100,19 +100,22 @@
     }
 
     :root {
-      --bg-primary: #000000;
-      --bg-secondary: #0a0a0a;
-      --bg-card: #111111;
-      --bg-card-hover: #1a1a1a;
-      --border: rgba(255, 255, 255, 0.06);
-      --border-hover: rgba(255, 255, 255, 0.12);
-      --text-primary: #ffffff;
-      --text-secondary: #a1a1aa;
-      --text-muted: #71717a;
+      --bg-primary: #F9FAFB;
+      --bg-secondary: #FFFFFF;
+      --bg-card: #FFFFFF;
+      --bg-card-hover: #F3F4F6;
+      --border: rgba(15, 23, 42, 0.08);
+      --border-hover: rgba(15, 23, 42, 0.14);
+      --text-primary: #111827;
+      --text-secondary: #4B5563;
+      --text-muted: #6B7280;
       --accent: #10B981;
       --accent-hover: #34D399;
-      --accent-glow: rgba(16, 185, 129, 0.25);
-      --gradient-hero: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #000a12 100%);
+      --accent-glow: rgba(16, 185, 129, 0.28);
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.1);
+      --gradient-hero: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 45%, #ECFDF5 100%);
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
@@ -151,7 +154,7 @@
       right: 0;
       z-index: 100;
       height: var(--nav-height);
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
@@ -243,7 +246,7 @@
 
     .btn-outline:hover {
       border-color: var(--text-muted);
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(15, 23, 42, 0.04);
     }
 
     .btn-lg {
@@ -289,7 +292,7 @@
         align-items: stretch;
         gap: 0;
         padding: 16px 24px 32px;
-        background: rgba(0, 0, 0, 0.97);
+        background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         overflow-y: auto;
@@ -442,7 +445,7 @@
 
     .hero h1 em {
       font-style: normal;
-      background: linear-gradient(135deg, var(--accent) 0%, #b8e4ff 100%);
+      background: linear-gradient(135deg, var(--accent) 0%, #6EE7B7 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -534,13 +537,14 @@
       overflow: hidden;
       transition: all var(--transition);
       cursor: pointer;
+      box-shadow: var(--shadow-sm);
     }
 
     .card:hover {
       background: var(--bg-card-hover);
       border-color: var(--border-hover);
       transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      box-shadow: var(--shadow-lg);
     }
 
     .card > a {
@@ -579,14 +583,14 @@
       top: 14px;
       left: 14px;
       padding: 4px 10px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(17, 24, 39, 0.72);
       backdrop-filter: blur(8px);
       border-radius: 100px;
       font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: var(--text-primary);
+      color: #ffffff;
     }
 
     .card-tag.live {

@@ -50,7 +50,7 @@
 
 .sog-hero h1 em {
   font-style: normal;
-  background: linear-gradient(135deg, var(--accent) 0%, #b8e4ff 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #6EE7B7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -148,7 +148,7 @@
   margin-top: 16px;
   height: 8px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(15, 23, 42, 0.06);
 }
 
 .sog-block-placeholder:nth-child(2) { width: 85%; }
@@ -178,9 +178,9 @@
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: #000;
+  background: #FFFFFF;
   border: 1px solid var(--border-hover);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-lg);
 }
 
 .sog-video-embed-wrap iframe {
@@ -200,7 +200,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(15, 23, 42, 0.04);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 16px;
@@ -225,7 +225,7 @@
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(15, 23, 42, 0.03);
   color: var(--text-secondary);
   font-size: 0.82rem;
   font-weight: 500;
