@@ -8,7 +8,13 @@ import json
 import re
 from pathlib import Path
 
-from seo_lib import apply_seo, normalize_rel_path
+from seo_lib import apply_seo, extract_article_metadata, normalize_rel_path
+
+RELATED_SECTION_RE = re.compile(
+    r'\n?\s*<section class="article-related"[^>]*>.*?</section>\s*',
+    re.S | re.I,
+)
+READ_TIME_RE = re.compile(r'(\d+\s*min\s*read)', re.I)
 
 ROOT = Path(__file__).resolve().parent.parent
 ARTICLES_DIR = ROOT / 'articles'
@@ -112,7 +118,57 @@ def source_to_index_content(content: str) -> str:
     return content.replace('../../', '../../../')
 
 
-def build_related_articles_html(source: Path, limit: int = 3) -> str:
+def parse_read_time(source_html: str) -> str:
+    match = READ_TIME_RE.search(source_html)
+    return match.group(1) if match else '5 min read'
+
+
+def ensure_article_related_assets(content: str, asset_prefix: str) -> str:
+    if 'assets/article-related.css' in content:
+        return content
+    insert = (
+        f'  <link rel="stylesheet" href="{asset_prefix}assets/article-related.css" />\n'
+        f'  <script src="{asset_prefix}assets/article-related.js" defer></script>\n'
+    )
+    marker = 'assets/nav-mobile.css" />'
+    if marker not in content:
+        return content
+    return content.replace(marker, marker + '\n' + insert, 1)
+
+
+def build_related_card_html(peer: Path) -> str:
+    peer_html = peer.read_text(encoding='utf-8')
+    metadata = extract_article_metadata(peer_html) or {}
+    href = f'/{public_article_href(peer)}'
+    title = metadata.get('headline') or parse_article_title(peer)
+    tag = metadata.get('story_tag') or 'News'
+    read_time = parse_read_time(peer_html)
+    image_url = metadata.get('image_url') or ''
+    image_alt = metadata.get('image_alt') or title
+
+    if image_url:
+        thumb_inner = (
+            f'<img src="{html.escape(image_url, quote=True)}" '
+            f'alt="{html.escape(image_alt, quote=True)}" loading="lazy" />'
+        )
+    else:
+        thumb_inner = '<div class="article-related-thumb-fallback" aria-hidden="true"></div>'
+
+    return (
+        '          <li class="article-related-card">\n'
+        f'            <a class="article-related-card-link" href="{html.escape(href, quote=True)}">\n'
+        f'              <div class="article-related-thumb">{thumb_inner}</div>\n'
+        '              <div class="article-related-body">\n'
+        f'                <span class="article-related-tag">{html.escape(tag)}</span>\n'
+        f'                <h3 class="article-related-title">{html.escape(title)}</h3>\n'
+        f'                <span class="article-related-meta">{html.escape(read_time)}</span>\n'
+        '              </div>\n'
+        '            </a>\n'
+        '          </li>'
+    )
+
+
+def build_related_articles_html(source: Path, limit: int = 6) -> str:
     category = source.parent.name
     peers = [
         candidate
@@ -125,34 +181,38 @@ def build_related_articles_html(source: Path, limit: int = 3) -> str:
         return ''
 
     hub_label = HUBS.get(category, ('', category.upper()))[1]
-    items = []
-    for peer in peers:
-        href = public_article_href(peer)
-        title = parse_article_title(peer)
-        items.append(
-            f'          <li><a href="/{href}">{html.escape(title)}</a></li>'
-        )
+    items = [build_related_card_html(peer) for peer in peers]
 
     return (
         '\n      <section class="article-related" aria-label="Related articles">\n'
-        f'        <h2>More from {html.escape(hub_label)}</h2>\n'
-        '        <ul>\n'
+        '        <div class="article-related-header">\n'
+        f'          <h2>More from {html.escape(hub_label)}</h2>\n'
+        '          <div class="article-related-controls">\n'
+        '            <button type="button" class="article-related-scroll-btn" data-direction="prev" aria-label="Scroll related articles left">&#8249;</button>\n'
+        '            <button type="button" class="article-related-scroll-btn" data-direction="next" aria-label="Scroll related articles right">&#8250;</button>\n'
+        '          </div>\n'
+        '        </div>\n'
+        '        <div class="article-related-track-wrap">\n'
+        '          <ul class="article-related-track">\n'
         f'{chr(10).join(items)}\n'
-        '        </ul>\n'
+        '          </ul>\n'
+        '        </div>\n'
         '      </section>\n'
     )
 
 
 def inject_related_articles(content: str, source: Path) -> str:
-    if 'class="article-related"' in content:
-        return content
+    content = RELATED_SECTION_RE.sub('\n', content)
     block = build_related_articles_html(source)
     if not block:
         return content
-    marker = '<footer class="footer">'
+    marker = '  </main>'
     if marker not in content:
-        return content
-    return content.replace(marker, block + '\n  ' + marker, 1)
+        marker = '<footer class="footer">'
+        if marker not in content:
+            return content
+        return content.replace(marker, block + '\n  ' + marker, 1)
+    return content.replace(marker, block + marker, 1)
 
 
 def sync_article(source: Path) -> Path:
@@ -162,6 +222,7 @@ def sync_article(source: Path) -> Path:
     index_path = source.parent / source.stem / 'index.html'
     index_path.parent.mkdir(parents=True, exist_ok=True)
     content = source.read_text(encoding='utf-8')
+    content = ensure_article_related_assets(content, '../../')
     source_rel_path = normalize_rel_path(source)
     source.write_text(
         apply_seo(content, source_rel_path, source_path=source),
@@ -172,6 +233,7 @@ def sync_article(source: Path) -> Path:
         normalize_rel_path(index_path),
         source_path=source,
     )
+    index_content = ensure_article_related_assets(index_content, '../../../')
     index_content = inject_related_articles(index_content, source)
     index_path.write_text(index_content, encoding='utf-8')
     return index_path
