@@ -79,9 +79,9 @@
   font-weight: 600;
   font-style: italic;
   line-height: 1.45;
-  color: #ffe9a8;
-  background: linear-gradient(135deg, rgba(255, 200, 80, 0.14) 0%, rgba(16, 185, 129, 0.1) 100%);
-  border: 1px solid rgba(255, 215, 120, 0.35);
+  color: #111827;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, #ffffff 100%);
+  border: 1px solid rgba(16, 185, 129, 0.28);
   border-radius: var(--radius-sm);
   box-shadow: 0 0 20px rgba(255, 200, 80, 0.12);
 }
