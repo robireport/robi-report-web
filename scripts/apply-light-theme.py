@@ -20,7 +20,7 @@ ROOT_BLOCK_OLD = """      --bg-primary: #000000;
       --accent-hover: #34D399;
       --accent-glow: rgba(16, 185, 129, 0.25);"""
 
-ROOT_BLOCK_NEW = """      --bg-primary: #F9FAFB;
+ROOT_BLOCK_NEW = """      --bg-primary: #FFFFFF;
       --bg-secondary: #FFFFFF;
       --bg-card: #FFFFFF;
       --bg-card-hover: #F3F4F6;
@@ -40,7 +40,7 @@ REPLACEMENTS: list[tuple[str, str]] = [
     (ROOT_BLOCK_OLD, ROOT_BLOCK_NEW),
     (
         "--gradient-hero: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #000a12 100%);",
-        "--gradient-hero: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 45%, #ECFDF5 100%);",
+        "--gradient-hero: linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 45%, #ECFDF5 100%);",
     ),
     (
         "background: rgba(0, 0, 0, 0.85);",
@@ -93,7 +93,7 @@ REPLACEMENTS: list[tuple[str, str]] = [
     ),
     (
         "html, body {\n      margin: 0;\n      min-height: 100vh;\n      background: #000;\n      color: #fff;",
-        "html, body {\n      margin: 0;\n      min-height: 100vh;\n      background: #F9FAFB;\n      color: #111827;",
+        "html, body {\n      margin: 0;\n      min-height: 100vh;\n      background: #FFFFFF;\n      color: #111827;",
     ),
     ("color: #92d2ff;", "color: #10B981;"),
     ("color: #a1a1aa;", "color: #6B7280;"),

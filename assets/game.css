@@ -298,10 +298,11 @@
 
 /* Box score */
 .boxscore-team {
-  background: var(--bg-card);
+  background: #FFFFFF;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .boxscore-team-header {
@@ -374,7 +375,7 @@
   text-align: left;
   position: sticky;
   left: 0;
-  background: var(--bg-card);
+  background: #FFFFFF;
   z-index: 1;
   min-width: 140px;
   max-width: 180px;
@@ -393,7 +394,7 @@
 }
 
 .boxscore-table tbody tr:hover td:first-child {
-  background: #121820;
+  background: #ECFDF5;
 }
 
 .boxscore-table .player-name {
