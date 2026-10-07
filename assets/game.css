@@ -40,7 +40,7 @@
 
 .sk-hero,
 .sk-block {
-  background: linear-gradient(90deg, #111 0%, #1a1a1a 50%, #111 100%);
+  background: linear-gradient(90deg, #F3F4F6 0%, #E5E7EB 50%, #F3F4F6 100%);
   background-size: 200% 100%;
   animation: game-pulse 1.4s ease-in-out infinite;
   border-radius: var(--radius-md);
@@ -266,7 +266,7 @@
 .game-linescore-pill {
   font-size: 0.68rem;
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.05);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 3px 7px;
@@ -310,7 +310,7 @@
   gap: 12px;
   padding: 14px 18px;
   border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(15, 23, 42, 0.03);
 }
 
 .boxscore-team-header img {

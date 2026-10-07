@@ -12,7 +12,7 @@
   .nav {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background: #000000 !important;
+    background: #FFFFFF !important;
   }
 
   .nav-toggle {
@@ -53,7 +53,7 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: #000000;
+    background: #FFFFFF;
     z-index: 999;
   }
 
@@ -76,7 +76,7 @@
     gap: 0;
     margin: 0;
     padding: 16px 24px 48px;
-    background: #000000;
+    background: #FFFFFF;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;

@@ -88,13 +88,13 @@
 .catalog-card:not(.catalog-card--placeholder):hover {
   border-color: var(--border-hover);
   transform: translateY(-3px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-lg);
 }
 
 .catalog-card-image {
   position: relative;
   aspect-ratio: 1;
-  background: #0a0a0a;
+  background: #F3F4F6;
   overflow: hidden;
 }
 
@@ -308,7 +308,7 @@
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  background: #0a0a0a;
+  background: #F3F4F6;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   aspect-ratio: 1;
