@@ -8,6 +8,7 @@
     mlb: { category: 'baseball', league: 'mlb', hub: 'mlb.html', label: 'MLB' },
     soccer: { category: 'soccer', league: 'eng.1', hub: 'soccer.html', label: 'Premier League' },
     ufc: { category: 'mma', league: 'ufc', hub: 'ufc.html', label: 'UFC' },
+    boxing: { category: 'mma', league: 'ufc', hub: 'boxing.html', label: 'Boxing' },
   };
 
   const SEASON_PILL_STATS = ['PTS', 'REB', 'AST', 'STL', 'BLK', 'TO', 'MIN', 'FG%', '3P%', 'FT%'];

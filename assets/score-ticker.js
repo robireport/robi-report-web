@@ -297,7 +297,8 @@
         const sections = [];
         results.forEach((r, i) => {
           const key = ALL_KEYS[i];
-          if (r.status === 'fulfilled' && r.value.length) {
+          if (r.status !== 'fulfilled') return;
+          if (r.value.length || COMBAT_LEAGUES.has(key)) {
             sections.push(buildSection(key, r.value));
           }
         });

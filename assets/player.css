@@ -12,14 +12,21 @@
   overflow: hidden;
   border: 1px solid var(--border);
   margin-bottom: 28px;
-  background: var(--bg-card);
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
 }
 
 .player-hero-bg {
   position: absolute;
   inset: 0;
-  opacity: 0.35;
-  background: linear-gradient(135deg, var(--team-color, #266092) 0%, #000 55%, rgba(16, 185, 129, 0.15) 100%);
+  opacity: 1;
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.12) 0%,
+    #ffffff 45%,
+    #ffffff 100%
+  );
+  border-bottom: 1px solid var(--border);
 }
 
 .player-hero-inner {

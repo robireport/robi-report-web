@@ -1,7 +1,7 @@
 (function (global) {
   'use strict';
 
-  const LINKABLE_SPORTS = new Set(['nba', 'wnba', 'nfl', 'mlb', 'soccer', 'ufc']);
+  const LINKABLE_SPORTS = new Set(['nba', 'wnba', 'nfl', 'mlb', 'soccer', 'ufc', 'boxing']);
 
   function escapeHtml(str) {
     return String(str ?? '')
@@ -50,6 +50,19 @@
     );
   }
 
+  function handlePlayerLinkClick(event) {
+    const trigger = event.target.closest('.player-profile-link[data-athlete-id]');
+    if (!trigger) return;
+
+    const athleteId = trigger.dataset.athleteId;
+    const sport = trigger.dataset.sport;
+    const gameId = trigger.dataset.gameId || '';
+    if (!athleteId || !sport) return;
+
+    event.preventDefault();
+    navigateToPlayer(athleteId, sport, gameId);
+  }
+
   function init(container) {
     const root =
       container ||
@@ -57,22 +70,14 @@
       document.getElementById('game-app') ||
       document.body;
 
-    if (!root || root.dataset.playerLinksBound === 'true') return root;
+    if (!root) return root;
+
+    if (document.documentElement.dataset.playerLinksBound !== 'true') {
+      document.documentElement.dataset.playerLinksBound = 'true';
+      document.addEventListener('click', handlePlayerLinkClick);
+    }
+
     root.dataset.playerLinksBound = 'true';
-
-    root.addEventListener('click', (event) => {
-      const trigger = event.target.closest('.player-profile-link[data-athlete-id]');
-      if (!trigger || !root.contains(trigger)) return;
-
-      const athleteId = trigger.dataset.athleteId;
-      const sport = trigger.dataset.sport;
-      const gameId = trigger.dataset.gameId || '';
-      if (!athleteId || !sport) return;
-
-      event.preventDefault();
-      navigateToPlayer(athleteId, sport, gameId);
-    });
-
     return root;
   }
 
@@ -84,13 +89,13 @@
     isLinkableSport,
   };
 
-  function bindGameContainer() {
+  function bindOnReady() {
     init(document.getElementById('game-content') || document.getElementById('game-app'));
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bindGameContainer);
+    document.addEventListener('DOMContentLoaded', bindOnReady);
   } else {
-    bindGameContainer();
+    bindOnReady();
   }
 })(window);

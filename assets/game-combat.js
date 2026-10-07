@@ -9,46 +9,78 @@
     early: 'Early Prelims',
   };
 
-  async function fetchUfcCard(gameId) {
-    if (!gameId) return null;
+  const SCOREBOARD_BASE = {
+    ufc: 'https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard',
+    boxing: 'https://site.api.espn.com/apis/site/v2/sports/boxing/scoreboard',
+  };
+
+  function collectCompetitions(data) {
+    if (!data) return [];
+
+    if (Array.isArray(data.competitions) && data.competitions.length) {
+      return [...data.competitions];
+    }
+
+    const nested = (data.events || []).flatMap((event) => event.competitions || []);
+    if (nested.length) return nested;
+
+    return [];
+  }
+
+  function normalizeEventPayload(data) {
+    if (!data) return null;
+
+    const competitions = collectCompetitions(data);
+    if (!competitions.length) return null;
+
+    const firstEvent = (data.events || [])[0];
+    return {
+      id: data.id || firstEvent?.id || '',
+      name: data.name || firstEvent?.name || data.shortName || firstEvent?.shortName || '',
+      shortName: data.shortName || firstEvent?.shortName || '',
+      date: data.date || firstEvent?.date || competitions[0]?.date || '',
+      status: data.status || firstEvent?.status || competitions[0]?.status,
+      competitions,
+    };
+  }
+
+  async function fetchCombatCard(sport, gameId) {
+    const base = SCOREBOARD_BASE[sport];
+    if (!base || !gameId) return null;
 
     try {
-      const cardRes = await fetch(
-        `https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard/${encodeURIComponent(gameId)}`
-      );
-      if (cardRes.ok) {
-        const data = await cardRes.json();
-        if (Array.isArray(data?.competitions) && data.competitions.length) return data;
+      const directRes = await fetch(`${base}/${encodeURIComponent(gameId)}`);
+      if (directRes.ok) {
+        const directData = await directRes.json();
+        const normalized = normalizeEventPayload(directData);
+        if (normalized) return normalized;
+      } else if (directRes.status !== 404) {
+        console.warn(`${sport} card HTTP ${directRes.status} for event ${gameId}`);
       }
 
-      const listRes = await fetch(
-        'https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard'
-      );
-      if (!listRes.ok) return null;
+      const listRes = await fetch(base);
+      if (!listRes.ok) {
+        console.warn(`${sport} scoreboard HTTP ${listRes.status}`);
+        return null;
+      }
 
       const list = await listRes.json();
       const event = (list.events || []).find((ev) => String(ev.id) === String(gameId));
-      if (event?.competitions?.length) {
-        return {
-          id: event.id,
-          name: event.name,
-          shortName: event.shortName,
-          date: event.date,
-          status: event.status,
-          competitions: event.competitions,
-        };
-      }
+      if (!event) return null;
 
-      return null;
+      return normalizeEventPayload({
+        ...event,
+        competitions: event.competitions || [],
+      });
     } catch (err) {
-      console.warn('UFC card fetch failed:', err);
+      console.warn(`${sport} card fetch failed:`, err);
       return null;
     }
   }
 
-  function renderFighterName(name, athleteId, gameId) {
+  function renderFighterName(name, athleteId, sport, gameId) {
     if (global.PlayerLinks?.renderPlayerName) {
-      return global.PlayerLinks.renderPlayerName(name, athleteId, 'ufc', gameId, {
+      return global.PlayerLinks.renderPlayerName(name, athleteId, sport, gameId, {
         extraClass: 'combat-fighter-link',
       });
     }
@@ -127,21 +159,47 @@
   }
 
   function inferSegmentKey(startKey, uniqueStarts) {
+    if (!startKey) return 'main';
     if (uniqueStarts.length <= 1) return 'main';
+
     const index = uniqueStarts.indexOf(startKey);
+    if (index === -1) return 'main';
     if (index <= 0) return 'early';
     if (index >= uniqueStarts.length - 1) return 'main';
     return 'prelims';
   }
 
-  function parseUfcCard(data) {
-    const competitions = [...(data.competitions || [])].map((fight, index) => ({
+  function sortFights(items) {
+    return items.sort((a, b) => {
+      const af = a.fight;
+      const bf = b.fight;
+      const featuredDiff =
+        Number(Boolean(bf.status?.featured)) - Number(Boolean(af.status?.featured));
+      if (featuredDiff !== 0) return featuredDiff;
+
+      const roundsDiff =
+        (bf.format?.regulation?.periods || 0) - (af.format?.regulation?.periods || 0);
+      if (roundsDiff !== 0) return roundsDiff;
+
+      const orderDiff = (bf.order || 0) - (af.order || 0);
+      if (orderDiff !== 0) return orderDiff;
+
+      return b.index - a.index;
+    });
+  }
+
+  function parseCombatCard(data) {
+    const competitions = collectCompetitions(data).map((fight, index) => ({
       fight,
       index,
       startKey: getFightStartKey(fight),
     }));
 
-    const uniqueStarts = [...new Set(competitions.map((item) => item.startKey).filter(Boolean))].sort();
+    if (!competitions.length) return [];
+
+    const uniqueStarts = [
+      ...new Set(competitions.map((item) => item.startKey).filter(Boolean)),
+    ].sort();
 
     const segments = {
       main: [],
@@ -154,29 +212,25 @@
       segments[segment].push(item);
     });
 
-    const sortSegmentFights = (items) =>
-      items.sort((a, b) => {
-        const af = a.fight;
-        const bf = b.fight;
-        const featuredDiff =
-          Number(Boolean(bf.status?.featured)) - Number(Boolean(af.status?.featured));
-        if (featuredDiff !== 0) return featuredDiff;
+    const sections = [
+      { key: 'main', label: SEGMENT_LABELS.main, fights: sortFights(segments.main) },
+      { key: 'prelims', label: SEGMENT_LABELS.prelims, fights: sortFights(segments.prelims) },
+      { key: 'early', label: SEGMENT_LABELS.early, fights: sortFights(segments.early) },
+    ].filter((section) => section.fights.length);
 
-        const roundsDiff =
-          (bf.format?.regulation?.periods || 0) - (af.format?.regulation?.periods || 0);
-        if (roundsDiff !== 0) return roundsDiff;
-
-        return b.index - a.index;
-      });
+    const assigned = sections.reduce((sum, section) => sum + section.fights.length, 0);
+    if (assigned === competitions.length) return sections;
 
     return [
-      { key: 'main', label: SEGMENT_LABELS.main, fights: sortSegmentFights(segments.main) },
-      { key: 'prelims', label: SEGMENT_LABELS.prelims, fights: sortSegmentFights(segments.prelims) },
-      { key: 'early', label: SEGMENT_LABELS.early, fights: sortSegmentFights(segments.early) },
-    ].filter((section) => section.fights.length);
+      {
+        key: 'full',
+        label: 'Full Card',
+        fights: sortFights([...competitions]),
+      },
+    ];
   }
 
-  function renderFighter(competitor, gameId, fightState) {
+  function renderFighter(competitor, gameId, fightState, sport) {
     const athlete = competitor?.athlete || {};
     const name = athlete.displayName || athlete.shortName || 'TBD';
     const athleteId = competitor?.id || athlete.id || '';
@@ -190,7 +244,7 @@
       <div class="combat-fighter${isWinner ? ' is-winner' : ''}${isLoser ? ' is-loser' : ''}">
         <div class="combat-fighter-top">
           ${flag ? `<img class="combat-fighter-flag" src="${escapeHtml(flag)}" alt="" loading="lazy" />` : ''}
-          <div class="combat-fighter-name">${renderFighterName(name, athleteId, gameId)}</div>
+          <div class="combat-fighter-name">${renderFighterName(name, athleteId, sport, gameId)}</div>
           ${isWinner ? '<span class="combat-fighter-badge" aria-label="Winner">W</span>' : ''}
         </div>
         ${record ? `<div class="combat-fighter-record">${escapeHtml(record)}</div>` : ''}
@@ -198,7 +252,7 @@
     `;
   }
 
-  function renderFightRow(fight, gameId) {
+  function renderFightRow(fight, gameId, sport) {
     const competitors = getCompetitors(fight);
     const fighterOne = competitors[0];
     const fighterTwo = competitors[1];
@@ -212,17 +266,19 @@
       <article class="combat-fight-row">
         <div class="combat-fight-weight">${escapeHtml(weightClass)}</div>
         <div class="combat-fight-matchup">
-          ${fighterOne ? renderFighter(fighterOne, gameId, state) : '<div class="combat-fighter"><div class="combat-fighter-name">TBD</div></div>'}
+          ${fighterOne ? renderFighter(fighterOne, gameId, state, sport) : '<div class="combat-fighter"><div class="combat-fighter-name">TBD</div></div>'}
           <div class="combat-fight-divider" aria-hidden="true">vs</div>
-          ${fighterTwo ? renderFighter(fighterTwo, gameId, state) : '<div class="combat-fighter"><div class="combat-fighter-name">TBD</div></div>'}
+          ${fighterTwo ? renderFighter(fighterTwo, gameId, state, sport) : '<div class="combat-fighter"><div class="combat-fighter-name">TBD</div></div>'}
         </div>
         <div class="combat-fight-result ${stateClass}">${escapeHtml(resultText)}</div>
       </article>
     `;
   }
 
-  function renderCardSegment(section, gameId) {
-    const rows = section.fights.map(({ fight }) => renderFightRow(fight, gameId)).join('');
+  function renderCardSegment(section, gameId, sport) {
+    const rows = section.fights
+      .map(({ fight }) => renderFightRow(fight, gameId, sport))
+      .join('');
 
     return `
       <section class="combat-card-segment" data-segment="${escapeHtml(section.key)}">
@@ -240,7 +296,7 @@
     const status = data?.status?.type || {};
     const statusText = status.shortDetail || status.detail || 'Upcoming';
     const dateText = data?.date ? formatGameTime(data.date) : '';
-    const fightCount = data?.competitions?.length || 0;
+    const fightCount = collectCompetitions(data).length;
 
     return `
       <section class="game-hero combat-hero">
@@ -257,9 +313,9 @@
     `;
   }
 
-  function renderUfcCard(data, gameId) {
-    const sections = parseUfcCard(data);
-    const body = sections.map((section) => renderCardSegment(section, gameId)).join('');
+  function renderCombatCard(data, gameId, sport) {
+    const sections = parseCombatCard(data);
+    const body = sections.map((section) => renderCardSegment(section, gameId, sport)).join('');
 
     return `
       <section class="game-view-card combat-card">
@@ -296,13 +352,15 @@
     if (lineupSidebarEl) lineupSidebarEl.innerHTML = '';
     if (videoSidebarEl) videoSidebarEl.innerHTML = '';
 
-    if (sport === 'ufc' && gameId) {
-      const card = await fetchUfcCard(gameId);
-      if (card) {
+    const isCombatSport = sport === 'ufc' || sport === 'boxing';
+
+    if (isCombatSport && gameId) {
+      const card = await fetchCombatCard(sport, gameId);
+      if (card && collectCompetitions(card).length) {
         document.title = `${card.name || cfg.label} — Robi Report`;
         if (heroEl) heroEl.innerHTML = renderCombatHero(card, cfg);
-        if (mainEl) mainEl.innerHTML = renderUfcCard(card, gameId);
-        if (global.PlayerLinks && els?.content) global.PlayerLinks.init(els.content);
+        if (mainEl) mainEl.innerHTML = renderCombatCard(card, gameId, sport);
+        if (global.PlayerLinks) global.PlayerLinks.init(els?.content || document);
         return;
       }
     }
@@ -313,8 +371,11 @@
   }
 
   global.GameCombat = {
-    fetchUfcCard,
-    parseUfcCard,
+    fetchCombatCard,
+    parseCombatCard,
     renderCombatPage,
+    // Back-compat for any callers/tests
+    fetchUfcCard: (gameId) => fetchCombatCard('ufc', gameId),
+    parseUfcCard: parseCombatCard,
   };
 })(window);

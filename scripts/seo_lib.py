@@ -514,8 +514,20 @@ def extract_video_objects(page_html: str, rel_path: str) -> list[dict[str, Any]]
     return videos
 
 
+def _ensure_video_fields(video: dict[str, Any]) -> dict[str, Any]:
+    name = _normalize_video_name(str(video.get('name') or ''))
+    description = str(video.get('description') or '').strip() or _default_description(name)
+    upload_date = format_upload_date(str(video.get('uploadDate') or ''))
+    return {
+        **video,
+        'name': name,
+        'description': description,
+        'uploadDate': upload_date,
+    }
+
+
 def build_video_schema_script(page_html: str, rel_path: str) -> str:
-    videos = extract_video_objects(page_html, rel_path)
+    videos = [_ensure_video_fields(video) for video in extract_video_objects(page_html, rel_path)]
     if not videos:
         return ''
 
