@@ -125,7 +125,7 @@ a.btn-primary {
 }
 
 .ticker-organizer:focus-visible {
-  outline: 2px solid rgba(146, 210, 255, 0.55);
+  outline: 2px solid rgba(16, 185, 129, 0.55);
   outline-offset: -2px;
 }
 
@@ -181,8 +181,8 @@ a.btn-primary {
 
 .ticker-viewport:hover .ticker-arrow { display: flex; }
 .ticker-arrow:hover {
-  background: rgba(146, 210, 255, 0.2);
-  border-color: rgba(146, 210, 255, 0.5);
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.5);
 }
 
 .ticker-arrow-left { left: 4px; }
@@ -212,25 +212,25 @@ a.score-card {
 }
 
 a.score-card:hover {
-  background: rgba(146, 210, 255, 0.1);
-  border-color: rgba(146, 210, 255, 0.35);
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.35);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(146, 210, 255, 0.14);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.14);
 }
 
 a.score-card:focus-visible {
-  outline: 2px solid rgba(146, 210, 255, 0.55);
+  outline: 2px solid rgba(16, 185, 129, 0.55);
   outline-offset: 2px;
 }
 
 .score-card:hover {
-  background: rgba(146, 210, 255, 0.06);
-  border-color: rgba(146, 210, 255, 0.2);
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
 .score-card.is-live {
-  border-color: rgba(146, 210, 255, 0.35);
-  box-shadow: 0 0 12px rgba(146, 210, 255, 0.08);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.08);
 }
 
 .score-card.is-placeholder,
@@ -316,7 +316,7 @@ a.score-card:focus-visible {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #92d2ff;
+  color: #10B981;
   flex-shrink: 0;
   white-space: nowrap;
   line-height: 1;

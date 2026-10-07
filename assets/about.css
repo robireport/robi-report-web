@@ -24,8 +24,8 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
-  background: rgba(146, 210, 255, 0.1);
-  border: 1px solid rgba(146, 210, 255, 0.25);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
   border-radius: 100px;
   margin-bottom: 20px;
 }
@@ -135,9 +135,9 @@
 }
 
 .about-socials a:hover {
-  border-color: rgba(146, 210, 255, 0.35);
+  border-color: rgba(16, 185, 129, 0.35);
   color: var(--accent);
-  background: rgba(146, 210, 255, 0.06);
+  background: rgba(16, 185, 129, 0.06);
 }
 
 .contact-form-wrap {
@@ -200,8 +200,8 @@
 .form-row select:focus,
 .form-row textarea:focus {
   outline: none;
-  border-color: rgba(146, 210, 255, 0.5);
-  box-shadow: 0 0 0 3px rgba(146, 210, 255, 0.12);
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
 }
 
 .form-row select {
@@ -222,8 +222,8 @@
   display: none;
   padding: 14px 16px;
   border-radius: var(--radius-sm);
-  background: rgba(146, 210, 255, 0.1);
-  border: 1px solid rgba(146, 210, 255, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
   color: var(--accent);
   font-size: 0.875rem;
   font-weight: 600;

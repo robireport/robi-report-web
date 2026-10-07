@@ -20,7 +20,7 @@
 .game-spinner {
   width: 44px;
   height: 44px;
-  border: 3px solid rgba(146, 210, 255, 0.15);
+  border: 3px solid rgba(16, 185, 129, 0.15);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: game-spin 0.85s linear infinite;
@@ -128,13 +128,13 @@
 
 .game-tab:hover {
   color: var(--text-primary);
-  background: rgba(146, 210, 255, 0.04);
+  background: rgba(16, 185, 129, 0.04);
 }
 
 .game-tab.is-active {
   color: var(--accent);
   border-bottom-color: var(--accent);
-  background: rgba(146, 210, 255, 0.06);
+  background: rgba(16, 185, 129, 0.06);
 }
 
 #game-hero > .game-hero {
@@ -176,7 +176,7 @@
 }
 
 .game-hero-meta .live-badge {
-  background: rgba(146, 210, 255, 0.15);
+  background: rgba(16, 185, 129, 0.15);
   color: var(--accent);
   font-weight: 700;
   font-size: 0.7rem;
@@ -184,7 +184,7 @@
   text-transform: uppercase;
   padding: 4px 10px;
   border-radius: 100px;
-  border: 1px solid rgba(146, 210, 255, 0.35);
+  border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
 .game-matchup {
@@ -331,7 +331,7 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent);
-  background: rgba(146, 210, 255, 0.04);
+  background: rgba(16, 185, 129, 0.04);
   border-bottom: 1px solid var(--border);
 }
 
@@ -352,7 +352,7 @@
 .boxscore-table-wrap {
   overflow-x: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(146, 210, 255, 0.3) transparent;
+  scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
 }
 
 .boxscore-table {
@@ -389,7 +389,7 @@
 }
 
 .boxscore-table tbody tr:hover td {
-  background: rgba(146, 210, 255, 0.04);
+  background: rgba(16, 185, 129, 0.04);
 }
 
 .boxscore-table tbody tr:hover td:first-child {
@@ -476,7 +476,7 @@
 .gamecast-leaders-header {
   padding: 14px 18px;
   border-bottom: 1px solid var(--border);
-  background: rgba(146, 210, 255, 0.04);
+  background: rgba(16, 185, 129, 0.04);
 }
 
 .game-view-card-header h2,
@@ -514,7 +514,7 @@
   max-height: 720px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(146, 210, 255, 0.3) transparent;
+  scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
 }
 
 .pbp-item {
@@ -523,7 +523,7 @@
 }
 
 .pbp-item.is-scoring {
-  background: rgba(146, 210, 255, 0.04);
+  background: rgba(16, 185, 129, 0.04);
 }
 
 .pbp-item-top {
@@ -670,7 +670,7 @@
   color: var(--accent);
   padding: 14px 18px;
   border-bottom: 1px solid var(--border);
-  background: rgba(146, 210, 255, 0.04);
+  background: rgba(16, 185, 129, 0.04);
 }
 
 .game-info-list {
@@ -752,7 +752,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 18px;
-  background: rgba(146, 210, 255, 0.06);
+  background: rgba(16, 185, 129, 0.06);
   border-bottom: 1px solid var(--border);
 }
 

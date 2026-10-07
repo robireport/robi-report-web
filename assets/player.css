@@ -19,7 +19,7 @@
   position: absolute;
   inset: 0;
   opacity: 0.35;
-  background: linear-gradient(135deg, var(--team-color, #266092) 0%, #000 55%, rgba(146, 210, 255, 0.15) 100%);
+  background: linear-gradient(135deg, var(--team-color, #266092) 0%, #000 55%, rgba(16, 185, 129, 0.15) 100%);
 }
 
 .player-hero-inner {
@@ -137,7 +137,7 @@
 .player-card-header {
   padding: 14px 18px;
   border-bottom: 1px solid var(--border);
-  background: rgba(146, 210, 255, 0.04);
+  background: rgba(16, 185, 129, 0.04);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -269,7 +269,7 @@
 .player-table-wrap {
   overflow-x: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(146, 210, 255, 0.3) transparent;
+  scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
 }
 
 .player-table {
@@ -305,7 +305,7 @@
 }
 
 .player-table tbody tr:hover td {
-  background: rgba(146, 210, 255, 0.04);
+  background: rgba(16, 185, 129, 0.04);
 }
 
 .player-table tbody tr:hover td:first-child {
