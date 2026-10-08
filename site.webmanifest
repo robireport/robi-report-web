@@ -8,6 +8,12 @@
   "theme_color": "#10B981",
   "icons": [
     {
+      "src": "/assets/images/emerald-r-logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",

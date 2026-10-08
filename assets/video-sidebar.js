@@ -31,7 +31,7 @@
     }
   }
 
-  const PUBLISHER_LOGO = 'https://robireport.com/assets/Squared%20logo.png';
+  const PUBLISHER_LOGO = 'https://robireport.com/assets/images/emerald-r-logo.png';
   const DEFAULT_UPLOAD_DATE = '2024-01-01T00:00:00+00:00';
 
   function formatUploadDate(value) {

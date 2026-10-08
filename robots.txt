@@ -1,5 +1,11 @@
+# Robi Report — allow indexing and brand asset crawling (Google Search / Googlebot-Image).
+User-agent: Googlebot-Image
+Allow: /
+
 User-agent: *
 Allow: /
+Allow: /assets/
+Allow: /assets/images/
 
 Sitemap: https://robireport.com/sitemap.xml
 Sitemap: https://robireport.com/news-sitemap.xml

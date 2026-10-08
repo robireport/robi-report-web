@@ -79,8 +79,10 @@
   let scrollStart = 0;
   let edgeScrollSpeed = 0;
 
-  const EDGE_ZONE_PX = 64;
-  const EDGE_SCROLL_MAX_PX = 7;
+  const EDGE_ZONE_PX = 80;
+  const EDGE_SCROLL_MAX_PX = 22;
+  const ARROW_GUTTER_PX = 36;
+  const ARROW_SCROLL_PX = 280;
 
   const SORT_PHASE = { LIVE: 0, UPCOMING: 1, FINAL: 2 };
 
@@ -514,17 +516,30 @@
     }
   }
 
+  function scrollTickerBy(delta) {
+    edgeScrollSpeed = 0;
+    track.scrollBy({ left: delta, behavior: 'smooth' });
+  }
+
   // Scroll arrows
   const leftBtn = ticker.querySelector('.ticker-arrow-left');
   const rightBtn = ticker.querySelector('.ticker-arrow-right');
   if (leftBtn) {
-    leftBtn.addEventListener('click', () => {
-      track.scrollBy({ left: -260, behavior: 'smooth' });
+    leftBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      scrollTickerBy(-ARROW_SCROLL_PX);
+    });
+    leftBtn.addEventListener('mouseenter', () => {
+      edgeScrollSpeed = 0;
     });
   }
   if (rightBtn) {
-    rightBtn.addEventListener('click', () => {
-      track.scrollBy({ left: 260, behavior: 'smooth' });
+    rightBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      scrollTickerBy(ARROW_SCROLL_PX);
+    });
+    rightBtn.addEventListener('mouseenter', () => {
+      edgeScrollSpeed = 0;
     });
   }
 
@@ -536,12 +551,16 @@
       edgeScrollSpeed = 0;
       return;
     }
-    if (x < EDGE_ZONE_PX) {
-      edgeScrollSpeed = -EDGE_SCROLL_MAX_PX * (1 - Math.max(0, x) / EDGE_ZONE_PX);
+    const leftZoneEnd = ARROW_GUTTER_PX + EDGE_ZONE_PX;
+    const rightZoneStart = width - ARROW_GUTTER_PX - EDGE_ZONE_PX;
+    if (x >= ARROW_GUTTER_PX && x < leftZoneEnd) {
+      const depth = 1 - (x - ARROW_GUTTER_PX) / EDGE_ZONE_PX;
+      edgeScrollSpeed = -EDGE_SCROLL_MAX_PX * Math.max(0, Math.min(1, depth));
       return;
     }
-    if (x > width - EDGE_ZONE_PX) {
-      edgeScrollSpeed = EDGE_SCROLL_MAX_PX * (1 - Math.max(0, width - x) / EDGE_ZONE_PX);
+    if (x > rightZoneStart && x <= width - ARROW_GUTTER_PX) {
+      const depth = 1 - (width - ARROW_GUTTER_PX - x) / EDGE_ZONE_PX;
+      edgeScrollSpeed = EDGE_SCROLL_MAX_PX * Math.max(0, Math.min(1, depth));
       return;
     }
     edgeScrollSpeed = 0;
@@ -557,6 +576,10 @@
   const tickerViewport = ticker.querySelector('.ticker-viewport');
   if (tickerViewport) {
     tickerViewport.addEventListener('mousemove', (e) => {
+      if (e.target.closest('.ticker-arrow')) {
+        edgeScrollSpeed = 0;
+        return;
+      }
       updateEdgeScrollFromPointer(e.clientX, tickerViewport.getBoundingClientRect());
     });
     tickerViewport.addEventListener('mouseleave', () => {

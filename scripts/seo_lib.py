@@ -12,8 +12,61 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE_ORIGIN = 'https://robireport.com'
-PUBLISHER_LOGO = f'{SITE_ORIGIN}/assets/Squared%20logo.png'
+BRAND_LOGO_PATH = '/assets/images/emerald-r-logo.png'
+BRAND_LOGO_WIDTH = 1024
+BRAND_LOGO_HEIGHT = 1024
+BRAND_LOGO_ID = f'{SITE_ORIGIN}/#brand-logo'
+PUBLISHER_LOGO = f'{SITE_ORIGIN}{BRAND_LOGO_PATH}'
+DEFAULT_OG_IMAGE = PUBLISHER_LOGO
+DEFAULT_OG_IMAGE_ALT = 'Robi Report logo — emerald R mark'
+THEME_COLOR = '#10B981'
 YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@RobiReportt'
+
+
+def absolute_site_url(path: str) -> str:
+    if path.startswith('http://') or path.startswith('https://'):
+        return path
+    if not path.startswith('/'):
+        path = f'/{path}'
+    return f'{SITE_ORIGIN}{path}'
+
+
+def build_brand_logo_image_object() -> dict[str, Any]:
+    return {
+        '@type': 'ImageObject',
+        '@id': BRAND_LOGO_ID,
+        'url': PUBLISHER_LOGO,
+        'contentUrl': PUBLISHER_LOGO,
+        'width': BRAND_LOGO_WIDTH,
+        'height': BRAND_LOGO_HEIGHT,
+        'caption': DEFAULT_OG_IMAGE_ALT,
+    }
+
+
+def build_head_icon_link_tags() -> str:
+    """Absolute favicon / PWA icon links for crawlers and mobile bookmarks."""
+    icons = [
+        ('icon', 'image/png', '512x512', '/android-chrome-512x512.png'),
+        ('icon', 'image/png', '192x192', '/android-chrome-192x192.png'),
+        ('icon', 'image/png', '32x32', '/favicon-32x32.png'),
+        ('icon', 'image/png', '16x16', '/favicon-16x16.png'),
+        ('icon', None, 'any', '/favicon.ico'),
+        ('apple-touch-icon', None, '180x180', '/apple-touch-icon.png'),
+        ('shortcut icon', None, None, '/favicon.ico'),
+    ]
+    lines = [f'  <meta name="theme-color" content="{THEME_COLOR}" />']
+    for rel, mime, sizes, href in icons:
+        attrs = f'rel="{rel}" href="{absolute_site_url(href)}"'
+        if mime:
+            attrs = f'rel="{rel}" type="{mime}" href="{absolute_site_url(href)}"'
+        if sizes and sizes != 'any':
+            attrs += f' sizes="{sizes}"'
+        elif sizes == 'any':
+            attrs += ' sizes="any"'
+        lines.append(f'  <link {attrs} />')
+    lines.append(f'  <link rel="manifest" href="{absolute_site_url("/site.webmanifest")}" />')
+    lines.append(f'  <link rel="manifest" href="{absolute_site_url("/manifest.json")}" />')
+    return '\n'.join(lines) + '\n'
 
 CATEGORY_HUB_LABELS: dict[str, str] = {
     'nba': 'NBA',
@@ -276,7 +329,7 @@ LOCAL_VIDEO_METADATA: dict[str, dict[str, str]] = {
             'Standard of Greatness series.'
         ),
         'uploadDate': '2025-06-10',
-        'thumbnailUrl': f'{SITE_ORIGIN}/assets/logo.png',
+        'thumbnailUrl': PUBLISHER_LOGO,
     },
 }
 
@@ -416,10 +469,7 @@ def _video_object_youtube(
         'publisher': {
             '@type': 'Organization',
             'name': 'Robi Report',
-            'logo': {
-                '@type': 'ImageObject',
-                'url': PUBLISHER_LOGO,
-            },
+            'logo': build_brand_logo_image_object(),
         },
     }
 
@@ -455,10 +505,7 @@ def _video_object_local(
         'publisher': {
             '@type': 'Organization',
             'name': 'Robi Report',
-            'logo': {
-                '@type': 'ImageObject',
-                'url': PUBLISHER_LOGO,
-            },
+            'logo': build_brand_logo_image_object(),
         },
     }
 
@@ -814,10 +861,7 @@ def build_article_schema_payload(
         'publisher': {
             '@type': 'Organization',
             'name': 'Robi Report',
-            'logo': {
-                '@type': 'ImageObject',
-                'url': PUBLISHER_LOGO,
-            },
+            'logo': build_brand_logo_image_object(),
         },
         'mainEntityOfPage': {
             '@type': 'WebPage',
@@ -841,15 +885,14 @@ def hub_label_for_category(category: str) -> str:
 
 
 def build_organization_node() -> dict[str, Any]:
+    logo = build_brand_logo_image_object()
     return {
         '@type': 'Organization',
         '@id': f'{SITE_ORIGIN}/#organization',
         'name': 'Robi Report',
         'url': f'{SITE_ORIGIN}/',
-        'logo': {
-            '@type': 'ImageObject',
-            'url': PUBLISHER_LOGO,
-        },
+        'logo': logo,
+        'image': {'@id': BRAND_LOGO_ID},
         'sameAs': [YOUTUBE_CHANNEL_URL],
     }
 
@@ -866,6 +909,7 @@ def build_website_schema_payload() -> dict[str, Any]:
                 'name': 'Robi Report',
                 'url': f'{SITE_ORIGIN}/',
                 'publisher': {'@id': org['@id']},
+                'image': {'@id': BRAND_LOGO_ID},
                 'inLanguage': 'en-US',
             },
         ],
@@ -939,7 +983,8 @@ def build_page_head_tags(
     canonical_url: str,
     og_type: str = 'website',
 ) -> str:
-    image = PUBLISHER_LOGO
+    image = DEFAULT_OG_IMAGE
+    image_alt = DEFAULT_OG_IMAGE_ALT
     lines = [
         f'  <meta name="description" content="{html.escape(description, quote=True)}" />',
         '  <meta name="robots" content="index, follow, max-image-preview:large" />',
@@ -949,10 +994,15 @@ def build_page_head_tags(
         f'  <meta property="og:description" content="{html.escape(description, quote=True)}" />',
         f'  <meta property="og:url" content="{html.escape(canonical_url, quote=True)}" />',
         f'  <meta property="og:image" content="{html.escape(image, quote=True)}" />',
+        f'  <meta property="og:image:secure_url" content="{html.escape(image, quote=True)}" />',
+        f'  <meta property="og:image:width" content="{BRAND_LOGO_WIDTH}" />',
+        f'  <meta property="og:image:height" content="{BRAND_LOGO_HEIGHT}" />',
+        f'  <meta property="og:image:alt" content="{html.escape(image_alt, quote=True)}" />',
         f'  <meta name="twitter:card" content="summary_large_image" />',
         f'  <meta name="twitter:title" content="{html.escape(title, quote=True)}" />',
         f'  <meta name="twitter:description" content="{html.escape(description, quote=True)}" />',
         f'  <meta name="twitter:image" content="{html.escape(image, quote=True)}" />',
+        f'  <meta name="twitter:image:alt" content="{html.escape(image_alt, quote=True)}" />',
     ]
     return '\n'.join(lines) + '\n'
 
@@ -1025,8 +1075,11 @@ def build_article_head_tags(
     canonical_url: str,
 ) -> str:
     description = metadata.get('description') or metadata['headline']
-    title = f"{metadata['headline']} — Robi Report"
-    image = metadata.get('image_url') or PUBLISHER_LOGO
+    title = f"{metadata['headline']} | Robi Report"
+    image = metadata.get('image_url') or DEFAULT_OG_IMAGE
+    image_alt = metadata.get('image_alt') or (
+        DEFAULT_OG_IMAGE_ALT if image == DEFAULT_OG_IMAGE else metadata['headline']
+    )
 
     lines = [
         f'  <meta name="description" content="{html.escape(description, quote=True)}" />',
@@ -1037,11 +1090,25 @@ def build_article_head_tags(
         f'  <meta property="og:description" content="{html.escape(description, quote=True)}" />',
         f'  <meta property="og:url" content="{html.escape(canonical_url, quote=True)}" />',
         f'  <meta property="og:image" content="{html.escape(image, quote=True)}" />',
+        f'  <meta property="og:image:secure_url" content="{html.escape(image, quote=True)}" />',
         f'  <meta name="twitter:card" content="summary_large_image" />',
         f'  <meta name="twitter:title" content="{html.escape(title, quote=True)}" />',
         f'  <meta name="twitter:description" content="{html.escape(description, quote=True)}" />',
         f'  <meta name="twitter:image" content="{html.escape(image, quote=True)}" />',
+        f'  <meta name="twitter:image:alt" content="{html.escape(image_alt, quote=True)}" />',
     ]
+    if image == DEFAULT_OG_IMAGE:
+        lines.extend(
+            [
+                f'  <meta property="og:image:width" content="{BRAND_LOGO_WIDTH}" />',
+                f'  <meta property="og:image:height" content="{BRAND_LOGO_HEIGHT}" />',
+                f'  <meta property="og:image:alt" content="{html.escape(image_alt, quote=True)}" />',
+            ]
+        )
+    else:
+        lines.append(
+            f'  <meta property="og:image:alt" content="{html.escape(image_alt, quote=True)}" />'
+        )
 
     if metadata.get('date_published'):
         published = format_upload_date(metadata['date_published'])
@@ -1138,6 +1205,8 @@ def apply_seo(content: str, rel_path: str, *, source_path: Path | None = None) -
         metadata = dict(metadata)
         if modified_iso:
             metadata['date_modified'] = modified_iso
+        article_title = f"{metadata['headline']} | Robi Report"
+        content = replace_title_tag(content, article_title)
         head_blocks += build_article_head_tags(metadata, canonical)
         head_blocks += build_article_schema_script(
             metadata,
@@ -1170,6 +1239,21 @@ def apply_seo(content: str, rel_path: str, *, source_path: Path | None = None) -
                 description=description,
             )
             content = ensure_hub_breadcrumb_html(content, section_cfg['breadcrumb'])
+    elif canonical and not (metadata and (is_article_index(rel_path) or is_source_article(rel_path))):
+        title_match = TITLE_TAG_RE.search(content)
+        if title_match:
+            inner = re.sub(r'</?title>', '', title_match.group(0), flags=re.I)
+            page_title = html.unescape(inner).strip()
+        else:
+            page_title = 'Robi Report'
+        fallback_description = (
+            'Independent sports coverage from Robi Report — news, analysis, and video.'
+        )
+        head_blocks += build_page_head_tags(
+            title=page_title,
+            description=fallback_description,
+            canonical_url=canonical,
+        )
 
     if not head_blocks.strip():
         return content
