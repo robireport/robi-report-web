@@ -239,6 +239,66 @@
     return c.startsWith('#') ? c : `#${c}`;
   }
 
+  function parseShootingHand(athlete, core) {
+    const hand = athlete?.hand || core?.hand;
+    if (!hand) return '';
+
+    const raw =
+      hand.displayValue ||
+      hand.displayName ||
+      hand.abbreviation ||
+      hand.type ||
+      (typeof hand === 'string' ? hand : '');
+    const normalized = String(raw).trim();
+    if (!normalized) return '';
+
+    const map = {
+      left: 'Left',
+      right: 'Right',
+      both: 'Both',
+      l: 'Left',
+      r: 'Right',
+      b: 'Both',
+    };
+    const mapped = map[normalized.toLowerCase()] || normalized;
+    if (!/^(left|right|both)$/i.test(mapped)) return '';
+    return `Shoots: ${mapped.charAt(0).toUpperCase()}${mapped.slice(1).toLowerCase()}`;
+  }
+
+  function parseNicknames(athlete, core) {
+    const names = [];
+    const push = (value) => {
+      const cleaned = String(value ?? '').trim();
+      if (!cleaned) return;
+      if (!names.some((n) => n.toLowerCase() === cleaned.toLowerCase())) {
+        names.push(cleaned);
+      }
+    };
+
+    for (const src of [athlete, core]) {
+      if (!src) continue;
+      for (const key of ['nicknames', 'nickname', 'nickName', 'alternateDisplayName', 'displayNickName']) {
+        const val = src[key];
+        if (Array.isArray(val)) val.forEach(push);
+        else if (val) push(val);
+      }
+    }
+
+    const displayName = athlete?.displayName || core?.displayName || '';
+    const fullName = athlete?.fullName || core?.fullName || '';
+    const paren = fullName.match(/\(([^)]+)\)/);
+    if (paren?.[1]) push(paren[1]);
+
+    if (displayName && fullName && displayName !== fullName) {
+      const stripped = fullName.replace(displayName, '').trim();
+      if (stripped.startsWith('(') && stripped.endsWith(')')) {
+        push(stripped.slice(1, -1));
+      }
+    }
+
+    return names.filter((n) => n.length > 1);
+  }
+
   function mergeBio(siteData, coreData) {
     const a = siteData?.athlete || {};
     const c = coreData || {};
@@ -270,6 +330,8 @@
       draft: a.displayDraft || '',
       active,
       status: statusName,
+      nicknames: parseNicknames(a, c),
+      shootingHand: parseShootingHand(a, c),
     };
   }
 
@@ -752,9 +814,17 @@
               <span>${escapeHtml(cfg.label)}</span>
               ${bio.position ? `<span>${escapeHtml(bio.position)}</span>` : ''}
               ${bio.jersey ? `<span>#${escapeHtml(bio.jersey)}</span>` : ''}
+              ${bio.shootingHand ? `<span>${escapeHtml(bio.shootingHand)}</span>` : ''}
               <span class="${statusCls}">${escapeHtml(fallback(bio.status, 'Unknown'))}</span>
             </div>
             <h1 class="player-name">${escapeHtml(bio.name)}</h1>
+            ${
+              bio.nicknames?.length
+                ? `<p class="player-nickname">${bio.nicknames
+                    .map((n) => `"${escapeHtml(n)}"`)
+                    .join(' · ')}</p>`
+                : ''
+            }
             ${
               bio.teamName
                 ? `<div class="player-team-row">
@@ -819,6 +889,9 @@
     const items = [
       ['Height', bio.height],
       ['Weight', bio.weight],
+      ...(bio.shootingHand
+        ? [['Shoots', bio.shootingHand.replace(/^Shoots:\s*/i, '')]]
+        : []),
       ['Born', bio.dob],
       ['Birthplace', bio.birthPlace],
       ['College', bio.college],

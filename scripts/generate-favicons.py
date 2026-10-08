@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate root favicon assets from the transparent emerald R logo."""
+"""Generate root favicon assets from the emerald R logo on a white background."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ OUTPUTS = {
 
 
 def remove_dark_background(image: Image.Image, threshold: int = 32) -> Image.Image:
-    """Turn near-black pixels transparent (export shipped with a black matte)."""
+    """Turn near-black pixels transparent when a logo was exported on black."""
     rgba = image.convert('RGBA')
     pixels = rgba.load()
     width, height = rgba.size
@@ -34,12 +34,24 @@ def remove_dark_background(image: Image.Image, threshold: int = 32) -> Image.Ima
     return rgba
 
 
-def prepare_square_logo(image: Image.Image, size: int, padding_ratio: float = 0.1) -> Image.Image:
-    bbox = image.getbbox()
-    if not bbox:
-        return Image.new('RGBA', (size, size), (0, 0, 0, 0))
+def corner_is_dark(image: Image.Image, threshold: int = 40) -> bool:
+    rgba = image.convert('RGBA')
+    w, h = rgba.size
+    points = [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)]
+    for x, y in points:
+        red, green, blue, alpha = rgba.getpixel((x, y))
+        if alpha > 0 and red <= threshold and green <= threshold and blue <= threshold:
+            return True
+    return False
 
-    cropped = image.crop(bbox)
+
+def prepare_square_logo(image: Image.Image, size: int, padding_ratio: float = 0.08) -> Image.Image:
+    rgba = image.convert('RGBA')
+    bbox = rgba.getbbox()
+    if not bbox:
+        return Image.new('RGB', (size, size), (255, 255, 255))
+
+    cropped = rgba.crop(bbox)
     side = max(cropped.size)
     pad = max(1, int(side * padding_ratio))
     canvas_side = side + pad * 2
@@ -47,14 +59,11 @@ def prepare_square_logo(image: Image.Image, size: int, padding_ratio: float = 0.
     offset_x = (canvas_side - cropped.width) // 2
     offset_y = (canvas_side - cropped.height) // 2
     canvas.paste(cropped, (offset_x, offset_y), cropped)
-    return canvas.resize((size, size), Image.Resampling.LANCZOS)
+    resized = canvas.resize((size, size), Image.Resampling.LANCZOS)
 
-
-def flatten_on_white(image: Image.Image) -> Image.Image:
-    base = Image.new('RGB', image.size, (255, 255, 255))
-    rgba = image.convert('RGBA')
-    base.paste(rgba, mask=rgba.split()[-1])
-    return base
+    white = Image.new('RGB', (size, size), (255, 255, 255))
+    white.paste(resized, mask=resized.split()[-1])
+    return white
 
 
 def load_source_logo() -> Image.Image:
@@ -63,9 +72,10 @@ def load_source_logo() -> Image.Image:
         raise SystemExit(f'Source logo not found: {SOURCE}')
 
     opened = Image.open(path)
-    if path == SOURCE:
-        return remove_dark_background(opened)
-    return remove_dark_background(opened) if opened.mode == 'RGBA' else opened.convert('RGBA')
+    rgba = opened.convert('RGBA')
+    if corner_is_dark(rgba):
+        rgba = remove_dark_background(rgba)
+    return rgba
 
 
 def main() -> int:
@@ -77,7 +87,7 @@ def main() -> int:
         resized = prepare_square_logo(source, size)
         resized.save(out, format='PNG', optimize=True)
         png_paths[size] = out
-        print(f'Wrote {out.relative_to(ROOT).as_posix()} ({size}x{size}, transparent)')
+        print(f'Wrote {out.relative_to(ROOT).as_posix()} ({size}x{size}, white background)')
 
     ico_path = ROOT / 'favicon.ico'
     img16 = Image.open(png_paths[16])
