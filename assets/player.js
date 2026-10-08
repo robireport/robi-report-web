@@ -53,7 +53,7 @@
   }
 
   function fallback(val, placeholder) {
-    if (val === null || val === undefined || val === '') return placeholder || '—';
+    if (val === null || val === undefined || val === '') return placeholder || '-';
     return val;
   }
 
@@ -71,7 +71,7 @@
   }
 
   function formatGameDate(iso) {
-    if (!iso) return '—';
+    if (!iso) return '-';
     try {
       return new Date(iso).toLocaleDateString('en-US', {
         month: 'short',
@@ -79,7 +79,7 @@
         year: 'numeric',
       });
     } catch (_) {
-      return '—';
+      return '-';
     }
   }
 
@@ -486,11 +486,11 @@
     if (label === 'GP') {
       return row.inactiveNote || '0';
     }
-    if (label.includes('%') || value === '' || value === null || value === undefined) return '—';
+    if (label.includes('%') || value === '' || value === null || value === undefined) return '-';
     if (label === 'FG' || label === '3PT' || label === 'FT') return '0-0';
     if (label === 'MIN' && row.statsMode === 'avg') return '0.0';
     if (/^(GS|MIN|PTS|REB|AST|STL|BLK|TO|OR|DR|PF)$/.test(label)) return '0';
-    return '—';
+    return '-';
   }
 
   function parseStatsCategory(statsData, categoryName) {
@@ -507,7 +507,7 @@
         const gp = statGamesPlayed(labels, stats);
         const isInactiveSeason = Boolean(s._robiInactive) || gp === 0;
         return {
-          season: s.season?.displayName || String(s.season?.year || '—'),
+          season: s.season?.displayName || String(s.season?.year || '-'),
           year: s.season?.year || 0,
           stats: isInactiveSeason ? buildZeroStatsForLabels(labels, mode) : stats,
           teamId,
@@ -530,7 +530,7 @@
 
   function statAt(labels, stats, label) {
     const i = labels.indexOf(label);
-    return i >= 0 ? fallback(stats[i]) : '—';
+    return i >= 0 ? fallback(stats[i]) : '-';
   }
 
   function filterColumns(labels, wanted) {
@@ -567,7 +567,7 @@
       return '<td class="player-team-cell"><span class="player-team-abbr">—</span></td>';
     }
     const meta = teamMap?.get(row.teamId);
-    const abbr = meta?.abbr || slugToAbbrFallback(row.teamSlug) || '—';
+    const abbr = meta?.abbr || slugToAbbrFallback(row.teamSlug) || '-';
     const logo = meta?.logo || '';
     const logoHtml = logo
       ? `<img class="player-team-logo" src="${escapeHtml(logo)}" alt="" width="24" height="24" loading="lazy" />`
@@ -664,7 +664,7 @@
 
     const filteredRows = rows.map((row) => ({
       ...row,
-      stats: indices.map((i) => row.stats[i] ?? '—'),
+      stats: indices.map((i) => row.stats[i] ?? '-'),
     }));
 
     return buildStatsTable(labels, filteredRows, firstColLabel, firstColFn, ['PTS', 'REB', 'AST'], tableOpts);
@@ -695,10 +695,10 @@
           gameRows.push({
             eventId: ev.eventId,
             date: meta.gameDate,
-            opponent: meta.opponent?.abbreviation || meta.opponent?.displayName || '—',
+            opponent: meta.opponent?.abbreviation || meta.opponent?.displayName || '-',
             atVs: meta.atVs || '',
-            result: meta.gameResult || '—',
-            score: meta.score || '—',
+            result: meta.gameResult || '-',
+            score: meta.score || '-',
             stats: ev.stats || [],
           });
         }
@@ -725,7 +725,7 @@
         const statCells = indices.map((i) => `<td>${escapeHtml(fallback(row.stats[i]))}</td>`).join('');
         const gameLink = row.eventId
           ? `<a class="game-link" href="game.html?sport=${escapeHtml(sport)}&gameId=${escapeHtml(row.eventId)}">Box</a>`
-          : '—';
+          : '-';
 
         return `<tr>
           <td class="player-name">${escapeHtml(formatGameDate(row.date))}</td>
@@ -766,8 +766,8 @@
     return {
       away: away?.team?.displayName || away?.team?.abbreviation || 'Away',
       home: home?.team?.displayName || home?.team?.abbreviation || 'Home',
-      awayScore: away?.score ?? '—',
-      homeScore: home?.score ?? '—',
+      awayScore: away?.score ?? '-',
+      homeScore: home?.score ?? '-',
       status: comp.status?.type?.shortDetail || comp.status?.type?.detail || '',
       date: comp.date,
     };
@@ -1024,9 +1024,9 @@
     const avgRows = annotateSeasonAwards(avgCategory.rows, awards.byYear);
 
     if (selectedSeason) {
-      document.title = `${bio.name} (${selectedSeason.displayName}) — Robi Report`;
+      document.title = `${bio.name} (${selectedSeason.displayName}) | Robi Report`;
     } else {
-      document.title = `${bio.name} — Robi Report`;
+      document.title = `${bio.name} | Robi Report`;
     }
 
     const careerTableOpts = {

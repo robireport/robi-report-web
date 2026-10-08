@@ -149,7 +149,20 @@ def verify_articles() -> list[str]:
         )
         if body_match and EM_DASH in body_match.group(1):
             errors.append(f'{source.relative_to(ROOT).as_posix()}: em dash in article body')
+        if EM_DASH in source_html:
+            errors.append(f'{source.relative_to(ROOT).as_posix()}: em dash in article source')
 
+    return errors
+
+
+def verify_homepage_copy() -> list[str]:
+    errors: list[str] = []
+    index = (ROOT / 'index.html').read_text(encoding='utf-8')
+    main_match = re.search(r'<main\b[^>]*>(.*?)</main>', index, re.S | re.I)
+    if main_match and EM_DASH in main_match.group(1):
+        errors.append('index.html: em dash in homepage main content')
+    if EM_DASH in index:
+        errors.append('index.html: em dash present in page HTML')
     return errors
 
 
@@ -223,6 +236,7 @@ def main() -> int:
         ('section pages', verify_section_pages),
         ('internal links', verify_internal_links),
         ('branding assets', verify_branding_assets),
+        ('homepage copy', verify_homepage_copy),
     ]
 
     failures: list[str] = []
