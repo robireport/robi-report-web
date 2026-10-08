@@ -77,6 +77,12 @@
   let isDragging = false;
   let dragStartX = 0;
   let scrollStart = 0;
+  let edgeScrollSpeed = 0;
+
+  const EDGE_ZONE_PX = 64;
+  const EDGE_SCROLL_MAX_PX = 7;
+
+  const SORT_PHASE = { LIVE: 0, UPCOMING: 1, FINAL: 2 };
 
   function formatTimeET(isoDate) {
     try {
@@ -120,6 +126,57 @@
     const media = comp?.geoBroadcasts?.[0]?.media?.shortName;
     if (market && media) return `${media}`;
     return '';
+  }
+
+  function getSortMeta(event, comp) {
+    const status = comp?.status?.type || event?.status?.type || {};
+    const state = status.state;
+    let sortPhase = SORT_PHASE.UPCOMING;
+    if (state === 'in') {
+      sortPhase = SORT_PHASE.LIVE;
+    } else if (state === 'post' || status.completed) {
+      sortPhase = SORT_PHASE.FINAL;
+    }
+    const raw = event?.date || comp?.date;
+    let sortTime = 0;
+    if (raw) {
+      const t = Date.parse(raw);
+      if (!Number.isNaN(t)) sortTime = t;
+    }
+    return { sortPhase, sortTime };
+  }
+
+  function compareTickerCards(a, b) {
+    if (a.sortPhase !== b.sortPhase) return a.sortPhase - b.sortPhase;
+    if (a.sortPhase === SORT_PHASE.FINAL) return b.sortTime - a.sortTime;
+    return a.sortTime - b.sortTime;
+  }
+
+  function sortTickerCards(cards) {
+    return [...cards].sort(compareTickerCards);
+  }
+
+  function sectionSortPriority(section) {
+    if (!section.cards?.length) return SORT_PHASE.FINAL + 1;
+    return section.cards.reduce(
+      (min, card) => Math.min(min, card.sortPhase ?? SORT_PHASE.UPCOMING),
+      SORT_PHASE.FINAL + 1
+    );
+  }
+
+  function sortTickerSections(sections) {
+    return [...sections]
+      .sort((a, b) => {
+        const phaseDiff = sectionSortPriority(a) - sectionSortPriority(b);
+        if (phaseDiff !== 0) return phaseDiff;
+        const ai = ALL_KEYS.indexOf(a.league);
+        const bi = ALL_KEYS.indexOf(b.league);
+        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+      })
+      .map((section) => ({
+        ...section,
+        cards: sortTickerCards(section.cards),
+      }));
   }
 
   function getStatusText(event, comp) {
@@ -172,6 +229,7 @@
     const home = competitors.find((c) => c.homeAway === 'home') || competitors[1];
     const status = getStatusText(event, comp);
     const state = comp.status?.type?.state || event.status?.type?.state;
+    const { sortPhase, sortTime } = getSortMeta(event, comp);
 
     return {
       away: {
@@ -187,6 +245,8 @@
       status,
       broadcast: getBroadcast(comp),
       isLive: state === 'in',
+      sortPhase,
+      sortTime,
     };
   }
 
@@ -196,6 +256,7 @@
 
     const competitors = comp.competitors || [];
     if (competitors.length < 2) {
+      const { sortPhase, sortTime } = getSortMeta(event, comp);
       return {
         away: { abbr: event.shortName || 'TBD', score: '', logo: '' },
         home: { abbr: '', score: '', logo: '' },
@@ -204,6 +265,8 @@
         isLive: false,
         singleLine: true,
         label: event.name || event.shortName || 'Match',
+        sortPhase,
+        sortTime,
       };
     }
 
@@ -213,6 +276,7 @@
     const t2 = c2.athlete || c2.team || {};
     const status = getStatusText(event, comp);
     const state = comp.status?.type?.state || event.status?.type?.state;
+    const { sortPhase, sortTime } = getSortMeta(event, comp);
 
     return {
       away: {
@@ -230,6 +294,8 @@
       status,
       broadcast: getBroadcast(comp),
       isLive: state === 'in',
+      sortPhase,
+      sortTime,
     };
   }
 
@@ -302,11 +368,11 @@
             sections.push(buildSection(key, r.value));
           }
         });
-        return sections.length ? sections : null;
+        return sections.length ? sortTickerSections(sections) : null;
       }
 
       const cards = await fetchLeague(filter);
-      return [buildSection(filter, cards)];
+      return sortTickerSections([buildSection(filter, cards)]);
     } catch (err) {
       console.warn('Score ticker fetch failed:', err);
       throw err;
@@ -463,9 +529,46 @@
   }
 
   // Touch / mouse drag scroll
+  function updateEdgeScrollFromPointer(clientX, rect) {
+    const x = clientX - rect.left;
+    const width = rect.width;
+    if (width <= 0) {
+      edgeScrollSpeed = 0;
+      return;
+    }
+    if (x < EDGE_ZONE_PX) {
+      edgeScrollSpeed = -EDGE_SCROLL_MAX_PX * (1 - Math.max(0, x) / EDGE_ZONE_PX);
+      return;
+    }
+    if (x > width - EDGE_ZONE_PX) {
+      edgeScrollSpeed = EDGE_SCROLL_MAX_PX * (1 - Math.max(0, width - x) / EDGE_ZONE_PX);
+      return;
+    }
+    edgeScrollSpeed = 0;
+  }
+
+  function tickEdgeScroll() {
+    if (edgeScrollSpeed !== 0 && !isDragging) {
+      track.scrollLeft += edgeScrollSpeed;
+    }
+    requestAnimationFrame(tickEdgeScroll);
+  }
+
+  const tickerViewport = ticker.querySelector('.ticker-viewport');
+  if (tickerViewport) {
+    tickerViewport.addEventListener('mousemove', (e) => {
+      updateEdgeScrollFromPointer(e.clientX, tickerViewport.getBoundingClientRect());
+    });
+    tickerViewport.addEventListener('mouseleave', () => {
+      edgeScrollSpeed = 0;
+    });
+    requestAnimationFrame(tickEdgeScroll);
+  }
+
   track.addEventListener('mousedown', (e) => {
     if (e.target.closest('a.ticker-organizer, a.score-card')) return;
     isDragging = true;
+    edgeScrollSpeed = 0;
     dragStartX = e.pageX;
     scrollStart = track.scrollLeft;
     track.classList.add('is-dragging');
