@@ -18,7 +18,7 @@ BRAND_LOGO_HEIGHT = 1024
 BRAND_LOGO_ID = f'{SITE_ORIGIN}/#brand-logo'
 PUBLISHER_LOGO = f'{SITE_ORIGIN}{BRAND_LOGO_PATH}'
 DEFAULT_OG_IMAGE = PUBLISHER_LOGO
-DEFAULT_OG_IMAGE_ALT = 'Robi Report logo — emerald R mark'
+DEFAULT_OG_IMAGE_ALT = 'Robi Report logo, emerald R mark'
 THEME_COLOR = '#10B981'
 YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@RobiReportt'
 
@@ -80,16 +80,16 @@ CATEGORY_HUB_LABELS: dict[str, str] = {
 
 SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
     'index.html': {
-        'title': 'Robi Report — Sports News, Analysis & Video',
+        'title': 'Robi Report | Sports News, Analysis & Video',
         'description': (
-            'Independent sports coverage from Robi Report — news, analysis, and video '
+            'Independent sports coverage from Robi Report: news, analysis, and video '
             'across the NBA, WNBA, NFL, UFC, boxing, soccer, MLB, and more.'
         ),
     },
     'nba.html': {
         'title': 'Robi Report NBA | NBA News, Analysis & Stories',
         'description': (
-            'NBA news, analysis, and stories from Robi Report — league trends, player '
+            'NBA news, analysis, and stories from Robi Report: league trends, player '
             'coverage, and commentary beyond the box score.'
         ),
         'breadcrumb': 'NBA',
@@ -97,7 +97,7 @@ SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
     'wnba.html': {
         'title': 'Robi Report WNBA | WNBA News, Analysis & Stories',
         'description': (
-            'WNBA news, analysis, and stories from Robi Report — game coverage, player '
+            'WNBA news, analysis, and stories from Robi Report: game coverage, player '
             'breakouts, and league storylines.'
         ),
         'breadcrumb': 'WNBA',
@@ -105,7 +105,7 @@ SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
     'nfl.html': {
         'title': 'Robi Report NFL | NFL News, Analysis & Stories',
         'description': (
-            'NFL news, analysis, and stories from Robi Report — game recaps, draft takes, '
+            'NFL news, analysis, and stories from Robi Report: game recaps, draft takes, '
             'and commentary across the league.'
         ),
         'breadcrumb': 'NFL',
@@ -113,7 +113,7 @@ SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
     'ufc.html': {
         'title': 'Robi Report UFC | UFC News, Analysis & Stories',
         'description': (
-            'UFC news, analysis, and fight coverage from Robi Report — cards, matchups, '
+            'UFC news, analysis, and fight coverage from Robi Report: cards, matchups, '
             'and mixed martial arts storylines.'
         ),
         'breadcrumb': 'UFC',
@@ -121,7 +121,7 @@ SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
     'boxing.html': {
         'title': 'Robi Report Boxing | Boxing News, Analysis & Stories',
         'description': (
-            'Boxing news, analysis, and fight coverage from Robi Report — champions, '
+            'Boxing news, analysis, and fight coverage from Robi Report: champions, '
             'matchups, and stories from the ring.'
         ),
         'breadcrumb': 'Boxing',
@@ -129,7 +129,7 @@ SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
     'soccer.html': {
         'title': 'Robi Report Soccer | Soccer News, Analysis & Stories',
         'description': (
-            'Soccer news, analysis, and stories from Robi Report — clubs, leagues, and '
+            'Soccer news, analysis, and stories from Robi Report: clubs, leagues, and '
             'global football coverage.'
         ),
         'breadcrumb': 'Soccer',
@@ -137,7 +137,7 @@ SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
     'mlb.html': {
         'title': 'Robi Report MLB | MLB News, Analysis & Stories',
         'description': (
-            'MLB news, analysis, and stories from Robi Report — baseball coverage and '
+            'MLB news, analysis, and stories from Robi Report: baseball coverage and '
             'commentary across the league.'
         ),
         'breadcrumb': 'MLB',
@@ -145,7 +145,7 @@ SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
     'standard-of-greatness.html': {
         'title': 'Robi Report Standard of Greatness | Original Video Series',
         'description': (
-            "Standard of Greatness — Robi Report's original video series on greatness "
+            "Standard of Greatness: Robi Report's original video series on greatness "
             'in sports and culture.'
         ),
         'breadcrumb': 'Standard of Greatness',
@@ -153,7 +153,7 @@ SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
     'shop.html': {
         'title': 'Robi Report Shop | Official Merchandise',
         'description': (
-            'Shop official Robi Report merchandise — apparel and gear from independent '
+            'Shop official Robi Report merchandise: apparel and gear from independent '
             'sports and media coverage.'
         ),
         'breadcrumb': 'Shop',
@@ -161,7 +161,7 @@ SECTION_PAGE_SEO: dict[str, dict[str, str]] = {
     'about.html': {
         'title': 'Robi Report About | Team, Contact & Mission',
         'description': (
-            'About Robi Report — our mission, team, contact information, and how we cover '
+            'About Robi Report: our mission, team, contact information, and how we cover '
             'sports and media for fans.'
         ),
         'breadcrumb': 'About',
@@ -275,7 +275,7 @@ YOUTUBE_METADATA: dict[str, dict[str, str]] = {
     'TdXr8Ka2weo': {
         'uploadDate': '2025-06-10',
         'description': (
-            'Jaylen Brown: The Price of Thinking For Yourself — the series finale of '
+            'Jaylen Brown: The Price of Thinking For Yourself, the series finale of '
             'Robi Report\'s Standard of Greatness philosophy series.'
         ),
     },
@@ -290,34 +290,34 @@ YOUTUBE_METADATA: dict[str, dict[str, str]] = {
     'Ztguwlw6bNk': {
         'uploadDate': '2025-01-12',
         'description': (
-            'Making the obvious case that Baker Mayfield is the MVP — NFL analysis from Robi Report.'
+            'Making the obvious case that Baker Mayfield is the MVP: NFL analysis from Robi Report.'
         ),
     },
     'Hv8c9dhZPTg': {
         'uploadDate': '2024-12-03',
         'description': (
-            'Why the Baltimore Ravens struggled and what it means for the season — NFL analysis from Robi Report.'
+            'Why the Baltimore Ravens struggled and what it means for the season: NFL analysis from Robi Report.'
         ),
     },
     'T3u1E9eQaRE': {
         'uploadDate': '2024-03-18',
-        'description': 'Giannis Antetokounmpo profile — Episode 1 of The Philosophy Series by Robi Report.',
+        'description': 'Giannis Antetokounmpo profile, Episode 1 of The Philosophy Series by Robi Report.',
     },
     '97S3sy-cuL4': {
         'uploadDate': '2024-04-22',
-        'description': 'LaMelo Ball profile — Episode 2 of The Philosophy Series by Robi Report.',
+        'description': 'LaMelo Ball profile, Episode 2 of The Philosophy Series by Robi Report.',
     },
     'FoIytsKYas0': {
         'uploadDate': '2024-05-30',
-        'description': 'Kevin Love profile — Episode 3 of The Philosophy Series by Robi Report.',
+        'description': 'Kevin Love profile, Episode 3 of The Philosophy Series by Robi Report.',
     },
     '2-8csUPkx9E': {
         'uploadDate': '2024-07-08',
-        'description': 'Cade Cunningham profile — Episode 4 of The Philosophy Series by Robi Report.',
+        'description': 'Cade Cunningham profile, Episode 4 of The Philosophy Series by Robi Report.',
     },
     'FJn9m4yyRH8': {
         'uploadDate': '2024-09-16',
-        'description': 'Stephen Curry profile — Episode 5 of The Philosophy Series by Robi Report.',
+        'description': 'Stephen Curry profile, Episode 5 of The Philosophy Series by Robi Report.',
     },
 }
 
@@ -433,7 +433,7 @@ def _default_description(name: str) -> str:
     cleaned = _normalize_video_name(name)
     if cleaned.lower().endswith('robi report'):
         return f'{cleaned}. Independent sports analysis and original video from Robi Report.'
-    return f'{cleaned} — independent sports analysis and original video from Robi Report.'
+    return f'{cleaned}: independent sports analysis and original video from Robi Report.'
 
 
 def _youtube_thumbnail(video_id: str) -> str:
@@ -1191,6 +1191,10 @@ def apply_seo(content: str, rel_path: str, *, source_path: Path | None = None) -
     canonical = canonical_url_for_path(rel_path)
     content = _strip_existing_seo(content)
 
+    from copy_sanitize import sweep_html_document
+
+    content = sweep_html_document(content)
+
     head_blocks = build_www_redirect_script()
 
     if canonical:
@@ -1247,7 +1251,7 @@ def apply_seo(content: str, rel_path: str, *, source_path: Path | None = None) -
         else:
             page_title = 'Robi Report'
         fallback_description = (
-            'Independent sports coverage from Robi Report — news, analysis, and video.'
+            'Independent sports coverage from Robi Report: news, analysis, and video.'
         )
         head_blocks += build_page_head_tags(
             title=page_title,
@@ -1255,10 +1259,10 @@ def apply_seo(content: str, rel_path: str, *, source_path: Path | None = None) -
             canonical_url=canonical,
         )
 
-    if not head_blocks.strip():
-        return content
+    if head_blocks.strip():
+        content = _insert_after_manifest(content, head_blocks)
 
-    return _insert_after_manifest(content, head_blocks)
+    return content
 
 
 def apply_seo_file(path: Path) -> bool:
