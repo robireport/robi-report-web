@@ -174,7 +174,23 @@ OG_META_RE = re.compile(r'\s*<meta\s+property="og:[^"]+"[^>]*/>\s*', re.I)
 TWITTER_META_RE = re.compile(r'\s*<meta\s+name="twitter:[^"]+"[^>]*/>\s*', re.I)
 ARTICLE_TITLE_RE = re.compile(r'<h1 class="article-title">(.*?)</h1>', re.S)
 ARTICLE_TAG_RE = re.compile(r'<span class="article-tag">(.*?)</span>', re.S)
-ARTICLE_META_RE = re.compile(r'<div class="article-meta">(.*?)</div>', re.S)
+ARTICLE_META_RE = re.compile(r'<div class="article-meta"([^>]*)>(.*?)</div>', re.S)
+ARTICLE_META_DIV_FULL_RE = re.compile(
+    r'(<div class="article-meta"[^>]*>)(.*?)(</div>)',
+    re.S,
+)
+
+SITE_ARTICLE_AUTHORS: dict[str, str] = {
+    'matthew robi': 'Matthew Robi',
+    'robi report': 'Robi Report',
+    'joel h. cohen': 'Joel H. Cohen',
+    'joel cohen': 'Joel H. Cohen',
+}
+
+CITED_REPORTER_RE = re.compile(
+    r'\breporter\s+([A-Z][\w.\'-]+(?:\s+[A-Z][\w.\'-]+)*)',
+    re.I,
+)
 ARTICLE_HERO_RE = re.compile(
     r'<figure class="article-hero">\s*<img src="([^"]+)" alt="([^"]*)"',
     re.S,
@@ -589,6 +605,112 @@ def _clean_text(value: str) -> str:
     return re.sub(r'\s+', ' ', html.unescape(value or '')).strip()
 
 
+def normalize_site_article_author(name: str) -> str:
+    """Map byline names to canonical Robi Report article authors."""
+    key = _clean_text(name).lower()
+    return SITE_ARTICLE_AUTHORS.get(key, 'Matthew Robi')
+
+
+def is_site_article_author(name: str) -> bool:
+    return _clean_text(name).lower() in SITE_ARTICLE_AUTHORS
+
+
+def extract_cited_sources(page_html: str) -> list[str]:
+    """Reporter or outlet names cited in article body (not article authors)."""
+    body_match = re.search(r'<div class="article-body">(.*?)</div>', page_html, re.S)
+    if not body_match:
+        return []
+    body_text = _clean_text(re.sub(r'<[^>]+>', ' ', body_match.group(1)))
+    seen: set[str] = set()
+    sources: list[str] = []
+    for match in CITED_REPORTER_RE.finditer(body_text):
+        name = _clean_text(match.group(1))
+        if not name or is_site_article_author(name):
+            continue
+        key = name.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        sources.append(name)
+    return sources
+
+
+def _parse_data_attr(attrs: str, name: str) -> str:
+    return _extract_attr(f'<div {attrs.strip()}>', name)
+
+
+def _set_data_attr(attrs: str, name: str, value: str) -> str:
+    escaped = html.escape(value, quote=True)
+    pattern = re.compile(rf'\b{re.escape(name)}="[^"]*"', re.I)
+    if pattern.search(attrs):
+        return pattern.sub(f'{name}="{escaped}"', attrs, count=1)
+    spacer = ' ' if attrs.strip() else ' '
+    return f'{attrs.rstrip()}{spacer}{name}="{escaped}"'
+
+
+def ensure_article_byline(page_html: str) -> str:
+    """Keep visible byline + data-author aligned with site authors; track cited sources."""
+    match = ARTICLE_META_DIV_FULL_RE.search(page_html)
+    if not match:
+        return page_html
+
+    open_tag = match.group(1)
+    inner = match.group(2)
+    close_tag = match.group(3)
+    attrs_match = re.match(r'<div class="article-meta"([^>]*)>', open_tag, re.I)
+    attrs = attrs_match.group(1) if attrs_match else ''
+
+    data_author = _parse_data_attr(attrs, 'data-author')
+    strong_match = re.search(r'<strong>(.*?)</strong>', inner, re.S)
+    visible_author = _clean_text(strong_match.group(1)) if strong_match else ''
+    raw_author = data_author or visible_author or 'Matthew Robi'
+
+    sources: list[str] = []
+    data_sources = _parse_data_attr(attrs, 'data-sources')
+    if data_sources:
+        sources.extend(part.strip() for part in data_sources.split(',') if part.strip())
+    sources.extend(extract_cited_sources(page_html))
+
+    if not is_site_article_author(raw_author):
+        mistaken = _clean_text(raw_author)
+        if mistaken and mistaken.lower() not in {s.lower() for s in sources}:
+            sources.insert(0, mistaken)
+        raw_author = 'Matthew Robi'
+
+    author = normalize_site_article_author(raw_author)
+
+    deduped_sources: list[str] = []
+    seen_source_keys: set[str] = set()
+    for source in sources:
+        cleaned = _clean_text(source)
+        if not cleaned or is_site_article_author(cleaned):
+            continue
+        key = cleaned.lower()
+        if key in seen_source_keys:
+            continue
+        seen_source_keys.add(key)
+        deduped_sources.append(cleaned)
+
+    attrs = _set_data_attr(attrs, 'data-author', author)
+    attrs = _set_data_attr(
+        attrs,
+        'data-sources',
+        ', '.join(deduped_sources),
+    )
+
+    if strong_match:
+        inner = inner.replace(
+            strong_match.group(0),
+            f'<strong>{html.escape(author)}</strong>',
+            1,
+        )
+    else:
+        inner = f'<strong>{html.escape(author)}</strong>{inner}'
+
+    replacement = f'<div class="article-meta"{attrs}>{inner}{close_tag}'
+    return page_html[: match.start()] + replacement + page_html[match.end() :]
+
+
 def _truncate(text: str, limit: int = 160) -> str:
     if len(text) <= limit:
         return text
@@ -614,19 +736,33 @@ def extract_article_metadata(page_html: str) -> dict[str, Any] | None:
     tag_raw = _clean_text(tag_match.group(1)) if tag_match else 'News'
     is_news = bool(re.search(r'\bnews\b', tag_raw, re.I))
 
-    author = 'Robi Report'
+    author = 'Matthew Robi'
     date_published = ''
     date_display = ''
+    cited_sources: list[str] = []
     meta_match = ARTICLE_META_RE.search(page_html)
     if meta_match:
-        meta_block = meta_match.group(1)
+        meta_attrs = meta_match.group(1)
+        meta_block = meta_match.group(2)
+        data_author = _parse_data_attr(meta_attrs, 'data-author')
+        data_sources = _parse_data_attr(meta_attrs, 'data-sources')
         author_match = re.search(r'<strong>(.*?)</strong>', meta_block, re.S)
         time_match = re.search(r'<time datetime="([^"]+)">([^<]*)</time>', meta_block)
-        if author_match:
-            author = _clean_text(author_match.group(1))
+        raw_author = data_author
+        if not raw_author and author_match:
+            raw_author = _clean_text(author_match.group(1))
+        if raw_author:
+            author = normalize_site_article_author(raw_author)
+        if data_sources:
+            cited_sources.extend(
+                part.strip() for part in data_sources.split(',') if part.strip()
+            )
         if time_match:
             date_published = time_match.group(1).strip()
             date_display = _clean_text(time_match.group(2))
+
+    if not cited_sources:
+        cited_sources = extract_cited_sources(page_html)
 
     hero_match = ARTICLE_HERO_RE.search(page_html)
     image_url = hero_match.group(1).strip() if hero_match else ''
@@ -641,6 +777,7 @@ def extract_article_metadata(page_html: str) -> dict[str, Any] | None:
         'headline': headline,
         'description': description,
         'author': author,
+        'cited_sources': cited_sources,
         'date_published': date_published,
         'date_display': date_display,
         'image_url': image_url,

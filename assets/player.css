@@ -39,6 +39,11 @@
   align-items: center;
 }
 
+.player-hero-inner--with-awards {
+  grid-template-columns: auto 1fr minmax(220px, 300px);
+  align-items: start;
+}
+
 .player-headshot-wrap {
   width: 140px;
   height: 140px;
@@ -117,6 +122,114 @@
   width: 32px;
   height: 32px;
   object-fit: contain;
+}
+
+.player-hero-awards {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  box-shadow: var(--shadow-sm);
+}
+
+.player-hero-awards h2 {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.player-award-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.player-award-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+
+.player-award-badge-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.player-award-badge-count {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 0.68rem;
+}
+
+.player-season-banner {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.player-season-back {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.player-season-back:hover {
+  color: var(--accent-hover);
+}
+
+.player-season-banner h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.player-season-banner h2 span {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.player-season-milestones {
+  display: grid;
+  gap: 18px;
+}
+
+.player-milestone-block h3 {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.player-milestone-block ul {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  font-size: 0.875rem;
+}
+
+.player-milestone-meta {
+  color: var(--text-muted);
+  font-size: 0.78rem;
 }
 
 /* Layout */
@@ -359,6 +472,66 @@
   font-style: italic;
 }
 
+.player-table .player-season-link {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.player-table .player-season-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.player-table tr.player-season-row-active td {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.player-table tr.player-season-row-active td:first-child {
+  background: #ECFDF5;
+}
+
+.player-table .player-awards-cell {
+  text-align: left;
+  max-width: 220px;
+  white-space: normal;
+}
+
+.player-table .player-awards-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.player-table .player-award-chip {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #065F46;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.player-table .player-awards-empty {
+  color: var(--text-muted);
+}
+
+.player-table td.player-stat-inactive {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  font-style: italic;
+  white-space: normal;
+  max-width: 96px;
+  line-height: 1.25;
+}
+
+.player-table tr.player-season-row-inactive td {
+  background: rgba(15, 23, 42, 0.02);
+}
+
 .player-table .result-w {
   color: #86efac;
   font-weight: 600;
@@ -395,10 +568,17 @@
     grid-template-columns: 1fr;
   }
 
-  .player-hero-inner {
+  .player-hero-inner,
+  .player-hero-inner--with-awards {
     grid-template-columns: 1fr;
     text-align: center;
     justify-items: center;
+  }
+
+  .player-hero-awards {
+    width: 100%;
+    max-width: 420px;
+    text-align: left;
   }
 
   .player-team-row {

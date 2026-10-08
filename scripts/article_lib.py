@@ -8,7 +8,7 @@ import json
 import re
 from pathlib import Path
 
-from seo_lib import apply_seo, extract_article_metadata, normalize_rel_path
+from seo_lib import apply_seo, ensure_article_byline, extract_article_metadata, normalize_rel_path
 
 RELATED_SECTION_RE = re.compile(
     r'\n?\s*<section class="article-related"[^>]*>.*?</section>\s*',
@@ -222,6 +222,7 @@ def sync_article(source: Path) -> Path:
     index_path = source.parent / source.stem / 'index.html'
     index_path.parent.mkdir(parents=True, exist_ok=True)
     content = source.read_text(encoding='utf-8')
+    content = ensure_article_byline(content)
     content = ensure_article_related_assets(content, '../../')
     source_rel_path = normalize_rel_path(source)
     source.write_text(

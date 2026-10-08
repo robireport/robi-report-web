@@ -29,6 +29,7 @@
   const playerId = params.get('id');
   const gameId = params.get('gameId');
   const sport = (params.get('sport') || 'wnba').toLowerCase();
+  const seasonParam = params.get('season');
 
   function showError(msg) {
     els.loading.classList.add('hidden');
@@ -97,16 +98,130 @@
     }
   }
 
-  function buildUrls(cfg, id) {
+  function buildUrls(cfg, id, gamelogSeasonYear) {
     const siteBase = `https://site.api.espn.com/apis/common/v3/sports/${cfg.category}/${cfg.league}/athletes/${id}`;
+    const seasonYear = gamelogSeasonYear || currentSeasonYear();
     return {
       siteAthlete: siteBase,
+      overview: `${siteBase}/overview`,
       coreAthlete: `https://sports.core.api.espn.com/v2/sports/${cfg.category}/leagues/${cfg.league}/athletes/${id}`,
       stats: `${siteBase}/stats`,
-      gamelog: `${siteBase}/gamelog?season=${currentSeasonYear()}`,
+      gamelog: `${siteBase}/gamelog?season=${seasonYear}`,
       summary: (eventId) =>
         `https://site.api.espn.com/apis/site/v2/sports/${cfg.category}/${cfg.league}/summary?event=${eventId}`,
     };
+  }
+
+  function playerProfileUrl(id, extraParams) {
+    const q = new URLSearchParams({ id: String(id), sport });
+    if (extraParams) {
+      Object.entries(extraParams).forEach(([k, v]) => {
+        if (v != null && v !== '') q.set(k, String(v));
+      });
+    }
+    return `player.html?${q.toString()}`;
+  }
+
+  function parseAwards(overviewData) {
+    const raw = overviewData?.awards || [];
+    const career = [];
+    const byYear = new Map();
+
+    raw.forEach((award) => {
+      const name = award.name || award.displayName || '';
+      if (!name) return;
+      career.push({
+        name,
+        displayCount: award.displayCount || '',
+        seasons: (award.seasons || []).map(String),
+      });
+      (award.seasons || []).forEach((seasonYear) => {
+        const y = parseInt(String(seasonYear), 10);
+        if (!y) return;
+        if (!byYear.has(y)) byYear.set(y, []);
+        byYear.get(y).push(name);
+      });
+    });
+
+    byYear.forEach((list, y) => {
+      byYear.set(
+        y,
+        [...new Set(list)].sort((a, b) => a.localeCompare(b))
+      );
+    });
+
+    return { career, byYear };
+  }
+
+  function abbreviateAward(name) {
+    const shortcuts = {
+      'Rookie of the Year': 'ROY',
+      'Most Improved Player': 'MIP',
+      'Defensive Player of the Year': 'DPOY',
+      'Sixth Man of the Year': '6MOY',
+      'All-Rookie 1st Team': 'All-Rookie 1st',
+      'All-Rookie 2nd Team': 'All-Rookie 2nd',
+    };
+    if (shortcuts[name]) return shortcuts[name];
+    return name.replace(/ Team$/, '').replace(/^All-NBA /, 'NBA ');
+  }
+
+  function annotateSeasonAwards(rows, awardsByYear) {
+    return rows.map((row) => {
+      const list = awardsByYear.get(row.year) || [];
+      let seasonAwards = [];
+      if (list.length) {
+        if (row.isSeasonTotal) {
+          seasonAwards = list;
+        } else {
+          const hasTotal = rows.some((r) => r.year === row.year && r.isSeasonTotal);
+          if (!hasTotal) seasonAwards = list;
+        }
+      }
+      return { ...row, seasonAwards };
+    });
+  }
+
+  function resolveSelectedSeason(seasonQuery, avgRows) {
+    if (!seasonQuery || !avgRows.length) return null;
+    const q = decodeURIComponent(seasonQuery).trim().toLowerCase();
+    const match =
+      avgRows.find((r) => r.season.toLowerCase() === q) ||
+      avgRows.find((r) => String(r.year) === q) ||
+      avgRows.find((r) => r.season.toLowerCase().replace(/\s+/g, '') === q.replace(/\s+/g, ''));
+    if (!match) return null;
+    return { displayName: match.season, year: match.year };
+  }
+
+  function findSeasonAverageRow(avgRows, year) {
+    const yearRows = avgRows.filter((r) => r.year === year);
+    return yearRows.find((r) => r.isSeasonTotal) || yearRows[0] || null;
+  }
+
+  function computeSeasonHighs(gamelogData, labels) {
+    const { rows } = parseGamelog(gamelogData);
+    if (!rows.length) return [];
+    const track = [
+      { key: 'PTS', label: 'Points' },
+      { key: 'REB', label: 'Rebounds' },
+      { key: 'AST', label: 'Assists' },
+    ];
+    const highs = [];
+    track.forEach(({ key, label }) => {
+      const idx = labels.indexOf(key);
+      if (idx < 0) return;
+      let best = null;
+      rows.forEach((row) => {
+        const raw = row.stats[idx];
+        const num = parseFloat(String(raw).replace(/[^\d.-]/g, ''));
+        if (Number.isNaN(num)) return;
+        if (!best || num > best.value) {
+          best = { value: num, display: fallback(raw), date: row.date, opponent: row.opponent, atVs: row.atVs };
+        }
+      });
+      if (best) highs.push({ label, ...best });
+    });
+    return highs;
   }
 
   function getTeamLogo(team) {
@@ -158,22 +273,187 @@
     };
   }
 
+  function padStatsArray(stats, len) {
+    const out = (stats || []).slice();
+    while (out.length < len) out.push('');
+    return out;
+  }
+
+  function statGamesPlayed(labels, stats) {
+    const i = labels.indexOf('GP');
+    if (i < 0) return null;
+    const v = stats[i];
+    if (v === undefined || v === null || v === '') return null;
+    const n = parseFloat(String(v).replace(/[^\d.-]/g, ''));
+    return Number.isNaN(n) ? null : n;
+  }
+
+  function statsCategoryMode(categoryName) {
+    return categoryName.includes('Averages') ? 'avg' : 'tot';
+  }
+
+  function buildZeroStatsForLabels(labels, mode) {
+    return labels.map((label) => {
+      if (label === 'GP' || label === 'GS') return '0';
+      if (label.includes('%')) return '';
+      if (label === 'FG' || label === '3PT' || label === 'FT') return '0-0';
+      if (label === 'MIN' && mode === 'avg') return '0.0';
+      if (/^(MIN|PTS|REB|AST|STL|BLK|TO|OR|DR|PF)$/.test(label)) return '0';
+      return '0';
+    });
+  }
+
+  function seasonDisplayFromLabelStart(labelStart, league, sampleDisplayNames) {
+    const year = labelStart + 1;
+    const usesHyphenSeason = (sampleDisplayNames || []).some((name) => /^\d{4}-\d{2}$/.test(name));
+    if (usesHyphenSeason || league === 'nba' || league === 'nfl') {
+      return { year, displayName: `${labelStart}-${String(labelStart + 1).slice(-2)}` };
+    }
+    return { year, displayName: String(year) };
+  }
+
+  function expandTeamHistorySeasons(teamHistory, league, sampleDisplayNames) {
+    const expected = [];
+    for (const stint of teamHistory || []) {
+      const range = stint.seasons || '';
+      const teamId = stint.id != null ? String(stint.id) : null;
+      const teamSlug = stint.slug || '';
+      const parts = range.split('-').map((p) => parseInt(p, 10));
+      if (parts.length < 2 || !parts[0] || !parts[1]) continue;
+      const [start, end] = parts;
+      for (let labelStart = start; labelStart < end; labelStart += 1) {
+        const season = seasonDisplayFromLabelStart(labelStart, league, sampleDisplayNames);
+        expected.push({ ...season, teamId, teamSlug });
+      }
+    }
+    return expected;
+  }
+
+  function inactiveNoteForSeason(siteAthlete, seasonYear) {
+    const injuries = siteAthlete?.athlete?.injuries || [];
+    if (!injuries.length) return 'DNP - Injury';
+    const currentYear = currentSeasonYear();
+    if (seasonYear < currentYear - 1) return 'DNP - Injury';
+    const inj = injuries[0];
+    const detail = inj?.details?.type || inj?.shortComment?.split(' ').slice(0, 3).join(' ') || 'Injury';
+    return `DNP - ${detail}`;
+  }
+
+  function applyCareerTimelineEnrichment(statsData, siteAthlete, bioData, league) {
+    if (!statsData?.categories?.length) return statsData;
+
+    const avgCat = statsData.categories.find((c) => c.displayName === 'Regular Season Averages');
+    const sampleNames = (avgCat?.statistics || []).map((s) => s.season?.displayName).filter(Boolean);
+    const teamHistory = bioData?.teamHistory || [];
+    let expected = expandTeamHistorySeasons(teamHistory, league, sampleNames);
+
+    const athlete = siteAthlete?.athlete;
+    const currentTeam = athlete?.team;
+    if (currentTeam?.id) {
+      const y = currentSeasonYear();
+      const displayName =
+        avgCat?.statistics?.find((s) => s.season?.year === y)?.season?.displayName ||
+        seasonDisplayFromLabelStart(y - 1, league, sampleNames).displayName;
+      expected.push({
+        year: y,
+        displayName,
+        teamId: String(currentTeam.id),
+        teamSlug: currentTeam.slug || '',
+      });
+    }
+
+    const seen = new Set();
+    expected = expected.filter((e) => {
+      const key = `${e.year}|${e.teamId || ''}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    const enrichCategory = (cat) => {
+      if (!cat?.statistics || !cat.labels?.length) return;
+      const labels = cat.labels;
+      const mode = statsCategoryMode(cat.displayName);
+      const hasGp = labels.includes('GP');
+
+      const hasRow = (year, teamId) =>
+        cat.statistics.some((s) => {
+          if (s.season?.year !== year) return false;
+          if (/totals/i.test(s.teamSlug || '')) return false;
+          if (teamId && String(s.teamId) !== String(teamId)) return false;
+          return true;
+        });
+
+      expected.forEach((exp) => {
+        if (hasRow(exp.year, exp.teamId)) return;
+        cat.statistics.push({
+          teamId: exp.teamId,
+          teamSlug: exp.teamSlug,
+          season: { year: exp.year, displayName: exp.displayName },
+          stats: buildZeroStatsForLabels(labels, mode),
+          _robiInactive: true,
+          _robiInactiveNote: inactiveNoteForSeason(siteAthlete, exp.year),
+        });
+      });
+
+      cat.statistics = cat.statistics.map((s) => {
+        const stats = padStatsArray(s.stats, labels.length);
+        const gp = hasGp ? statGamesPlayed(labels, stats) : null;
+        const isInactive = Boolean(s._robiInactive) || gp === 0;
+        if (!isInactive) return { ...s, stats };
+        return {
+          ...s,
+          stats: buildZeroStatsForLabels(labels, mode),
+          _robiInactive: true,
+          _robiInactiveNote: s._robiInactiveNote || inactiveNoteForSeason(siteAthlete, s.season?.year),
+        };
+      });
+    };
+
+    statsData.categories.forEach((cat) => {
+      if (cat.displayName === 'Regular Season Averages' || cat.displayName === 'Regular Season Totals') {
+        enrichCategory(cat);
+      }
+    });
+
+    return statsData;
+  }
+
+  function formatCareerStatDisplay(row, label, value) {
+    if (!row.isInactiveSeason) return fallback(value);
+    if (label === 'GP') {
+      return row.inactiveNote || '0';
+    }
+    if (label.includes('%') || value === '' || value === null || value === undefined) return '—';
+    if (label === 'FG' || label === '3PT' || label === 'FT') return '0-0';
+    if (label === 'MIN' && row.statsMode === 'avg') return '0.0';
+    if (/^(GS|MIN|PTS|REB|AST|STL|BLK|TO|OR|DR|PF)$/.test(label)) return '0';
+    return '—';
+  }
+
   function parseStatsCategory(statsData, categoryName) {
     const cat = statsData?.categories?.find((c) => c.displayName === categoryName);
     if (!cat) return { labels: [], rows: [] };
 
     const labels = cat.labels || [];
+    const mode = statsCategoryMode(categoryName);
     const rows = (cat.statistics || [])
       .map((s) => {
         const teamSlug = s.teamSlug || '';
         const teamId = s.teamId != null && s.teamId !== '' ? String(s.teamId) : null;
+        const stats = padStatsArray(s.stats, labels.length);
+        const gp = statGamesPlayed(labels, stats);
+        const isInactiveSeason = Boolean(s._robiInactive) || gp === 0;
         return {
           season: s.season?.displayName || String(s.season?.year || '—'),
           year: s.season?.year || 0,
-          stats: s.stats || [],
+          stats: isInactiveSeason ? buildZeroStatsForLabels(labels, mode) : stats,
           teamId,
           teamSlug,
           isSeasonTotal: !teamId && /totals/i.test(teamSlug),
+          isInactiveSeason,
+          inactiveNote: isInactiveSeason ? s._robiInactiveNote || 'DNP - Injury' : '',
+          statsMode: mode,
         };
       })
       .sort((a, b) => {
@@ -252,33 +532,65 @@
     return map;
   }
 
-  function buildStatsTable(labels, rows, firstColLabel, firstColFn, highlightLabels, teamMap) {
+  function renderAwardsCell(awardNames) {
+    if (!awardNames?.length) {
+      return '<td class="player-awards-cell"><span class="player-awards-empty">—</span></td>';
+    }
+    const chips = awardNames
+      .map(
+        (name) =>
+          `<span class="player-award-chip" title="${escapeHtml(name)}">${escapeHtml(abbreviateAward(name))}</span>`
+      )
+      .join('');
+    return `<td class="player-awards-cell"><div class="player-awards-chips">${chips}</div></td>`;
+  }
+
+  function buildStatsTable(labels, rows, firstColLabel, firstColFn, highlightLabels, tableOpts) {
     if (!rows.length) {
       return '<div class="player-empty">Statistics not available.</div>';
     }
 
+    const opts = tableOpts || {};
+    const teamMap = opts.teamMap;
+    const showAwards = opts.showAwards;
+    const seasonLinks = opts.seasonLinks;
     const highlight = new Set(highlightLabels || []);
     const teamHead = teamMap ? '<th>Team</th>' : '';
+    const awardsHead = showAwards ? '<th>Awards</th>' : '';
     const head = labels.map((l) => `<th>${escapeHtml(l)}</th>`).join('');
     const body = rows
       .map((row) => {
-        const first = firstColFn(row);
+        let first = firstColFn(row);
+        if (seasonLinks && !row.isSeasonTotal && row.season) {
+          const href = playerProfileUrl(playerId, { season: row.season });
+          first = `<a class="player-season-link" href="${escapeHtml(href)}">${escapeHtml(row.season)}</a>`;
+        }
         const teamCell = teamMap ? renderTeamCell(row, teamMap) : '';
+        const awardsCell = showAwards ? renderAwardsCell(row.seasonAwards) : '';
         const cells = row.stats
           .map((v, i) => {
             const label = labels[i];
-            const cls = highlight.has(label) ? ' class="stat-highlight"' : '';
-            return `<td${cls}>${escapeHtml(fallback(v))}</td>`;
+            const display = formatCareerStatDisplay(row, label, v);
+            let cls = highlight.has(label) ? 'stat-highlight' : '';
+            if (row.isInactiveSeason && (label === 'GP' || display.startsWith('DNP'))) {
+              cls = cls ? `${cls} player-stat-inactive` : 'player-stat-inactive';
+            }
+            const clsAttr = cls ? ` class="${cls}"` : '';
+            return `<td${clsAttr}>${escapeHtml(display)}</td>`;
           })
           .join('');
-        return `<tr><td class="player-name">${first}</td>${teamCell}${cells}</tr>`;
+        let rowCls = '';
+        if (opts.highlightYear && row.year === opts.highlightYear) rowCls = 'player-season-row-active';
+        if (row.isInactiveSeason) rowCls = rowCls ? `${rowCls} player-season-row-inactive` : 'player-season-row-inactive';
+        const rowClsAttr = rowCls ? ` class="${rowCls}"` : '';
+        return `<tr${rowClsAttr}><td class="player-name">${first}</td>${teamCell}${awardsCell}${cells}</tr>`;
       })
       .join('');
 
-    return `<div class="player-table-wrap"><table class="player-table"><thead><tr><th>${escapeHtml(firstColLabel)}</th>${teamHead}${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+    return `<div class="player-table-wrap"><table class="player-table"><thead><tr><th>${escapeHtml(firstColLabel)}</th>${teamHead}${awardsHead}${head}</tr></thead><tbody>${body}</tbody></table></div>`;
   }
 
-  function buildFilteredStatsTable(allLabels, rows, wantedCols, firstColLabel, firstColFn, teamMap) {
+  function buildFilteredStatsTable(allLabels, rows, wantedCols, firstColLabel, firstColFn, tableOpts) {
     if (!rows.length) {
       return '<div class="player-empty">Statistics not available.</div>';
     }
@@ -293,7 +605,7 @@
       stats: indices.map((i) => row.stats[i] ?? '—'),
     }));
 
-    return buildStatsTable(labels, filteredRows, firstColLabel, firstColFn, ['PTS', 'REB', 'AST'], teamMap);
+    return buildStatsTable(labels, filteredRows, firstColLabel, firstColFn, ['PTS', 'REB', 'AST'], tableOpts);
   }
 
   function buildSeasonAveragesCard(statsData) {
@@ -399,7 +711,23 @@
     };
   }
 
-  function renderHero(bio, cfg) {
+  function renderHeroAwards(careerAwards) {
+    if (!careerAwards?.length) return '';
+    const badges = careerAwards
+      .map(
+        (a) =>
+          `<span class="player-award-badge" title="${escapeHtml(a.name)}"><span class="player-award-badge-name">${escapeHtml(a.name)}</span>${a.displayCount ? `<span class="player-award-badge-count">${escapeHtml(a.displayCount)}</span>` : ''}</span>`
+      )
+      .join('');
+    return `
+      <aside class="player-hero-awards" aria-labelledby="player-awards-heading">
+        <h2 id="player-awards-heading">Awards &amp; Honors</h2>
+        <div class="player-award-badges">${badges}</div>
+      </aside>
+    `;
+  }
+
+  function renderHero(bio, cfg, careerAwards) {
     const initials = bio.name
       .split(' ')
       .map((p) => p[0])
@@ -412,11 +740,12 @@
       : `<div class="player-headshot-fallback" aria-hidden="true">${escapeHtml(initials)}</div>`;
 
     const statusCls = bio.active !== false ? 'status-active' : 'status-inactive';
+    const awardsHtml = renderHeroAwards(careerAwards);
 
     return `
       <section class="player-hero" style="--team-color:${escapeHtml(bio.teamColor)};">
         <div class="player-hero-bg"></div>
-        <div class="player-hero-inner">
+        <div class="player-hero-inner${awardsHtml ? ' player-hero-inner--with-awards' : ''}">
           <div class="player-headshot-wrap">${headshotHtml}</div>
           <div class="player-hero-main">
             <div class="player-hero-meta">
@@ -435,8 +764,50 @@
                 : ''
             }
           </div>
+          ${awardsHtml}
         </div>
       </section>
+    `;
+  }
+
+  function renderSeasonBanner(selectedSeason) {
+    const backHref = playerProfileUrl(playerId);
+    return `
+      <section class="player-season-banner">
+        <a class="player-season-back" href="${escapeHtml(backHref)}">← Full career profile</a>
+        <h2>${escapeHtml(selectedSeason.displayName)} <span>Season Summary</span></h2>
+      </section>
+    `;
+  }
+
+  function renderSeasonMilestones(awards, highs) {
+    const awardItems = (awards || [])
+      .map((name) => `<li>${escapeHtml(name)}</li>`)
+      .join('');
+    const highItems = (highs || [])
+      .map(
+        (h) =>
+          `<li><strong>${escapeHtml(h.label)}:</strong> ${escapeHtml(h.display)} <span class="player-milestone-meta">(${escapeHtml(formatGameDate(h.date))} ${escapeHtml(h.atVs)} ${escapeHtml(h.opponent)})</span></li>`
+      )
+      .join('');
+
+    if (!awardItems && !highItems) {
+      return '<div class="player-empty">No milestones recorded for this season.</div>';
+    }
+
+    return `
+      <div class="player-season-milestones">
+        ${
+          awardItems
+            ? `<div class="player-milestone-block"><h3>Awards</h3><ul>${awardItems}</ul></div>`
+            : ''
+        }
+        ${
+          highItems
+            ? `<div class="player-milestone-block"><h3>Season highs</h3><ul>${highItems}</ul></div>`
+            : ''
+        }
+      </div>
     `;
   }
 
@@ -564,20 +935,41 @@
     `;
   }
 
-  function renderPage({ bio, statsData, gamelogData, summaryData, cfg, videos, teamMap }) {
-    document.title = `${bio.name} — Robi Report`;
-
-    const seasonCard = buildSeasonAveragesCard(statsData);
+  function renderPage({
+    bio,
+    statsData,
+    gamelogData,
+    summaryData,
+    cfg,
+    videos,
+    teamMap,
+    awards,
+    selectedSeason,
+  }) {
     const avgCategory = parseStatsCategory(statsData, 'Regular Season Averages');
     const totalsCategory = parseStatsCategory(statsData, 'Regular Season Totals');
+    const avgRows = annotateSeasonAwards(avgCategory.rows, awards.byYear);
+
+    if (selectedSeason) {
+      document.title = `${bio.name} (${selectedSeason.displayName}) — Robi Report`;
+    } else {
+      document.title = `${bio.name} — Robi Report`;
+    }
+
+    const careerTableOpts = {
+      teamMap,
+      showAwards: true,
+      seasonLinks: true,
+      highlightYear: selectedSeason?.year,
+    };
 
     const careerHtml = buildFilteredStatsTable(
       avgCategory.labels,
-      avgCategory.rows,
+      avgRows,
       CAREER_TABLE_COLS,
       'Season',
       (row) => escapeHtml(row.season),
-      teamMap
+      careerTableOpts
     );
 
     const totalsHtml = buildFilteredStatsTable(
@@ -588,22 +980,60 @@
       (row) => escapeHtml(row.season)
     );
 
+    const seasonMode = Boolean(selectedSeason);
+    const seasonAvgRow = seasonMode ? findSeasonAverageRow(avgCategory.rows, selectedSeason.year) : null;
+    const seasonCard = seasonMode
+      ? seasonAvgRow
+        ? {
+            season: selectedSeason.displayName,
+            pills: SEASON_PILL_STATS.map((key) => ({
+              label: key,
+              value: statAt(avgCategory.labels, seasonAvgRow.stats, key),
+            })),
+          }
+        : null
+      : buildSeasonAveragesCard(statsData);
+
+    const gamelogSub = seasonMode ? `${selectedSeason.displayName} Regular Season` : `${currentSeasonYear()} Season`;
     const gamelogHtml = buildGamelogTable(gamelogData);
+    const seasonAwards = seasonMode ? awards.byYear.get(selectedSeason.year) || [] : [];
+    const seasonHighs = seasonMode ? computeSeasonHighs(gamelogData, gamelogData?.labels || []) : [];
 
     els.content.innerHTML = `
-      ${renderHero(bio, cfg)}
+      ${renderHero(bio, cfg, awards.career)}
+      ${seasonMode ? renderSeasonBanner(selectedSeason) : ''}
       <div class="player-layout">
         <div class="player-main">
-          ${renderGamePerformance(summaryData, bio.id)}
+          ${seasonMode ? '' : renderGamePerformance(summaryData, bio.id)}
           ${renderSeasonAverages(seasonCard)}
+          ${
+            seasonMode
+              ? `<section class="player-card">
+            <div class="player-card-header">
+              <h2>Milestones</h2>
+              <span class="sub">${escapeHtml(selectedSeason.displayName)}</span>
+            </div>
+            <div class="player-card-body">${renderSeasonMilestones(seasonAwards, seasonHighs)}</div>
+          </section>`
+              : ''
+          }
           <section class="player-card">
             <div class="player-card-header">
+              <h2>${seasonMode ? 'Season Game Log' : 'Career Averages'}</h2>
+              <span class="sub">${seasonMode ? 'Regular Season' : 'Regular Season · click a season for details'}</span>
+            </div>
+            ${seasonMode ? gamelogHtml : careerHtml}
+          </section>
+          ${
+            seasonMode
+              ? `<section class="player-card">
+            <div class="player-card-header">
               <h2>Career Averages</h2>
-              <span class="sub">Regular Season</span>
+              <span class="sub">Highlighted: ${escapeHtml(selectedSeason.displayName)}</span>
             </div>
             ${careerHtml}
-          </section>
-          <section class="player-card">
+          </section>`
+              : `<section class="player-card">
             <div class="player-card-header">
               <h2>Career Totals</h2>
               <span class="sub">Regular Season</span>
@@ -613,10 +1043,11 @@
           <section class="player-card">
             <div class="player-card-header">
               <h2>Game Log</h2>
-              <span class="sub">${currentSeasonYear()} Season</span>
+              <span class="sub">${escapeHtml(gamelogSub)}</span>
             </div>
             ${gamelogHtml}
-          </section>
+          </section>`
+          }
         </div>
         ${renderBioSidebar(bio, videos)}
       </div>
@@ -632,18 +1063,30 @@
     }
 
     const cfg = SPORT_CONFIG[sport];
-    const urls = buildUrls(cfg, playerId);
 
     const newsUrl = `https://site.api.espn.com/apis/site/v2/sports/${cfg.category}/${cfg.league}/news?limit=50`;
 
-    const [siteAthlete, coreAthlete, statsData, gamelogData, summaryData, newsData] = await Promise.all([
-      fetchJsonSafe(urls.siteAthlete),
-      fetchJsonSafe(urls.coreAthlete),
-      fetchJsonSafe(urls.stats),
-      fetchJsonSafe(urls.gamelog),
-      gameId ? fetchJsonSafe(urls.summary(gameId)) : Promise.resolve(null),
+    const [siteAthlete, coreAthlete, statsDataRaw, bioData, overviewData, summaryData, newsData] = await Promise.all([
+      fetchJsonSafe(`https://site.api.espn.com/apis/common/v3/sports/${cfg.category}/${cfg.league}/athletes/${playerId}`),
+      fetchJsonSafe(`https://sports.core.api.espn.com/v2/sports/${cfg.category}/leagues/${cfg.league}/athletes/${playerId}`),
+      fetchJsonSafe(`https://site.api.espn.com/apis/common/v3/sports/${cfg.category}/${cfg.league}/athletes/${playerId}/stats`),
+      fetchJsonSafe(`https://site.api.espn.com/apis/common/v3/sports/${cfg.category}/${cfg.league}/athletes/${playerId}/bio`),
+      fetchJsonSafe(`https://site.api.espn.com/apis/common/v3/sports/${cfg.category}/${cfg.league}/athletes/${playerId}/overview`),
+      gameId
+        ? fetchJsonSafe(
+            `https://site.api.espn.com/apis/site/v2/sports/${cfg.category}/${cfg.league}/summary?event=${gameId}`
+          )
+        : Promise.resolve(null),
       fetchJsonSafe(newsUrl),
     ]);
+
+    const statsData = applyCareerTimelineEnrichment(statsDataRaw, siteAthlete, bioData, cfg.league);
+
+    const avgCategoryPreview = parseStatsCategory(statsData, 'Regular Season Averages');
+    const selectedSeason = resolveSelectedSeason(seasonParam, avgCategoryPreview.rows);
+    const gamelogSeasonYear = selectedSeason?.year || currentSeasonYear();
+    const urls = buildUrls(cfg, playerId, gamelogSeasonYear);
+    const gamelogData = await fetchJsonSafe(urls.gamelog);
 
     if (!siteAthlete?.athlete && !coreAthlete?.displayName && !coreAthlete?.fullName) {
       showError(`Player not found (ID: ${playerId}). Verify the player ID and league (sport=${sport}).`);
@@ -671,11 +1114,22 @@
         })
       : [];
 
-    const avgRows = parseStatsCategory(statsData, 'Regular Season Averages').rows;
+    const avgRows = avgCategoryPreview.rows;
     const teamMap = await fetchTeamLogoMap(cfg, avgRows);
+    const awards = parseAwards(overviewData);
 
     hideLoading();
-    renderPage({ bio, statsData, gamelogData, summaryData, cfg, videos, teamMap });
+    renderPage({
+      bio,
+      statsData,
+      gamelogData,
+      summaryData,
+      cfg,
+      videos,
+      teamMap,
+      awards,
+      selectedSeason,
+    });
 
     const ticker = document.getElementById('score-ticker');
     if (ticker) {

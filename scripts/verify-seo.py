@@ -15,6 +15,7 @@ from seo_lib import (
     SECTION_PAGE_SEO,
     canonical_url_for_path,
     extract_article_metadata,
+    is_site_article_author,
     normalize_rel_path,
 )
 from sitemap_lib import NEWS_WINDOW, expected_indexable_article_urls
@@ -118,6 +119,12 @@ def verify_articles() -> list[str]:
 
         if not ARTICLE_SCHEMA_ID_RE.search(html):
             errors.append(f'{rel}: missing article JSON-LD')
+
+        meta = extract_article_metadata(html)
+        if meta and not is_site_article_author(meta.get('author', '')):
+            errors.append(
+                f'{rel}: author must be a Robi Report byline, got {meta.get("author")!r}',
+            )
 
         category = source.parent.name
         peer_count = sum(
