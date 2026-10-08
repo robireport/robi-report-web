@@ -164,12 +164,24 @@
 
     const labels = cat.labels || [];
     const rows = (cat.statistics || [])
-      .map((s) => ({
-        season: s.season?.displayName || String(s.season?.year || '—'),
-        year: s.season?.year || 0,
-        stats: s.stats || [],
-      }))
-      .sort((a, b) => b.year - a.year);
+      .map((s) => {
+        const teamSlug = s.teamSlug || '';
+        const teamId = s.teamId != null && s.teamId !== '' ? String(s.teamId) : null;
+        return {
+          season: s.season?.displayName || String(s.season?.year || '—'),
+          year: s.season?.year || 0,
+          stats: s.stats || [],
+          teamId,
+          teamSlug,
+          isSeasonTotal: !teamId && /totals/i.test(teamSlug),
+        };
+      })
+      .sort((a, b) => {
+        if (b.year !== a.year) return b.year - a.year;
+        if (a.isSeasonTotal && !b.isSeasonTotal) return 1;
+        if (b.isSeasonTotal && !a.isSeasonTotal) return -1;
+        return (a.teamSlug || '').localeCompare(b.teamSlug || '');
+      });
 
     return { labels, rows };
   }
@@ -192,16 +204,66 @@
     return { indices, labels: filtered };
   }
 
-  function buildStatsTable(labels, rows, firstColLabel, firstColFn, highlightLabels) {
+  function slugToAbbrFallback(teamSlug) {
+    if (!teamSlug || /totals/i.test(teamSlug)) return '';
+    const parts = teamSlug.split('-').filter(Boolean);
+    if (!parts.length) return '';
+    const last = parts[parts.length - 1];
+    if (last.length <= 4) return last.toUpperCase();
+    return parts
+      .map((p) => p[0])
+      .join('')
+      .slice(0, 3)
+      .toUpperCase();
+  }
+
+  function renderTeamCell(row, teamMap) {
+    if (row.isSeasonTotal) {
+      return '<td class="player-team-cell"><span class="player-team-total">Total</span></td>';
+    }
+    if (!row.teamId) {
+      return '<td class="player-team-cell"><span class="player-team-abbr">—</span></td>';
+    }
+    const meta = teamMap?.get(row.teamId);
+    const abbr = meta?.abbr || slugToAbbrFallback(row.teamSlug) || '—';
+    const logo = meta?.logo || '';
+    const logoHtml = logo
+      ? `<img class="player-team-logo" src="${escapeHtml(logo)}" alt="" width="24" height="24" loading="lazy" />`
+      : '';
+    return `<td class="player-team-cell"><span class="player-team-chip">${logoHtml}<span class="player-team-abbr">${escapeHtml(abbr)}</span></span></td>`;
+  }
+
+  async function fetchTeamLogoMap(cfg, rows) {
+    const ids = [...new Set((rows || []).map((r) => r.teamId).filter(Boolean))];
+    const map = new Map();
+    await Promise.all(
+      ids.map(async (id) => {
+        const url = `https://site.api.espn.com/apis/site/v2/sports/${cfg.category}/${cfg.league}/teams/${id}`;
+        const data = await fetchJsonSafe(url);
+        const team = data?.team;
+        if (!team) return;
+        map.set(id, {
+          abbr: team.abbreviation || team.shortDisplayName || '',
+          logo: getTeamLogo(team),
+          name: team.displayName || team.shortDisplayName || '',
+        });
+      })
+    );
+    return map;
+  }
+
+  function buildStatsTable(labels, rows, firstColLabel, firstColFn, highlightLabels, teamMap) {
     if (!rows.length) {
       return '<div class="player-empty">Statistics not available.</div>';
     }
 
     const highlight = new Set(highlightLabels || []);
+    const teamHead = teamMap ? '<th>Team</th>' : '';
     const head = labels.map((l) => `<th>${escapeHtml(l)}</th>`).join('');
     const body = rows
       .map((row) => {
         const first = firstColFn(row);
+        const teamCell = teamMap ? renderTeamCell(row, teamMap) : '';
         const cells = row.stats
           .map((v, i) => {
             const label = labels[i];
@@ -209,14 +271,14 @@
             return `<td${cls}>${escapeHtml(fallback(v))}</td>`;
           })
           .join('');
-        return `<tr><td class="player-name">${first}</td>${cells}</tr>`;
+        return `<tr><td class="player-name">${first}</td>${teamCell}${cells}</tr>`;
       })
       .join('');
 
-    return `<div class="player-table-wrap"><table class="player-table"><thead><tr><th>${escapeHtml(firstColLabel)}</th>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+    return `<div class="player-table-wrap"><table class="player-table"><thead><tr><th>${escapeHtml(firstColLabel)}</th>${teamHead}${head}</tr></thead><tbody>${body}</tbody></table></div>`;
   }
 
-  function buildFilteredStatsTable(allLabels, rows, wantedCols, firstColLabel, firstColFn) {
+  function buildFilteredStatsTable(allLabels, rows, wantedCols, firstColLabel, firstColFn, teamMap) {
     if (!rows.length) {
       return '<div class="player-empty">Statistics not available.</div>';
     }
@@ -231,7 +293,7 @@
       stats: indices.map((i) => row.stats[i] ?? '—'),
     }));
 
-    return buildStatsTable(labels, filteredRows, firstColLabel, firstColFn, ['PTS', 'REB', 'AST']);
+    return buildStatsTable(labels, filteredRows, firstColLabel, firstColFn, ['PTS', 'REB', 'AST'], teamMap);
   }
 
   function buildSeasonAveragesCard(statsData) {
@@ -502,7 +564,7 @@
     `;
   }
 
-  function renderPage({ bio, statsData, gamelogData, summaryData, cfg, videos }) {
+  function renderPage({ bio, statsData, gamelogData, summaryData, cfg, videos, teamMap }) {
     document.title = `${bio.name} — Robi Report`;
 
     const seasonCard = buildSeasonAveragesCard(statsData);
@@ -514,7 +576,8 @@
       avgCategory.rows,
       CAREER_TABLE_COLS,
       'Season',
-      (row) => escapeHtml(row.season)
+      (row) => escapeHtml(row.season),
+      teamMap
     );
 
     const totalsHtml = buildFilteredStatsTable(
@@ -608,8 +671,11 @@
         })
       : [];
 
+    const avgRows = parseStatsCategory(statsData, 'Regular Season Averages').rows;
+    const teamMap = await fetchTeamLogoMap(cfg, avgRows);
+
     hideLoading();
-    renderPage({ bio, statsData, gamelogData, summaryData, cfg, videos });
+    renderPage({ bio, statsData, gamelogData, summaryData, cfg, videos, teamMap });
 
     const ticker = document.getElementById('score-ticker');
     if (ticker) {
