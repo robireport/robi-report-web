@@ -10,6 +10,8 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'assets' / 'Squared logo.png'
 OUTPUTS = {
+    'android-chrome-512x512.png': 512,
+    'android-chrome-192x192.png': 192,
     'apple-touch-icon.png': 180,
     'favicon-32x32.png': 32,
     'favicon-16x16.png': 16,

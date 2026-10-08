@@ -156,6 +156,35 @@ def verify_section_pages() -> list[str]:
     return errors
 
 
+def verify_branding_assets() -> list[str]:
+    errors: list[str] = []
+    required_root_icons = (
+        'favicon.ico',
+        'favicon-16x16.png',
+        'favicon-32x32.png',
+        'apple-touch-icon.png',
+        'android-chrome-192x192.png',
+        'android-chrome-512x512.png',
+        'site.webmanifest',
+        'manifest.json',
+    )
+    for name in required_root_icons:
+        if not (ROOT / name).is_file():
+            errors.append(f'missing root branding asset: {name}')
+
+    index = (ROOT / 'index.html').read_text(encoding='utf-8')
+    for needle in (
+        'rel="apple-touch-icon"',
+        'android-chrome-192x192.png',
+        'android-chrome-512x512.png',
+        'name="theme-color"',
+        '/site.webmanifest',
+    ):
+        if needle not in index:
+            errors.append(f'index.html missing {needle}')
+    return errors
+
+
 def verify_internal_links() -> list[str]:
     errors: list[str] = []
     for page in (ROOT / 'index.html', ROOT / 'wnba.html'):
@@ -174,6 +203,7 @@ def main() -> int:
         ('article metadata', verify_articles),
         ('section pages', verify_section_pages),
         ('internal links', verify_internal_links),
+        ('branding assets', verify_branding_assets),
     ]
 
     failures: list[str] = []

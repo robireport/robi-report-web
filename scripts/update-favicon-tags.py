@@ -1,45 +1,41 @@
 #!/usr/bin/env python3
-"""Point favicon and apple-touch-icon tags at root icon assets."""
+"""Standardize favicon, PWA manifest, and mobile bookmark tags across HTML pages."""
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-FAVICON_32 = '/favicon-32x32.png'
-FAVICON_16 = '/favicon-16x16.png'
-FAVICON_ICO = '/favicon.ico'
-APPLE_TOUCH_ICON = '/apple-touch-icon.png'
-
-ICON_BLOCK = re.compile(
-    r'\s*<link rel="icon" type="image/png" sizes="32x32" href="[^"]+" />\s*'
-    r'(?:<link rel="icon" type="image/png" sizes="16x16" href="[^"]+" />\s*)?'
-    r'(?:<link rel="icon" href="[^"]+" sizes="any" />\s*)?'
-    r'(?:<link rel="shortcut icon" href="[^"]+"[^>]*/>\s*)?'
-    r'<link rel="apple-touch-icon"[^>]*/>\s*',
-    re.I,
-)
-
-STANDALONE_APPLE_TOUCH = re.compile(
-    r'\s*<link rel="apple-touch-icon"[^>]*/>\s*',
-    re.I,
-)
+THEME_COLOR = '#10B981'
+MANIFEST_HREF = '/site.webmanifest'
+MANIFEST_JSON_HREF = '/manifest.json'
 
 
 def build_icon_block() -> str:
     return (
         '\n'
-        f'  <link rel="icon" type="image/png" sizes="32x32" href="{FAVICON_32}" />\n'
-        f'  <link rel="icon" type="image/png" sizes="16x16" href="{FAVICON_16}" />\n'
-        f'  <link rel="icon" href="{FAVICON_ICO}" sizes="any" />\n'
-        f'  <link rel="apple-touch-icon" sizes="180x180" href="{APPLE_TOUCH_ICON}" />\n'
+        f'  <meta name="theme-color" content="{THEME_COLOR}" />\n'
+        '  <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />\n'
+        '  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />\n'
+        '  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />\n'
+        '  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />\n'
+        '  <link rel="icon" href="/favicon.ico" sizes="any" />\n'
+        '  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />\n'
+        f'  <link rel="manifest" href="{MANIFEST_HREF}" />\n'
+        f'  <link rel="manifest" href="{MANIFEST_JSON_HREF}" />\n'
     )
 
 
-def build_apple_touch_tag() -> str:
-    return f'  <link rel="apple-touch-icon" sizes="180x180" href="{APPLE_TOUCH_ICON}" />\n'
+ICON_BLOCK = re.compile(
+    r'\s*(?:<meta name="theme-color"[^>]*/>\s*)?'
+    r'(?:<link rel="icon"[^>]*/>\s*)+'
+    r'<link rel="apple-touch-icon"[^>]*/>\s*'
+    r'(?:<link rel="manifest"[^>]*/>\s*)*',
+    re.I,
+)
 
 
 def update_file(path: Path) -> bool:
@@ -47,29 +43,41 @@ def update_file(path: Path) -> bool:
     block = build_icon_block()
     updated, count = ICON_BLOCK.subn(block, content, count=1)
     if count:
-        path.write_text(updated, encoding='utf-8')
-        return True
-
-    if STANDALONE_APPLE_TOUCH.search(content):
-        updated = STANDALONE_APPLE_TOUCH.sub(build_apple_touch_tag(), content, count=1)
         if updated != content:
             path.write_text(updated, encoding='utf-8')
             return True
+        return False
 
     marker = '<meta name="apple-mobile-web-app-title" content="Robi Report" />'
-    if marker in content and 'rel="apple-touch-icon"' not in content:
-        updated = content.replace(
-            marker,
-            marker + '\n' + build_icon_block().rstrip(),
-            1,
-        )
-        path.write_text(updated, encoding='utf-8')
-        return True
+    if marker in content:
+        if 'rel="apple-touch-icon"' not in content:
+            updated = content.replace(marker, marker + build_icon_block().rstrip(), 1)
+            path.write_text(updated, encoding='utf-8')
+            return True
+        if 'name="theme-color"' not in content:
+            standalone = re.compile(
+                r'\s*<link rel="apple-touch-icon"[^>]*/>\s*',
+                re.I,
+            )
+            updated, count = standalone.subn(build_icon_block(), content, count=1)
+            if count:
+                path.write_text(updated, encoding='utf-8')
+                return True
 
     return False
 
 
+def verify_manifest_icons() -> None:
+    for name in ('site.webmanifest', 'manifest.json'):
+        path = ROOT / name
+        data = json.loads(path.read_text(encoding='utf-8'))
+        sizes = {entry.get('sizes') for entry in data.get('icons', [])}
+        if '192x192' not in sizes or '512x512' not in sizes:
+            raise SystemExit(f'{name} missing required 192x192 or 512x512 icon entries.')
+
+
 def main() -> int:
+    verify_manifest_icons()
     updated: list[str] = []
     for path in sorted(ROOT.rglob('*.html')):
         if 'node_modules' in path.parts:
