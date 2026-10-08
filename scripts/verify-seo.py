@@ -9,10 +9,12 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from article_lib import iter_source_articles
+from article_lib import EM_DASH, iter_source_articles
 from seo_lib import (
+    PUBLISHER_LOGO,
     ROOT,
     SECTION_PAGE_SEO,
+    SITE_ORIGIN,
     canonical_url_for_path,
     extract_article_metadata,
     is_site_article_author,
@@ -51,8 +53,12 @@ def verify_robots() -> list[str]:
         errors.append('robots.txt missing main sitemap reference')
     if 'news-sitemap.xml' not in robots:
         errors.append('robots.txt missing news sitemap reference')
-    if re.search(r'Disallow:\s*/', robots, re.I):
-        errors.append('robots.txt appears to disallow public paths')
+    if re.search(r'Disallow:\s*/\s*$', robots, re.M | re.I):
+        errors.append('robots.txt appears to disallow the entire site')
+    if 'Googlebot-Image' not in robots:
+        errors.append('robots.txt missing Googlebot-Image rules')
+    if 'Allow: /assets/' not in robots:
+        errors.append('robots.txt should explicitly allow /assets/')
     return errors
 
 
@@ -135,6 +141,15 @@ def verify_articles() -> list[str]:
         if peer_count and 'class="article-related"' not in html:
             errors.append(f'{rel}: missing related-articles section')
 
+        source_html = source.read_text(encoding='utf-8')
+        body_match = re.search(
+            r'<div class="article-body"[^>]*>(.*?)</div>',
+            source_html,
+            re.S | re.I,
+        )
+        if body_match and EM_DASH in body_match.group(1):
+            errors.append(f'{source.relative_to(ROOT).as_posix()}: em dash in article body')
+
     return errors
 
 
@@ -165,6 +180,7 @@ def verify_branding_assets() -> list[str]:
         'apple-touch-icon.png',
         'android-chrome-192x192.png',
         'android-chrome-512x512.png',
+        'assets/images/emerald-r-logo.png',
         'site.webmanifest',
         'manifest.json',
     )
@@ -175,10 +191,13 @@ def verify_branding_assets() -> list[str]:
     index = (ROOT / 'index.html').read_text(encoding='utf-8')
     for needle in (
         'rel="apple-touch-icon"',
-        'android-chrome-192x192.png',
-        'android-chrome-512x512.png',
+        f'href="{SITE_ORIGIN}/android-chrome-192x192.png"',
+        f'href="{SITE_ORIGIN}/android-chrome-512x512.png"',
+        'rel="shortcut icon"',
         'name="theme-color"',
-        '/site.webmanifest',
+        f'href="{SITE_ORIGIN}/site.webmanifest"',
+        PUBLISHER_LOGO,
+        'id="robi-site-schema"',
     ):
         if needle not in index:
             errors.append(f'index.html missing {needle}')

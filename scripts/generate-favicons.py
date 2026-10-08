@@ -10,6 +10,8 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'assets' / 'emerald-r-logo.png'
 FALLBACK_SOURCE = ROOT / 'assets' / 'Squared logo.png'
+CANONICAL_BRAND_DIR = ROOT / 'assets' / 'images'
+CANONICAL_BRAND_FILE = CANONICAL_BRAND_DIR / 'emerald-r-logo.png'
 OUTPUTS = {
     'android-chrome-512x512.png': 512,
     'android-chrome-192x192.png': 192,
@@ -78,8 +80,17 @@ def load_source_logo() -> Image.Image:
     return rgba
 
 
+def publish_canonical_brand_logo(source: Image.Image) -> None:
+    CANONICAL_BRAND_DIR.mkdir(parents=True, exist_ok=True)
+    if source.mode != 'RGB':
+        source = source.convert('RGB')
+    source.save(CANONICAL_BRAND_FILE, format='PNG', optimize=True)
+    print(f'Wrote {CANONICAL_BRAND_FILE.relative_to(ROOT).as_posix()}')
+
+
 def main() -> int:
     source = load_source_logo()
+    publish_canonical_brand_logo(source)
     png_paths: dict[int, Path] = {}
 
     for filename, size in OUTPUTS.items():
