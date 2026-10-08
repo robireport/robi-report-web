@@ -100,7 +100,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('category', choices=sorted(VALID_CATEGORIES))
     parser.add_argument('slug', help='URL slug, e.g. curry-under-armour')
     parser.add_argument('title', help='Article headline')
-    parser.add_argument('--author', default='Robi Report')
+    parser.add_argument('--author', default='Matthew Robi')
     parser.add_argument('--date', dest='date_iso', default=date.today().isoformat())
     parser.add_argument('--date-display', default=date.today().strftime('%B %d, %Y'))
     parser.add_argument('--read-time', default='4 min read')

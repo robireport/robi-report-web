@@ -11,6 +11,7 @@ SCRIPTS = ROOT / 'scripts'
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 from article_lib import is_source_article, public_article_href, sync_all_articles, write_redirect_map
+from seo_lib import extract_article_metadata
 from sitemap_lib import write_sitemaps
 
 HUBS = {
@@ -52,7 +53,7 @@ def parse_article(path: Path) -> dict:
 
     title_m = re.search(r'<h1 class="article-title">(.*?)</h1>', text, re.S)
     tag_m = re.search(r'<span class="article-tag">(.*?)</span>', text, re.S)
-    meta_m = re.search(r'<div class="article-meta">(.*?)</div>', text, re.S)
+    meta_m = re.search(r'<div class="article-meta"[^>]*>(.*?)</div>', text, re.S)
     img_m = re.search(r'<figure class="article-hero">\s*<img src="([^"]+)" alt="([^"]*)"', text, re.S)
     body_m = re.search(r'<div class="article-body">\s*<p>(.*?)</p>', text, re.S)
 
@@ -62,20 +63,14 @@ def parse_article(path: Path) -> dict:
     story_tag = tag_parts[0] if tag_parts else 'News'
     league = tag_parts[-1].upper() if len(tag_parts) > 1 else path.parent.name.upper()
 
-    author = 'Robi Report'
-    date_iso = ''
-    date_label = ''
+    seo_meta = extract_article_metadata(text) or {}
+    author = seo_meta.get('author') or 'Matthew Robi'
+    date_iso = seo_meta.get('date_published') or ''
+    date_label = seo_meta.get('date_display') or ''
     read_time = ''
     if meta_m:
         meta = meta_m.group(1)
-        author_m = re.search(r'<strong>(.*?)</strong>', meta, re.S)
-        time_m = re.search(r'<time datetime="([^"]+)">([^<]+)</time>', meta)
         read_m = re.search(r'<span>(\d+\s*min read)</span>', meta)
-        if author_m:
-            author = html.unescape(author_m.group(1)).strip()
-        if time_m:
-            date_iso = time_m.group(1)
-            date_label = html.unescape(time_m.group(2)).strip()
         if read_m:
             read_time = read_m.group(1)
 

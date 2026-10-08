@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Robi Report" />
+  <meta name="theme-color" content="#10B981" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link rel="manifest" href="../../../site.webmanifest" />
-  <title>{PAGE_TITLE} — Robi Report</title>
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="manifest" href="/manifest.json" />
+<title>{PAGE_TITLE} — Robi Report</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -912,7 +916,7 @@
 
       <span class="article-tag">{{CATEGORY}}</span>
       <h1 class="article-title">{{TITLE}}</h1>
-      <div class="article-meta">
+      <div class="article-meta" data-author="{{AUTHOR}}" data-sources="">
         <strong>{{AUTHOR}}</strong>
         <span class="dot"></span>
         <time datetime="{{DATE_ISO}}">{{DATE_DISPLAY}}</time>
