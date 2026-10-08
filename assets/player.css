@@ -325,6 +325,40 @@
   color: var(--text-primary);
 }
 
+.player-table .player-team-cell {
+  text-align: left;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.player-table .player-team-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+}
+
+.player-table .player-team-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.player-table .player-team-abbr {
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.player-table .player-team-total {
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 .player-table .result-w {
   color: #86efac;
   font-weight: 600;
