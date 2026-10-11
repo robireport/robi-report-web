@@ -1,7 +1,7 @@
 Add-Type -AssemblyName System.Drawing
 
 $root = Split-Path -Parent $PSScriptRoot
-$srcPath = Join-Path $root 'assets/Squared logo.png'
+$srcPath = Join-Path $root 'assets/images/emerald-r-logo.png'
 
 function New-PaddedIcon {
     param(

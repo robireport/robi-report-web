@@ -20,6 +20,7 @@ PUBLISHER_LOGO = f'{SITE_ORIGIN}{BRAND_LOGO_PATH}'
 DEFAULT_OG_IMAGE = PUBLISHER_LOGO
 DEFAULT_OG_IMAGE_ALT = 'Robi Report logo, emerald R mark'
 THEME_COLOR = '#10B981'
+BRAND_FAVICON_VERSION = '2'
 YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@RobiReportt'
 
 
@@ -29,6 +30,13 @@ def absolute_site_url(path: str) -> str:
     if not path.startswith('/'):
         path = f'/{path}'
     return f'{SITE_ORIGIN}{path}'
+
+
+def versioned_asset_url(path: str, *, version: str = BRAND_FAVICON_VERSION) -> str:
+    base = absolute_site_url(path)
+    if '?' in base:
+        return base
+    return f'{base}?v={version}'
 
 
 def build_brand_logo_image_object() -> dict[str, Any]:
@@ -46,6 +54,7 @@ def build_brand_logo_image_object() -> dict[str, Any]:
 def build_head_icon_link_tags() -> str:
     """Absolute favicon / PWA icon links for crawlers and mobile bookmarks."""
     icons = [
+        ('icon', 'image/png', '192x192', '/favicon.png'),
         ('icon', 'image/png', '512x512', '/android-chrome-512x512.png'),
         ('icon', 'image/png', '192x192', '/android-chrome-192x192.png'),
         ('icon', 'image/png', '32x32', '/favicon-32x32.png'),
@@ -56,16 +65,19 @@ def build_head_icon_link_tags() -> str:
     ]
     lines = [f'  <meta name="theme-color" content="{THEME_COLOR}" />']
     for rel, mime, sizes, href in icons:
-        attrs = f'rel="{rel}" href="{absolute_site_url(href)}"'
+        versioned_href = versioned_asset_url(href)
+        attrs = f'rel="{rel}" href="{versioned_href}"'
         if mime:
-            attrs = f'rel="{rel}" type="{mime}" href="{absolute_site_url(href)}"'
+            attrs = f'rel="{rel}" type="{mime}" href="{versioned_href}"'
         if sizes and sizes != 'any':
             attrs += f' sizes="{sizes}"'
         elif sizes == 'any':
             attrs += ' sizes="any"'
         lines.append(f'  <link {attrs} />')
-    lines.append(f'  <link rel="manifest" href="{absolute_site_url("/site.webmanifest")}" />')
-    lines.append(f'  <link rel="manifest" href="{absolute_site_url("/manifest.json")}" />')
+    manifest_v = versioned_asset_url('/site.webmanifest')
+    manifest_json_v = versioned_asset_url('/manifest.json')
+    lines.append(f'  <link rel="manifest" href="{manifest_v}" />')
+    lines.append(f'  <link rel="manifest" href="{manifest_json_v}" />')
     return '\n'.join(lines) + '\n'
 
 CATEGORY_HUB_LABELS: dict[str, str] = {
