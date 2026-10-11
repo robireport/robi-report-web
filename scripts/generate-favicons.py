@@ -13,12 +13,14 @@ FALLBACK_SOURCE = ROOT / 'assets' / 'Squared logo.png'
 CANONICAL_BRAND_DIR = ROOT / 'assets' / 'images'
 CANONICAL_BRAND_FILE = CANONICAL_BRAND_DIR / 'emerald-r-logo.png'
 OUTPUTS = {
+    'favicon.png': 192,
     'android-chrome-512x512.png': 512,
     'android-chrome-192x192.png': 192,
     'apple-touch-icon.png': 180,
     'favicon-32x32.png': 32,
     'favicon-16x16.png': 16,
 }
+LEGACY_NAV_LOGO = ROOT / 'assets' / 'logo.png'
 
 
 def remove_dark_background(image: Image.Image, threshold: int = 32) -> Image.Image:
@@ -82,10 +84,11 @@ def load_source_logo() -> Image.Image:
 
 def publish_canonical_brand_logo(source: Image.Image) -> None:
     CANONICAL_BRAND_DIR.mkdir(parents=True, exist_ok=True)
-    if source.mode != 'RGB':
-        source = source.convert('RGB')
-    source.save(CANONICAL_BRAND_FILE, format='PNG', optimize=True)
+    rgb = source.convert('RGB') if source.mode != 'RGB' else source
+    rgb.save(CANONICAL_BRAND_FILE, format='PNG', optimize=True)
     print(f'Wrote {CANONICAL_BRAND_FILE.relative_to(ROOT).as_posix()}')
+    rgb.save(LEGACY_NAV_LOGO, format='PNG', optimize=True)
+    print(f'Wrote {LEGACY_NAV_LOGO.relative_to(ROOT).as_posix()} (nav alias)')
 
 
 def main() -> int:

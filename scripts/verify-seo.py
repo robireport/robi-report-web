@@ -11,6 +11,7 @@ from pathlib import Path
 
 from article_lib import EM_DASH, iter_source_articles
 from seo_lib import (
+    BRAND_FAVICON_VERSION,
     PUBLISHER_LOGO,
     ROOT,
     SECTION_PAGE_SEO,
@@ -188,6 +189,7 @@ def verify_branding_assets() -> list[str]:
     errors: list[str] = []
     required_root_icons = (
         'favicon.ico',
+        'favicon.png',
         'favicon-16x16.png',
         'favicon-32x32.png',
         'apple-touch-icon.png',
@@ -202,13 +204,16 @@ def verify_branding_assets() -> list[str]:
             errors.append(f'missing root branding asset: {name}')
 
     index = (ROOT / 'index.html').read_text(encoding='utf-8')
+    favicon_bust = f'href="{SITE_ORIGIN}/favicon.png?v={BRAND_FAVICON_VERSION}"'
     for needle in (
         'rel="apple-touch-icon"',
-        f'href="{SITE_ORIGIN}/android-chrome-192x192.png"',
-        f'href="{SITE_ORIGIN}/android-chrome-512x512.png"',
+        favicon_bust,
+        f'href="{SITE_ORIGIN}/favicon.ico?v={BRAND_FAVICON_VERSION}"',
+        f'href="{SITE_ORIGIN}/android-chrome-192x192.png?v={BRAND_FAVICON_VERSION}"',
+        f'href="{SITE_ORIGIN}/android-chrome-512x512.png?v={BRAND_FAVICON_VERSION}"',
         'rel="shortcut icon"',
         'name="theme-color"',
-        f'href="{SITE_ORIGIN}/site.webmanifest"',
+        f'href="{SITE_ORIGIN}/site.webmanifest?v={BRAND_FAVICON_VERSION}"',
         PUBLISHER_LOGO,
         'id="robi-site-schema"',
     ):
