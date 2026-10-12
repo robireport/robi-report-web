@@ -11,10 +11,236 @@
     boxing: { category: 'mma', league: 'ufc', hub: 'boxing.html', label: 'Boxing' },
   };
 
-  const SEASON_PILL_STATS = ['PTS', 'REB', 'AST', 'STL', 'BLK', 'TO', 'MIN', 'FG%', '3P%', 'FT%'];
-  const GAME_PERF_STATS = ['PTS', 'REB', 'AST', 'STL', 'BLK', '+/-'];
-  const CAREER_TABLE_COLS = ['GP', 'MIN', 'PTS', 'REB', 'AST', 'STL', 'BLK', 'FG%', '3P%', 'FT%'];
-  const GAMELOG_COLS = ['MIN', 'PTS', 'REB', 'AST', 'STL', 'BLK', 'TO', 'FG', '3PT', 'FT'];
+  const BASKETBALL_STAT_PROFILE = {
+    avgCategory: 'Regular Season Averages',
+    totalsCategory: 'Regular Season Totals',
+    enrichCategories: ['Regular Season Averages', 'Regular Season Totals'],
+    seasonPills: ['PTS', 'REB', 'AST', 'STL', 'BLK', 'TO', 'MIN', 'FG%', '3P%', 'FT%'],
+    gamePerf: ['PTS', 'REB', 'AST', 'STL', 'BLK', '+/-'],
+    careerCols: ['GP', 'MIN', 'PTS', 'REB', 'AST', 'STL', 'BLK', 'FG%', '3P%', 'FT%'],
+    totalsCols: ['GP', 'MIN', 'PTS', 'REB', 'AST', 'STL', 'BLK'],
+    gamelogCols: ['MIN', 'PTS', 'REB', 'AST', 'STL', 'BLK', 'TO', 'FG', '3PT', 'FT'],
+    tableHighlights: ['PTS', 'REB', 'AST'],
+    seasonHighs: [
+      { key: 'PTS', label: 'Points' },
+      { key: 'REB', label: 'Rebounds' },
+      { key: 'AST', label: 'Assists' },
+    ],
+  };
+
+  const MLB_STAT_PROFILE = {
+    avgCategory: 'Career Batting',
+    totalsCategory: 'Career Batting',
+    enrichCategories: ['Career Batting'],
+    seasonPills: ['AVG', 'HR', 'RBI', 'H', 'R', 'SB', 'OPS', 'OBP', 'SLG'],
+    gamePerf: ['AB', 'H', 'R', 'HR', 'RBI', 'BB', 'SO'],
+    careerCols: ['GP', 'AVG', 'HR', 'RBI', 'H', 'R', 'SB', 'OPS', 'OBP', 'SLG'],
+    totalsCols: ['GP', 'AB', 'H', 'HR', 'RBI', 'R', 'BB', 'SO'],
+    gamelogCols: ['AB', 'R', 'H', 'HR', 'RBI', 'BB', 'SO', 'AVG'],
+    tableHighlights: ['AVG', 'HR', 'RBI'],
+    seasonHighs: [
+      { key: 'H', label: 'Hits' },
+      { key: 'HR', label: 'Home Runs' },
+      { key: 'RBI', label: 'RBIs' },
+    ],
+  };
+
+  const NFL_STAT_ALIASES = {
+    LONG: ['LONG', 'LNG'],
+    TAR: ['TAR', 'TGTS', 'TGT'],
+    SACKS: ['SACKS', 'SACK'],
+    'C/ATT': ['C/ATT', 'CMP/ATT'],
+  };
+
+  const NFL_STAT_PROFILES = {
+    qb: {
+      primaryCategory: 'Passing',
+      totalsCategory: 'Scoring',
+      enrichCategories: ['Passing', 'Scoring'],
+      boxBlock: 'passing',
+      seasonPills: ['C/ATT', 'YDS', 'TD', 'INT', 'SACKS', 'RTG'],
+      gamePerf: ['C/ATT', 'YDS', 'TD', 'INT', 'SACKS', 'RTG'],
+      careerCols: ['GP', 'CMP', 'ATT', 'CMP%', 'YDS', 'AVG', 'TD', 'INT', 'SACK', 'RTG'],
+      totalsCols: ['GP', 'PASS', 'RUSH', 'TD', 'PTS'],
+      gamelogCols: [
+        { header: 'C/ATT', special: 'cmpAtt' },
+        { header: 'YDS', label: 'YDS', occ: 0 },
+        { header: 'TD', label: 'TD', occ: 0 },
+        { header: 'INT', label: 'INT', occ: 0 },
+        { header: 'RTG', label: 'RTG', occ: 0 },
+        { header: 'CAR', label: 'CAR', occ: 0 },
+        { header: 'R-YDS', label: 'YDS', occ: 1 },
+        { header: 'R-TD', label: 'TD', occ: 1 },
+      ],
+      tableHighlights: ['YDS', 'TD', 'INT', 'RTG'],
+      seasonHighs: [
+        { key: 'YDS', label: 'Pass Yards', occ: 0 },
+        { key: 'TD', label: 'Pass TDs', occ: 0 },
+      ],
+    },
+    rb: {
+      primaryCategory: 'Rushing',
+      totalsCategory: 'Scoring',
+      enrichCategories: ['Rushing', 'Scoring'],
+      boxBlock: 'rushing',
+      seasonPills: ['CAR', 'YDS', 'AVG', 'TD', 'LONG', 'FUM'],
+      gamePerf: ['CAR', 'YDS', 'AVG', 'TD', 'LONG', 'FUM'],
+      careerCols: ['GP', 'CAR', 'YDS', 'AVG', 'TD', 'LNG', 'FUM', 'LST'],
+      totalsCols: ['GP', 'RUSH', 'REC', 'TD', 'PTS'],
+      gamelogCols: [
+        { header: 'CAR', label: 'CAR', occ: 0 },
+        { header: 'YDS', label: 'YDS', occ: 0 },
+        { header: 'AVG', label: 'AVG', occ: 0 },
+        { header: 'TD', label: 'TD', occ: 0 },
+        { header: 'LONG', label: 'LNG', occ: 0 },
+        { header: 'FUM', label: 'FUM', occ: 0 },
+      ],
+      tableHighlights: ['YDS', 'AVG', 'TD', 'CAR'],
+      seasonHighs: [
+        { key: 'YDS', label: 'Rush Yards', occ: 0 },
+        { key: 'TD', label: 'Rush TDs', occ: 0 },
+      ],
+    },
+    receiver: {
+      primaryCategory: 'Receiving',
+      totalsCategory: 'Scoring',
+      enrichCategories: ['Receiving', 'Scoring'],
+      boxBlock: 'receiving',
+      seasonPills: ['REC', 'YDS', 'AVG', 'TD', 'LONG', 'TAR'],
+      gamePerf: ['REC', 'YDS', 'AVG', 'TD', 'LONG', 'TAR'],
+      careerCols: ['GP', 'REC', 'TGTS', 'YDS', 'AVG', 'TD', 'LNG'],
+      totalsCols: ['GP', 'REC', 'RUSH', 'TD', 'PTS'],
+      gamelogCols: [
+        { header: 'REC', label: 'REC', occ: 0 },
+        { header: 'TAR', label: 'TGTS', occ: 0 },
+        { header: 'YDS', label: 'YDS', occ: 0 },
+        { header: 'AVG', label: 'AVG', occ: 0 },
+        { header: 'TD', label: 'TD', occ: 0 },
+        { header: 'LONG', label: 'LNG', occ: 0 },
+      ],
+      tableHighlights: ['REC', 'YDS', 'TD', 'AVG'],
+      seasonHighs: [
+        { key: 'REC', label: 'Receptions', occ: 0 },
+        { key: 'YDS', label: 'Rec Yards', occ: 0 },
+      ],
+    },
+    defense: {
+      primaryCategory: 'Defense',
+      totalsCategory: 'Scoring',
+      enrichCategories: ['Defense', 'Scoring'],
+      boxBlock: 'defensive',
+      seasonPills: ['TOT', 'SOLO', 'SACK', 'INT', 'PD', 'FF'],
+      gamePerf: ['TOT', 'SOLO', 'SACK', 'INT', 'PD', 'FF'],
+      careerCols: ['GP', 'TOT', 'SOLO', 'SACK', 'INT', 'PD', 'FF'],
+      totalsCols: ['GP', 'TD', 'PTS'],
+      gamelogCols: ['TOT', 'SOLO', 'SACK', 'INT', 'PD', 'FF'],
+      tableHighlights: ['TOT', 'SACK', 'INT', 'PD'],
+      seasonHighs: [
+        { key: 'TOT', label: 'Tackles', occ: 0 },
+        { key: 'SACK', label: 'Sacks', occ: 0 },
+      ],
+    },
+    kicker: {
+      primaryCategory: 'Kicking',
+      totalsCategory: 'Scoring',
+      enrichCategories: ['Kicking', 'Scoring'],
+      boxBlock: 'kicking',
+      seasonPills: ['FG', 'FG%', 'LNG', 'XPM', 'XPA', 'PTS'],
+      gamePerf: ['FG', 'PCT', 'LONG', 'XP', 'PTS'],
+      careerCols: ['GP', 'FG', 'FG%', 'LNG', 'XPM', 'XPA', 'PTS'],
+      totalsCols: ['GP', 'FG', 'PAT', 'PTS'],
+      gamelogCols: ['FG', 'PCT', 'LONG', 'XP', 'PTS'],
+      tableHighlights: ['FG', 'PTS'],
+      seasonHighs: [{ key: 'PTS', label: 'Points', occ: 0 }],
+    },
+    punter: {
+      primaryCategory: 'Punting',
+      totalsCategory: 'Scoring',
+      enrichCategories: ['Punting', 'Scoring'],
+      boxBlock: 'punting',
+      seasonPills: ['NO', 'YDS', 'AVG', 'TB', 'LONG'],
+      gamePerf: ['NO', 'YDS', 'AVG', 'TB', 'LONG'],
+      careerCols: ['GP', 'NO', 'YDS', 'AVG', 'TB', 'LNG'],
+      totalsCols: ['GP', 'PTS'],
+      gamelogCols: ['NO', 'YDS', 'AVG', 'TB', 'LONG'],
+      tableHighlights: ['YDS', 'AVG'],
+      seasonHighs: [{ key: 'YDS', label: 'Punt Yards', occ: 0 }],
+    },
+  };
+
+  function resolveNflPositionGroup(position) {
+    const p = String(position || '')
+      .toUpperCase()
+      .replace(/[^A-Z0-9/]/g, '');
+    if (p.includes('QB') || p.includes('QUARTERBACK')) return 'qb';
+    if (/^(RB|FB|HB)/.test(p) || p.includes('RUNNING')) return 'rb';
+    if (/^(WR|TE)/.test(p) || p.includes('WIDE') || p.includes('TIGHT')) return 'receiver';
+    if (/^(K|PK)$/.test(p) || p.includes('KICKER')) return 'kicker';
+    if (/^P$/.test(p) || p.includes('PUNTER')) return 'punter';
+    return 'defense';
+  }
+
+  function getStatProfile(sportKey, position) {
+    if (sportKey === 'nfl') {
+      return NFL_STAT_PROFILES[resolveNflPositionGroup(position)] || NFL_STAT_PROFILES.defense;
+    }
+    if (sportKey === 'mlb') return MLB_STAT_PROFILE;
+    return BASKETBALL_STAT_PROFILE;
+  }
+
+  function labelIndexAt(labels, label, occurrence) {
+    const occ = occurrence || 0;
+    let seen = 0;
+    for (let i = 0; i < labels.length; i += 1) {
+      if (labels[i] === label) {
+        if (seen === occ) return i;
+        seen += 1;
+      }
+    }
+    return -1;
+  }
+
+  function statAtAliases(labels, stats, displayLabel) {
+    const aliases = NFL_STAT_ALIASES[displayLabel] || [displayLabel];
+    for (const alias of aliases) {
+      const i = labels.indexOf(alias);
+      if (i >= 0) return fallback(stats[i]);
+    }
+    if (displayLabel === 'C/ATT') {
+      const cmpIdx = labels.indexOf('CMP');
+      const attIdx = labels.indexOf('ATT');
+      if (cmpIdx >= 0 || attIdx >= 0) {
+        const cmp = cmpIdx >= 0 ? fallback(stats[cmpIdx]) : '0';
+        const att = attIdx >= 0 ? fallback(stats[attIdx]) : '0';
+        return `${cmp}/${att}`;
+      }
+    }
+    if (displayLabel === 'LONG') {
+      const lng = labelIndexAt(labels, 'LNG', 0);
+      if (lng >= 0) return fallback(stats[lng]);
+    }
+    if (displayLabel === 'TAR') {
+      for (const alias of ['TGTS', 'TGT', 'TAR']) {
+        const i = labels.indexOf(alias);
+        if (i >= 0) return fallback(stats[i]);
+      }
+    }
+    if (displayLabel === 'SACK') {
+      for (const alias of ['SACK', 'SACKS']) {
+        const i = labels.indexOf(alias);
+        if (i >= 0) return fallback(stats[i]);
+      }
+    }
+    return statAt(labels, stats, displayLabel);
+  }
+
+  function parseSportStatsCategory(statsData, profile, kind) {
+    const name =
+      kind === 'totals'
+        ? profile.totalsCategory || profile.primaryCategory || profile.avgCategory
+        : profile.avgCategory || profile.primaryCategory;
+    return parseStatsCategory(statsData, name);
+  }
 
   const els = {
     loading: document.getElementById('player-loading'),
@@ -198,17 +424,13 @@
     return yearRows.find((r) => r.isSeasonTotal) || yearRows[0] || null;
   }
 
-  function computeSeasonHighs(gamelogData, labels) {
+  function computeSeasonHighs(gamelogData, labels, profile) {
     const { rows } = parseGamelog(gamelogData);
     if (!rows.length) return [];
-    const track = [
-      { key: 'PTS', label: 'Points' },
-      { key: 'REB', label: 'Rebounds' },
-      { key: 'AST', label: 'Assists' },
-    ];
+    const track = profile?.seasonHighs || BASKETBALL_STAT_PROFILE.seasonHighs;
     const highs = [];
-    track.forEach(({ key, label }) => {
-      const idx = labels.indexOf(key);
+    track.forEach(({ key, label, occ }) => {
+      const idx = occ != null ? labelIndexAt(labels, key, occ) : labels.indexOf(key);
       if (idx < 0) return;
       let best = null;
       rows.forEach((row) => {
@@ -359,7 +581,9 @@
       if (label === 'GP' || label === 'GS') return '0';
       if (label.includes('%')) return '';
       if (label === 'FG' || label === '3PT' || label === 'FT') return '0-0';
+      if (label === 'C/ATT' || label === 'CMP/ATT') return '0/0';
       if (label === 'MIN' && mode === 'avg') return '0.0';
+      if (label === 'AVG' && mode === 'avg') return '0.0';
       if (/^(MIN|PTS|REB|AST|STL|BLK|TO|OR|DR|PF)$/.test(label)) return '0';
       return '0';
     });
@@ -401,10 +625,12 @@
     return `DNP - ${detail}`;
   }
 
-  function applyCareerTimelineEnrichment(statsData, siteAthlete, bioData, league) {
+  function applyCareerTimelineEnrichment(statsData, siteAthlete, bioData, league, profile) {
     if (!statsData?.categories?.length) return statsData;
 
-    const avgCat = statsData.categories.find((c) => c.displayName === 'Regular Season Averages');
+    const statProfile = profile || BASKETBALL_STAT_PROFILE;
+    const avgCatName = statProfile.avgCategory || statProfile.primaryCategory;
+    const avgCat = statsData.categories.find((c) => c.displayName === avgCatName);
     const sampleNames = (avgCat?.statistics || []).map((s) => s.season?.displayName).filter(Boolean);
     const teamHistory = bioData?.teamHistory || [];
     let expected = expandTeamHistorySeasons(teamHistory, league, sampleNames);
@@ -472,8 +698,13 @@
       });
     };
 
+    const enrichNames = statProfile.enrichCategories || [
+      statProfile.avgCategory,
+      statProfile.totalsCategory,
+    ].filter(Boolean);
+
     statsData.categories.forEach((cat) => {
-      if (cat.displayName === 'Regular Season Averages' || cat.displayName === 'Regular Season Totals') {
+      if (enrichNames.includes(cat.displayName)) {
         enrichCategory(cat);
       }
     });
@@ -489,7 +720,9 @@
     if (label.includes('%') || value === '' || value === null || value === undefined) return '-';
     if (label === 'FG' || label === '3PT' || label === 'FT') return '0-0';
     if (label === 'MIN' && row.statsMode === 'avg') return '0.0';
-    if (/^(GS|MIN|PTS|REB|AST|STL|BLK|TO|OR|DR|PF)$/.test(label)) return '0';
+    if (/^(GS|MIN|PTS|REB|AST|STL|BLK|TO|OR|DR|PF|CMP|ATT|CAR|REC|YDS|TD|INT|TOT|SOLO|SACK|AB|H|HR|RBI|R)$/.test(label)) {
+      return '0';
+    }
     return '-';
   }
 
@@ -652,7 +885,7 @@
     return `<div class="player-table-wrap"><table class="player-table"><thead><tr><th>${escapeHtml(firstColLabel)}</th>${teamHead}${awardsHead}${head}</tr></thead><tbody>${body}</tbody></table></div>`;
   }
 
-  function buildFilteredStatsTable(allLabels, rows, wantedCols, firstColLabel, firstColFn, tableOpts) {
+  function buildFilteredStatsTable(allLabels, rows, wantedCols, firstColLabel, firstColFn, tableOpts, highlightLabels) {
     if (!rows.length) {
       return '<div class="player-empty">Statistics not available.</div>';
     }
@@ -667,17 +900,18 @@
       stats: indices.map((i) => row.stats[i] ?? '-'),
     }));
 
-    return buildStatsTable(labels, filteredRows, firstColLabel, firstColFn, ['PTS', 'REB', 'AST'], tableOpts);
+    const highlight = highlightLabels || tableOpts?.tableHighlights || BASKETBALL_STAT_PROFILE.tableHighlights;
+    return buildStatsTable(labels, filteredRows, firstColLabel, firstColFn, highlight, tableOpts);
   }
 
-  function buildSeasonAveragesCard(statsData) {
-    const { labels, rows } = parseStatsCategory(statsData, 'Regular Season Averages');
+  function buildSeasonAveragesCard(statsData, profile) {
+    const { labels, rows } = parseSportStatsCategory(statsData, profile, 'avg');
     if (!rows.length) return null;
 
     const latest = rows[0];
-    const pills = SEASON_PILL_STATS.map((key) => ({
+    const pills = (profile.seasonPills || BASKETBALL_STAT_PROFILE.seasonPills).map((key) => ({
       label: key,
-      value: statAt(labels, latest.stats, key),
+      value: sport === 'nfl' ? statAtAliases(labels, latest.stats, key) : statAt(labels, latest.stats, key),
     }));
 
     return { season: latest.season, pills };
@@ -709,20 +943,60 @@
     return { labels, rows: gameRows };
   }
 
-  function buildGamelogTable(gamelogData) {
+  function resolveGamelogColumns(labels, profile) {
+    const specs = profile?.gamelogCols || BASKETBALL_STAT_PROFILE.gamelogCols;
+    const resolved = [];
+    specs.forEach((spec) => {
+      if (typeof spec === 'string') {
+        const i = labels.indexOf(spec);
+        if (i >= 0) resolved.push({ header: spec, index: i });
+        return;
+      }
+      if (spec.special === 'cmpAtt') {
+        const cmpIdx = labels.indexOf('CMP');
+        const attIdx = labels.indexOf('ATT');
+        if (cmpIdx >= 0 || attIdx >= 0) {
+          resolved.push({
+            header: spec.header || 'C/ATT',
+            index: -1,
+            format: (stats) => {
+              const cmp = cmpIdx >= 0 ? fallback(stats[cmpIdx]) : '0';
+              const att = attIdx >= 0 ? fallback(stats[attIdx]) : '0';
+              return `${cmp}/${att}`;
+            },
+          });
+        }
+        return;
+      }
+      const idx = labelIndexAt(labels, spec.label, spec.occ ?? 0);
+      if (idx >= 0) resolved.push({ header: spec.header || spec.label, index: idx });
+    });
+    return resolved;
+  }
+
+  function buildGamelogTable(gamelogData, profile) {
     const { labels, rows } = parseGamelog(gamelogData);
     if (!rows.length) {
       return '<div class="player-empty">No game log entries for this season.</div>';
     }
 
-    const { indices, labels: displayLabels } = filterColumns(labels, GAMELOG_COLS);
-    const head = displayLabels.map((l) => `<th>${escapeHtml(l)}</th>`).join('');
+    const columns = resolveGamelogColumns(labels, profile);
+    if (!columns.length) {
+      return '<div class="player-empty">No game log entries for this season.</div>';
+    }
+
+    const head = columns.map((c) => `<th>${escapeHtml(c.header)}</th>`).join('');
 
     const body = rows
       .map((row) => {
         const opp = `${escapeHtml(row.atVs)} ${escapeHtml(row.opponent)}`;
         const resultCls = row.result === 'W' ? 'result-w' : row.result === 'L' ? 'result-l' : '';
-        const statCells = indices.map((i) => `<td>${escapeHtml(fallback(row.stats[i]))}</td>`).join('');
+        const statCells = columns
+          .map((col) => {
+            const val = col.format ? col.format(row.stats) : fallback(row.stats[col.index]);
+            return `<td>${escapeHtml(val)}</td>`;
+          })
+          .join('');
         const gameLink = row.eventId
           ? `<a class="game-link" href="game.html?sport=${escapeHtml(sport)}&gameId=${escapeHtml(row.eventId)}">Box</a>`
           : '-';
@@ -741,22 +1015,30 @@
     return `<div class="player-table-wrap"><table class="player-table"><thead><tr><th>Date</th><th>Opp</th><th>W/L</th><th>Score</th>${head}<th></th></tr></thead><tbody>${body}</tbody></table></div>`;
   }
 
-  function findPlayerInSummary(summaryData, id) {
+  function findPlayerInSummary(summaryData, id, boxBlockHint) {
     const pid = String(id);
+    const matches = [];
     for (const tg of summaryData?.boxscore?.players || []) {
       for (const block of tg.statistics || []) {
         for (const row of block.athletes || []) {
           if (String(row.athlete?.id || '') === pid) {
-            return {
+            matches.push({
               labels: block.labels || [],
               stats: row.stats || [],
               team: tg.team,
-            };
+              blockName: (block.name || block.type || '').toLowerCase(),
+            });
           }
         }
       }
     }
-    return null;
+    if (!matches.length) return null;
+    if (boxBlockHint) {
+      const hint = boxBlockHint.toLowerCase();
+      const preferred = matches.find((m) => m.blockName === hint);
+      if (preferred) return preferred;
+    }
+    return matches[0];
   }
 
   function getGameMeta(summaryData) {
@@ -947,10 +1229,10 @@
     `;
   }
 
-  function renderGamePerformance(summaryData, id) {
+  function renderGamePerformance(summaryData, id, profile) {
     if (!gameId) return '';
 
-    const perf = findPlayerInSummary(summaryData, id);
+    const perf = findPlayerInSummary(summaryData, id, profile?.boxBlock);
     const meta = summaryData ? getGameMeta(summaryData) : null;
 
     if (!summaryData) {
@@ -974,9 +1256,10 @@
       `;
     }
 
-    const pills = GAME_PERF_STATS.map((key) => ({
+    const perfKeys = profile?.gamePerf || BASKETBALL_STAT_PROFILE.gamePerf;
+    const pills = perfKeys.map((key) => ({
       label: key,
-      value: statAt(perf.labels, perf.stats, key),
+      value: sport === 'nfl' ? statAtAliases(perf.labels, perf.stats, key) : statAt(perf.labels, perf.stats, key),
     }));
 
     return `
@@ -1018,9 +1301,11 @@
     teamMap,
     awards,
     selectedSeason,
+    statProfile,
   }) {
-    const avgCategory = parseStatsCategory(statsData, 'Regular Season Averages');
-    const totalsCategory = parseStatsCategory(statsData, 'Regular Season Totals');
+    const profile = statProfile || getStatProfile(sport, bio.position);
+    const avgCategory = parseSportStatsCategory(statsData, profile, 'avg');
+    const totalsCategory = parseSportStatsCategory(statsData, profile, 'totals');
     const avgRows = annotateSeasonAwards(avgCategory.rows, awards.byYear);
 
     if (selectedSeason) {
@@ -1039,18 +1324,21 @@
     const careerHtml = buildFilteredStatsTable(
       avgCategory.labels,
       avgRows,
-      CAREER_TABLE_COLS,
+      profile.careerCols || BASKETBALL_STAT_PROFILE.careerCols,
       'Season',
       (row) => escapeHtml(row.season),
-      careerTableOpts
+      careerTableOpts,
+      profile.tableHighlights
     );
 
     const totalsHtml = buildFilteredStatsTable(
       totalsCategory.labels,
       totalsCategory.rows,
-      ['GP', 'MIN', 'PTS', 'REB', 'AST', 'STL', 'BLK'],
+      profile.totalsCols || BASKETBALL_STAT_PROFILE.totalsCols,
       'Season',
-      (row) => escapeHtml(row.season)
+      (row) => escapeHtml(row.season),
+      null,
+      profile.tableHighlights
     );
 
     const seasonMode = Boolean(selectedSeason);
@@ -1059,25 +1347,28 @@
       ? seasonAvgRow
         ? {
             season: selectedSeason.displayName,
-            pills: SEASON_PILL_STATS.map((key) => ({
+            pills: (profile.seasonPills || BASKETBALL_STAT_PROFILE.seasonPills).map((key) => ({
               label: key,
-              value: statAt(avgCategory.labels, seasonAvgRow.stats, key),
+              value:
+                sport === 'nfl'
+                  ? statAtAliases(avgCategory.labels, seasonAvgRow.stats, key)
+                  : statAt(avgCategory.labels, seasonAvgRow.stats, key),
             })),
           }
         : null
-      : buildSeasonAveragesCard(statsData);
+      : buildSeasonAveragesCard(statsData, profile);
 
     const gamelogSub = seasonMode ? `${selectedSeason.displayName} Regular Season` : `${currentSeasonYear()} Season`;
-    const gamelogHtml = buildGamelogTable(gamelogData);
+    const gamelogHtml = buildGamelogTable(gamelogData, profile);
     const seasonAwards = seasonMode ? awards.byYear.get(selectedSeason.year) || [] : [];
-    const seasonHighs = seasonMode ? computeSeasonHighs(gamelogData, gamelogData?.labels || []) : [];
+    const seasonHighs = seasonMode ? computeSeasonHighs(gamelogData, gamelogData?.labels || [], profile) : [];
 
     els.content.innerHTML = `
       ${renderHero(bio, cfg, awards.career)}
       ${seasonMode ? renderSeasonBanner(selectedSeason) : ''}
       <div class="player-layout">
         <div class="player-main">
-          ${seasonMode ? '' : renderGamePerformance(summaryData, bio.id)}
+          ${seasonMode ? '' : renderGamePerformance(summaryData, bio.id, profile)}
           ${renderSeasonAverages(seasonCard)}
           ${
             seasonMode
@@ -1153,9 +1444,12 @@
       fetchJsonSafe(newsUrl),
     ]);
 
-    const statsData = applyCareerTimelineEnrichment(statsDataRaw, siteAthlete, bioData, cfg.league);
+    const bioPreview = mergeBio(siteAthlete, coreAthlete);
+    const statProfile = getStatProfile(sport, bioPreview.position);
 
-    const avgCategoryPreview = parseStatsCategory(statsData, 'Regular Season Averages');
+    const statsData = applyCareerTimelineEnrichment(statsDataRaw, siteAthlete, bioData, cfg.league, statProfile);
+
+    const avgCategoryPreview = parseSportStatsCategory(statsData, statProfile, 'avg');
     const selectedSeason = resolveSelectedSeason(seasonParam, avgCategoryPreview.rows);
     const gamelogSeasonYear = selectedSeason?.year || currentSeasonYear();
     const urls = buildUrls(cfg, playerId, gamelogSeasonYear);
@@ -1166,7 +1460,7 @@
       return;
     }
 
-    const bio = mergeBio(siteAthlete, coreAthlete);
+    const bio = bioPreview;
 
     const recentEventIds = parseGamelog(gamelogData)
       .rows.slice(0, 3)
@@ -1202,6 +1496,7 @@
       teamMap,
       awards,
       selectedSeason,
+      statProfile,
     });
 
     const ticker = document.getElementById('score-ticker');
