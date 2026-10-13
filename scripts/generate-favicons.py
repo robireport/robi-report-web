@@ -14,6 +14,7 @@ CANONICAL_BRAND_DIR = ROOT / 'assets' / 'images'
 CANONICAL_BRAND_FILE = CANONICAL_BRAND_DIR / 'emerald-r-logo.png'
 OUTPUTS = {
     'favicon.png': 192,
+    'favicon-v3.png': 192,
     'android-chrome-512x512.png': 512,
     'android-chrome-192x192.png': 192,
     'apple-touch-icon.png': 180,

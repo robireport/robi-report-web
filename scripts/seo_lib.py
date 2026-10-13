@@ -13,14 +13,16 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 SITE_ORIGIN = 'https://robireport.com'
 BRAND_LOGO_PATH = '/assets/images/emerald-r-logo.png'
-BRAND_LOGO_WIDTH = 1024
-BRAND_LOGO_HEIGHT = 1024
+BRAND_FAVICON_PATH = '/favicon-v3.png'
+BRAND_FAVICON_URL = f'{SITE_ORIGIN}{BRAND_FAVICON_PATH}'
+BRAND_LOGO_WIDTH = 192
+BRAND_LOGO_HEIGHT = 192
 BRAND_LOGO_ID = f'{SITE_ORIGIN}/#brand-logo'
-PUBLISHER_LOGO = f'{SITE_ORIGIN}{BRAND_LOGO_PATH}'
-DEFAULT_OG_IMAGE = PUBLISHER_LOGO
+PUBLISHER_LOGO = BRAND_FAVICON_URL
+DEFAULT_OG_IMAGE = BRAND_FAVICON_URL
 DEFAULT_OG_IMAGE_ALT = 'Robi Report logo, emerald R mark'
 THEME_COLOR = '#10B981'
-BRAND_FAVICON_VERSION = '2'
+BRAND_FAVICON_VERSION = '3'
 YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@RobiReportt'
 
 
@@ -53,22 +55,20 @@ def build_brand_logo_image_object() -> dict[str, Any]:
 
 def build_head_icon_link_tags() -> str:
     """Absolute favicon / PWA icon links for crawlers and mobile bookmarks."""
+    favicon_href = BRAND_FAVICON_URL
     icons = [
-        ('icon', 'image/png', '192x192', '/favicon.png'),
-        ('icon', 'image/png', '512x512', '/android-chrome-512x512.png'),
-        ('icon', 'image/png', '192x192', '/android-chrome-192x192.png'),
-        ('icon', 'image/png', '32x32', '/favicon-32x32.png'),
-        ('icon', 'image/png', '16x16', '/favicon-16x16.png'),
-        ('icon', None, 'any', '/favicon.ico'),
-        ('apple-touch-icon', None, '180x180', '/apple-touch-icon.png'),
-        ('shortcut icon', None, None, '/favicon.ico'),
+        ('icon', 'image/png', '192x192', favicon_href),
+        ('icon', 'image/png', '512x512', favicon_href),
+        ('icon', 'image/png', '32x32', favicon_href),
+        ('icon', None, 'any', favicon_href),
+        ('apple-touch-icon', 'image/png', '180x180', favicon_href),
+        ('shortcut icon', None, None, favicon_href),
     ]
     lines = [f'  <meta name="theme-color" content="{THEME_COLOR}" />']
     for rel, mime, sizes, href in icons:
-        versioned_href = versioned_asset_url(href)
-        attrs = f'rel="{rel}" href="{versioned_href}"'
+        attrs = f'rel="{rel}" href="{href}"'
         if mime:
-            attrs = f'rel="{rel}" type="{mime}" href="{versioned_href}"'
+            attrs = f'rel="{rel}" type="{mime}" href="{href}"'
         if sizes and sizes != 'any':
             attrs += f' sizes="{sizes}"'
         elif sizes == 'any':

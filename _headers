@@ -5,6 +5,9 @@
 /favicon.png
   Cache-Control: public, max-age=86400
 
+/favicon-v3.png
+  Cache-Control: public, max-age=86400
+
 /favicon-16x16.png
   Cache-Control: public, max-age=86400
 
