@@ -8,10 +8,11 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE = ROOT / 'assets' / 'emerald-r-logo.png'
-FALLBACK_SOURCE = ROOT / 'assets' / 'Squared logo.png'
+SOURCE = ROOT / 'assets' / 'images' / 'emerald-r-logo.png'
+FALLBACK_SOURCE = ROOT / 'assets' / 'images' / 'emerald-r-logo.png'
 CANONICAL_BRAND_DIR = ROOT / 'assets' / 'images'
 CANONICAL_BRAND_FILE = CANONICAL_BRAND_DIR / 'emerald-r-logo.png'
+OG_COVER_FILE = CANONICAL_BRAND_DIR / 'og-cover-v3.png'
 OUTPUTS = {
     'favicon.png': 192,
     'favicon-v3.png': 192,
@@ -71,6 +72,27 @@ def prepare_square_logo(image: Image.Image, size: int, padding_ratio: float = 0.
     return white
 
 
+def prepare_og_cover(image: Image.Image, width: int = 1200, height: int = 630, padding_ratio: float = 0.14) -> Image.Image:
+    rgba = image.convert('RGBA')
+    bbox = rgba.getbbox()
+    if not bbox:
+        return Image.new('RGB', (width, height), (255, 255, 255))
+
+    cropped = rgba.crop(bbox)
+    max_logo_w = int(width * (1 - padding_ratio * 2))
+    max_logo_h = int(height * (1 - padding_ratio * 2))
+    scale = min(max_logo_w / cropped.width, max_logo_h / cropped.height)
+    logo_w = max(1, int(cropped.width * scale))
+    logo_h = max(1, int(cropped.height * scale))
+    logo = cropped.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
+
+    canvas = Image.new('RGB', (width, height), (255, 255, 255))
+    offset_x = (width - logo_w) // 2
+    offset_y = (height - logo_h) // 2
+    canvas.paste(logo, (offset_x, offset_y), logo)
+    return canvas
+
+
 def load_source_logo() -> Image.Image:
     path = SOURCE if SOURCE.exists() else FALLBACK_SOURCE
     if not path.exists():
@@ -114,6 +136,10 @@ def main() -> int:
         append_images=[img16],
     )
     print(f'Wrote {ico_path.relative_to(ROOT).as_posix()}')
+
+    og_cover = prepare_og_cover(source)
+    og_cover.save(OG_COVER_FILE, format='PNG', optimize=True)
+    print(f'Wrote {OG_COVER_FILE.relative_to(ROOT).as_posix()} (1200x630, white background)')
 
     return 0
 

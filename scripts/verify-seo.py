@@ -11,7 +11,9 @@ from pathlib import Path
 
 from article_lib import EM_DASH, iter_source_articles
 from seo_lib import (
+    BRAND_FAVICON_URL,
     BRAND_FAVICON_VERSION,
+    DEFAULT_OG_IMAGE,
     PUBLISHER_LOGO,
     ROOT,
     SECTION_PAGE_SEO,
@@ -197,6 +199,7 @@ def verify_branding_assets() -> list[str]:
         'android-chrome-192x192.png',
         'android-chrome-512x512.png',
         'assets/images/emerald-r-logo.png',
+        'assets/images/og-cover-v3.png',
         'site.webmanifest',
         'manifest.json',
     )
@@ -205,13 +208,15 @@ def verify_branding_assets() -> list[str]:
             errors.append(f'missing root branding asset: {name}')
 
     index = (ROOT / 'index.html').read_text(encoding='utf-8')
-    favicon_v3 = f'href="{PUBLISHER_LOGO}"'
+    favicon_v3 = f'href="{BRAND_FAVICON_URL}"'
     for needle in (
         'rel="apple-touch-icon"',
         favicon_v3,
         'rel="shortcut icon"',
         'name="theme-color"',
         f'href="{SITE_ORIGIN}/site.webmanifest?v={BRAND_FAVICON_VERSION}"',
+        f'property="og:image" content="{DEFAULT_OG_IMAGE}"',
+        f'name="twitter:image" content="{DEFAULT_OG_IMAGE}"',
         PUBLISHER_LOGO,
         'id="robi-site-schema"',
     ):

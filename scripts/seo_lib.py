@@ -13,14 +13,17 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 SITE_ORIGIN = 'https://robireport.com'
 BRAND_LOGO_PATH = '/assets/images/emerald-r-logo.png'
+BRAND_OG_IMAGE_PATH = '/assets/images/og-cover-v3.png'
 BRAND_FAVICON_PATH = '/favicon-v3.png'
 BRAND_FAVICON_URL = f'{SITE_ORIGIN}{BRAND_FAVICON_PATH}'
-BRAND_LOGO_WIDTH = 192
-BRAND_LOGO_HEIGHT = 192
+BRAND_LOGO_WIDTH = 1024
+BRAND_LOGO_HEIGHT = 1024
+OG_IMAGE_WIDTH = 1200
+OG_IMAGE_HEIGHT = 630
 BRAND_LOGO_ID = f'{SITE_ORIGIN}/#brand-logo'
-PUBLISHER_LOGO = BRAND_FAVICON_URL
-DEFAULT_OG_IMAGE = BRAND_FAVICON_URL
-DEFAULT_OG_IMAGE_ALT = 'Robi Report logo, emerald R mark'
+PUBLISHER_LOGO = f'{SITE_ORIGIN}{BRAND_LOGO_PATH}'
+DEFAULT_OG_IMAGE = f'{SITE_ORIGIN}{BRAND_OG_IMAGE_PATH}'
+DEFAULT_OG_IMAGE_ALT = 'Robi Report — emerald R mark on white'
 THEME_COLOR = '#10B981'
 BRAND_FAVICON_VERSION = '3'
 YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@RobiReportt'
@@ -1007,8 +1010,8 @@ def build_page_head_tags(
         f'  <meta property="og:url" content="{html.escape(canonical_url, quote=True)}" />',
         f'  <meta property="og:image" content="{html.escape(image, quote=True)}" />',
         f'  <meta property="og:image:secure_url" content="{html.escape(image, quote=True)}" />',
-        f'  <meta property="og:image:width" content="{BRAND_LOGO_WIDTH}" />',
-        f'  <meta property="og:image:height" content="{BRAND_LOGO_HEIGHT}" />',
+        f'  <meta property="og:image:width" content="{OG_IMAGE_WIDTH}" />',
+        f'  <meta property="og:image:height" content="{OG_IMAGE_HEIGHT}" />',
         f'  <meta property="og:image:alt" content="{html.escape(image_alt, quote=True)}" />',
         f'  <meta name="twitter:card" content="summary_large_image" />',
         f'  <meta name="twitter:title" content="{html.escape(title, quote=True)}" />',
@@ -1112,8 +1115,8 @@ def build_article_head_tags(
     if image == DEFAULT_OG_IMAGE:
         lines.extend(
             [
-                f'  <meta property="og:image:width" content="{BRAND_LOGO_WIDTH}" />',
-                f'  <meta property="og:image:height" content="{BRAND_LOGO_HEIGHT}" />',
+                f'  <meta property="og:image:width" content="{OG_IMAGE_WIDTH}" />',
+                f'  <meta property="og:image:height" content="{OG_IMAGE_HEIGHT}" />',
                 f'  <meta property="og:image:alt" content="{html.escape(image_alt, quote=True)}" />',
             ]
         )
