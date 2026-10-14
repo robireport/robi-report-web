@@ -11,6 +11,7 @@ from pathlib import Path
 
 from article_lib import EM_DASH, iter_source_articles
 from seo_lib import (
+    BRAND_FAVICON_ICO_URL,
     BRAND_FAVICON_URL,
     BRAND_FAVICON_VERSION,
     DEFAULT_OG_IMAGE,
@@ -195,6 +196,7 @@ def verify_branding_assets() -> list[str]:
         'favicon-v3.png',
         'favicon-16x16.png',
         'favicon-32x32.png',
+        'favicon-48x48.png',
         'apple-touch-icon.png',
         'android-chrome-192x192.png',
         'android-chrome-512x512.png',
@@ -209,9 +211,11 @@ def verify_branding_assets() -> list[str]:
 
     index = (ROOT / 'index.html').read_text(encoding='utf-8')
     favicon_v3 = f'href="{BRAND_FAVICON_URL}"'
+    favicon_ico = f'href="{BRAND_FAVICON_ICO_URL}"'
     for needle in (
         'rel="apple-touch-icon"',
         favicon_v3,
+        favicon_ico,
         'rel="shortcut icon"',
         'name="theme-color"',
         f'href="{SITE_ORIGIN}/site.webmanifest?v={BRAND_FAVICON_VERSION}"',
