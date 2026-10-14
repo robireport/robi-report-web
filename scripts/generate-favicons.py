@@ -19,6 +19,7 @@ OUTPUTS = {
     'android-chrome-512x512.png': 512,
     'android-chrome-192x192.png': 192,
     'apple-touch-icon.png': 180,
+    'favicon-48x48.png': 48,
     'favicon-32x32.png': 32,
     'favicon-16x16.png': 16,
 }
@@ -129,11 +130,12 @@ def main() -> int:
     ico_path = ROOT / 'favicon.ico'
     img16 = Image.open(png_paths[16])
     img32 = Image.open(png_paths[32])
-    img32.save(
+    img48 = Image.open(png_paths[48])
+    img48.save(
         ico_path,
         format='ICO',
-        sizes=[(16, 16), (32, 32)],
-        append_images=[img16],
+        sizes=[(16, 16), (32, 32), (48, 48)],
+        append_images=[img32, img16],
     )
     print(f'Wrote {ico_path.relative_to(ROOT).as_posix()}')
 

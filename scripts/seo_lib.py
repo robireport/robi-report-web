@@ -16,6 +16,8 @@ BRAND_LOGO_PATH = '/assets/images/emerald-r-logo.png'
 BRAND_OG_IMAGE_PATH = '/assets/images/og-cover-v3.png'
 BRAND_FAVICON_PATH = '/favicon-v3.png'
 BRAND_FAVICON_URL = f'{SITE_ORIGIN}{BRAND_FAVICON_PATH}'
+BRAND_FAVICON_ICO_URL = f'{SITE_ORIGIN}/favicon.ico'
+BRAND_APPLE_TOUCH_URL = f'{SITE_ORIGIN}/apple-touch-icon.png'
 BRAND_LOGO_WIDTH = 1024
 BRAND_LOGO_HEIGHT = 1024
 OG_IMAGE_WIDTH = 1200
@@ -58,14 +60,17 @@ def build_brand_logo_image_object() -> dict[str, Any]:
 
 def build_head_icon_link_tags() -> str:
     """Absolute favicon / PWA icon links for crawlers and mobile bookmarks."""
-    favicon_href = BRAND_FAVICON_URL
+    favicon_png = BRAND_FAVICON_URL
+    favicon_48 = f'{SITE_ORIGIN}/favicon-48x48.png'
     icons = [
-        ('icon', 'image/png', '192x192', favicon_href),
-        ('icon', 'image/png', '512x512', favicon_href),
-        ('icon', 'image/png', '32x32', favicon_href),
-        ('icon', None, 'any', favicon_href),
-        ('apple-touch-icon', 'image/png', '180x180', favicon_href),
-        ('shortcut icon', None, None, favicon_href),
+        # Google Search crawls /favicon.ico and <link rel="icon"> on the homepage.
+        ('icon', None, 'any', BRAND_FAVICON_ICO_URL),
+        ('icon', 'image/png', '48x48', favicon_48),
+        ('icon', 'image/png', '32x32', f'{SITE_ORIGIN}/favicon-32x32.png'),
+        ('icon', 'image/png', '16x16', f'{SITE_ORIGIN}/favicon-16x16.png'),
+        ('icon', 'image/png', '192x192', favicon_png),
+        ('apple-touch-icon', 'image/png', '180x180', BRAND_APPLE_TOUCH_URL),
+        ('shortcut icon', None, None, BRAND_FAVICON_ICO_URL),
     ]
     lines = [f'  <meta name="theme-color" content="{THEME_COLOR}" />']
     for rel, mime, sizes, href in icons:
