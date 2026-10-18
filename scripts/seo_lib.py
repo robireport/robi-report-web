@@ -68,7 +68,7 @@ def build_head_icon_link_tags() -> str:
         ('icon', 'image/png', '48x48', favicon_48),
         ('icon', 'image/png', '32x32', f'{SITE_ORIGIN}/favicon-32x32.png'),
         ('icon', 'image/png', '16x16', f'{SITE_ORIGIN}/favicon-16x16.png'),
-        ('icon', 'image/png', '192x192', favicon_png),
+        ('icon', 'image/png', '512x512', favicon_png),
         ('apple-touch-icon', 'image/png', '180x180', BRAND_APPLE_TOUCH_URL),
         ('shortcut icon', None, None, BRAND_FAVICON_ICO_URL),
     ]

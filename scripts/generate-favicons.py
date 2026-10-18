@@ -15,7 +15,7 @@ CANONICAL_BRAND_FILE = CANONICAL_BRAND_DIR / 'emerald-r-logo.png'
 OG_COVER_FILE = CANONICAL_BRAND_DIR / 'og-cover-v3.png'
 OUTPUTS = {
     'favicon.png': 192,
-    'favicon-v3.png': 192,
+    'favicon-v3.png': 512,
     'android-chrome-512x512.png': 512,
     'android-chrome-192x192.png': 192,
     'apple-touch-icon.png': 180,

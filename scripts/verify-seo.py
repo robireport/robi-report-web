@@ -209,6 +209,20 @@ def verify_branding_assets() -> list[str]:
         if not (ROOT / name).is_file():
             errors.append(f'missing root branding asset: {name}')
 
+    favicon_v3_path = ROOT / 'favicon-v3.png'
+    if favicon_v3_path.is_file():
+        try:
+            from PIL import Image
+
+            with Image.open(favicon_v3_path) as img:
+                width, height = img.size
+            if width != height or width < 512:
+                errors.append(
+                    f'favicon-v3.png must be a square PNG at least 512x512 (got {width}x{height})'
+                )
+        except ImportError:
+            pass
+
     index = (ROOT / 'index.html').read_text(encoding='utf-8')
     favicon_v3 = f'href="{BRAND_FAVICON_URL}"'
     favicon_ico = f'href="{BRAND_FAVICON_ICO_URL}"'
