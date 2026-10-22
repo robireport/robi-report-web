@@ -21,6 +21,16 @@
     mlb: 'mlb.html',
   };
 
+  const SCOREBOARD_PAGES = {
+    nba: 'nba-scores.html',
+    wnba: 'wnba-scores.html',
+    nfl: 'nfl-scores.html',
+    ufc: 'ufc-scores.html',
+    boxing: 'boxing-scores.html',
+    epl: 'soccer-scores.html',
+    mlb: 'mlb-scores.html',
+  };
+
   const LEAGUE_SPORT_CODES = {
     nba: 'nba',
     wnba: 'wnba',
@@ -459,8 +469,9 @@
   function renderOrganizer(leagueKey, label) {
     const link = document.createElement('a');
     link.className = 'ticker-organizer';
-    if (leagueKey === 'nba') {
-      link.href = `${getPathPrefix()}nba-scores.html`;
+    const scorePage = SCOREBOARD_PAGES[leagueKey];
+    if (scorePage) {
+      link.href = `${getPathPrefix()}${scorePage}`;
       link.setAttribute('aria-label', `${label} scoreboard`);
       link.classList.add('ticker-organizer--scoreboard');
     } else {
