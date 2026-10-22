@@ -1,0 +1,61 @@
+---
+description: Robi Report end-to-end workflow from code change through verified production on robireport.com
+alwaysApply: true
+---
+
+# Robi Report — End-to-End Deployment
+
+Production URL: **https://robireport.com**  
+Repository: **robireport/robi-report-web**  
+Hosting: GitHub Pages (typically `main` branch, site root `/` — confirm in repo Settings → Pages if deploys look wrong).
+
+## Deliverable
+
+The **live production website** is the final deliverable. Do not stop after editing files, committing, pushing, opening a PR, merging, or seeing a green GitHub Actions / Pages job.
+
+## Before changing code
+
+- Read existing implementation and preserve unrelated behavior.
+- Prefer the smallest safe diff; do not rebuild editorial hubs or unrelated pages unless explicitly requested.
+- Check git status and branch; do not discard the user’s unrelated local work.
+
+## Implement and test locally
+
+- Implement the requested change and sanity-check affected pages or scripts when feasible.
+- Distingu clearly in your report: **local/uncommitted**, **on branch/PR**, **merged to main**, **deployment finished**, and **production verified**.
+
+## Git and GitHub (when permissions allow)
+
+- Use an appropriate feature branch; sync with `origin/main` before branching when needed.
+- Commit with clear messages; push; open or **reuse** an existing PR (no duplicate PRs for the same fix).
+- Wait for required checks; merge only when policy allows (do not bypass branch protection or required reviews).
+- If merge or push requires human approval, state the exact action needed and continue automatically once unblocked.
+
+## Deployment verification (required)
+
+After merge to `main`:
+
+1. Confirm **which commit** is on `origin/main` (e.g. `git fetch` + log, or GitHub API).
+2. Confirm **GitHub Pages** source (branch/path) and that a deploy completed for that commit (Actions or Pages deployment history).
+3. **Verify production assets and pages**, not assumptions:
+   - Fetch live HTML/JS/CSS (HTTP) or use browser automation.
+   - Compare key files/paths to `main` when diagnosing mismatches.
+4. If live files are correct but the browser shows old UI, investigate **caching** (hard refresh, cache-bust query test). Do not treat cache refresh alone as fixing wrong deployed files.
+
+## Diagnosis when “deploy succeeded” but site looks wrong
+
+- Compare PR merge commit vs what production serves.
+- Check for partial deploy (only PR #50 merged, #51 pending), stale local `main`, or CDN/browser cache.
+- Inspect console/network for 404s on scripts or styles.
+
+## Final report to the user
+
+Always include:
+
+- Summary of **code changes** (or “no code change; production already correct”).
+- **Commit / PR** identifiers.
+- **Deployment status** and deployed commit SHA when known.
+- **Production URLs tested** and **what was verified** (HTTP content, browser snapshot, link targets, theme/copy).
+- Any **remaining blocker** and the minimum action only the user can take.
+
+Never claim the site is fixed or deployment is complete without **evidence from production** (live URLs or fetched live assets).
