@@ -1,5 +1,5 @@
 /* Robi Report — NBA Scoreboard Hub (light editorial theme, page-local) */
-body.nba-scores-page {
+body.scores-page {
   --nav-height: 72px;
   --ticker-height: 52px;
   --accent: #10b981;
@@ -36,18 +36,18 @@ html {
   scroll-behavior: smooth;
 }
 
-body.nba-scores-page a {
+body.scores-page a {
   color: inherit;
   text-decoration: none;
 }
 
-body.nba-scores-page img {
+body.scores-page img {
   display: block;
   max-width: 100%;
 }
 
 /* ── Site nav (compatible with score-ticker.css / nav-mobile.css) ── */
-body.nba-scores-page .nav {
+body.scores-page .nav {
   position: fixed;
   top: 0;
   left: 0;
@@ -60,7 +60,7 @@ body.nba-scores-page .nav {
   border-bottom: 1px solid var(--border);
 }
 
-body.nba-scores-page .nav-inner {
+body.scores-page .nav-inner {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 24px;
@@ -70,7 +70,7 @@ body.nba-scores-page .nav-inner {
   justify-content: space-between;
 }
 
-body.nba-scores-page .logo {
+body.scores-page .logo {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -80,18 +80,18 @@ body.nba-scores-page .logo {
   color: var(--text-primary);
 }
 
-body.nba-scores-page .logo-img {
+body.scores-page .logo-img {
   width: 40px;
   height: 40px;
   object-fit: contain;
 }
 
-body.nba-scores-page .logo span {
+body.scores-page .logo span {
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-body.nba-scores-page .nav-links {
+body.scores-page .nav-links {
   display: flex;
   align-items: center;
   gap: 18px;
@@ -100,29 +100,29 @@ body.nba-scores-page .nav-links {
   padding: 0;
 }
 
-body.nba-scores-page .nav-links > li > a {
+body.scores-page .nav-links > li > a {
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-secondary);
   transition: color var(--transition);
 }
 
-body.nba-scores-page .nav-links > li > a:hover {
+body.scores-page .nav-links > li > a:hover {
   color: var(--text-primary);
 }
 
-body.nba-scores-page .nav-links > li > a.active {
+body.scores-page .nav-links > li > a.active {
   color: var(--accent);
   font-weight: 600;
 }
 
-body.nba-scores-page .nav-actions {
+body.scores-page .nav-actions {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-body.nba-scores-page .btn {
+body.scores-page .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -136,17 +136,17 @@ body.nba-scores-page .btn {
   transition: all var(--transition);
 }
 
-body.nba-scores-page .btn-primary {
+body.scores-page .btn-primary {
   background: var(--accent);
   color: #000000;
 }
 
-body.nba-scores-page .btn-primary:hover {
+body.scores-page .btn-primary:hover {
   background: var(--accent-hover);
   box-shadow: 0 0 24px var(--accent-glow);
 }
 
-body.nba-scores-page .nav-toggle {
+body.scores-page .nav-toggle {
   display: none;
   background: none;
   border: none;
@@ -156,7 +156,7 @@ body.nba-scores-page .nav-toggle {
 }
 
 @media (max-width: 900px) {
-  body.nba-scores-page .nav-links {
+  body.scores-page .nav-links {
     display: none;
     position: fixed;
     top: var(--nav-height);
@@ -172,22 +172,22 @@ body.nba-scores-page .nav-toggle {
     border-top: 1px solid var(--border);
   }
 
-  body.nba-scores-page .nav.nav-open .nav-links {
+  body.scores-page .nav.nav-open .nav-links {
     display: flex;
   }
 
-  body.nba-scores-page .nav-links > li {
+  body.scores-page .nav-links > li {
     border-bottom: 1px solid var(--border);
   }
 
-  body.nba-scores-page .nav-links > li > a {
+  body.scores-page .nav-links > li > a {
     display: flex;
     width: 100%;
     padding: 14px 0;
     font-size: 1rem;
   }
 
-  body.nba-scores-page .nav-toggle {
+  body.scores-page .nav-toggle {
     display: block;
   }
 }
@@ -567,4 +567,147 @@ body.nba-scores-page .nav-toggle {
     min-width: 64px;
     padding: 8px;
   }
+}
+
+.nba-scoreboard-card-competition {
+  padding: 8px 14px 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nba-scoreboard-attribution {
+  margin: 24px 0 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.scoreboard-league-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.scoreboard-league-tab {
+  padding: 8px 14px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.scoreboard-league-tab.is-active,
+.scoreboard-league-tab[aria-selected='true'] {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #047857;
+}
+
+.scoreboard-league-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.combat-event-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.combat-event-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.combat-event-card.is-live {
+  border-color: rgba(16, 185, 129, 0.55);
+}
+
+.combat-event-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.combat-event-title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.combat-event-meta {
+  margin: 4px 0 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.combat-event-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.combat-event-status.is-live {
+  color: #059669;
+}
+
+.combat-fight-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.combat-fight-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.combat-fighters {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.combat-fight-status {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.combat-event-link {
+  margin: 0;
+  padding: 12px 16px 16px;
+  font-size: 0.875rem;
+}
+
+.combat-event-link a {
+  color: #059669;
+  font-weight: 600;
+}
+
+.combat-event-empty {
+  margin: 0;
+  padding: 16px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
 }
