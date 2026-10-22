@@ -59,11 +59,15 @@
     return d;
   }
 
-  function buildDayStrip(center) {
-    const start = addDays(center, -3);
+  /** Monday–Sunday week containing the anchor date. */
+  function buildWeekStrip(anchor) {
+    const d = startOfLocalDay(anchor);
+    const weekday = d.getDay();
+    const diffToMonday = weekday === 0 ? -6 : 1 - weekday;
+    const monday = addDays(d, diffToMonday);
     const days = [];
     for (let i = 0; i < DAY_COUNT; i += 1) {
-      days.push(addDays(start, i));
+      days.push(addDays(monday, i));
     }
     return days;
   }
@@ -83,6 +87,10 @@
   function getLogo(team) {
     if (!team) return '';
     return team.logo || team.logos?.[0]?.href || '';
+  }
+
+  function getDisplayName(entity) {
+    return entity?.displayName || entity?.name || entity?.abbreviation || '—';
   }
 
   function getAbbr(entity) {
@@ -131,25 +139,57 @@
     return { text: time || 'Scheduled', cls: 'is-scheduled' };
   }
 
-  function getOddsLine(comp) {
+  function getOddsLines(comp) {
     const odds = comp?.odds?.[0];
-    if (!odds) return '';
-    const parts = [];
-    if (odds.details) parts.push(odds.details);
-    else if (odds.spread != null) {
-      parts.push(`Spread ${odds.spread > 0 ? '+' : ''}${odds.spread}`);
+    if (!odds) return { spread: '', moneyline: '', total: '' };
+
+    const spread =
+      odds.details ||
+      (odds.spread != null ? `Spread ${odds.spread > 0 ? '+' : ''}${odds.spread}` : '');
+
+    let moneyline = '';
+    const ml = odds.moneyline;
+    if (ml?.away?.close?.odds && ml?.home?.close?.odds) {
+      moneyline = `ML ${ml.away.close.odds} / ${ml.home.close.odds}`;
     }
-    if (odds.overUnder != null) parts.push(`O/U ${odds.overUnder}`);
-    return parts.join(' · ');
+
+    let total = '';
+    if (odds.overUnder != null) total = `O/U ${odds.overUnder}`;
+    else if (odds.total?.over?.close?.line) {
+      total = `Total ${odds.total.over.close.line}`;
+    }
+
+    return { spread, moneyline, total };
   }
 
-  function getNotesText(comp, event) {
+  function getPlayersToWatch(comp) {
+    const snippets = [];
+    const seen = new Set();
+
+    (comp?.competitors || []).forEach((c) => {
+      const rating =
+        (c.leaders || []).find((g) => g.name === 'rating') ||
+        (c.leaders || []).find((g) => /rating/i.test(g.name || ''));
+      const leader = rating?.leaders?.[0] || (c.leaders || [])[0]?.leaders?.[0];
+      if (!leader?.athlete) return;
+      const id = leader.athlete.id || leader.athlete.fullName;
+      if (seen.has(id)) return;
+      seen.add(id);
+      const abbr = getAbbr(c.team);
+      const stat =
+        leader.displayValue ||
+        [leader.athlete.shortName, rating?.shortDisplayName].filter(Boolean).join(' ');
+      snippets.push(`${abbr}: ${leader.athlete.shortName || leader.athlete.displayName} (${stat})`);
+    });
+
     const headlines = (comp?.notes || [])
       .map((n) => n.headline || n.text)
       .filter(Boolean);
-    if (headlines.length) return headlines.join(' · ');
-    if (event?.shortName && event.shortName !== event.name) return event.shortName;
-    return '';
+    if (headlines.length && snippets.length < 2) {
+      return headlines.join(' · ');
+    }
+    if (!snippets.length && headlines.length) return headlines.join(' · ');
+    return snippets.slice(0, 3).join(' · ');
   }
 
   function getPathPrefix() {
@@ -181,6 +221,7 @@
     const homeScore = parseInt(home.score, 10);
     const awayWins = isFinal && !Number.isNaN(awayScore) && !Number.isNaN(homeScore) && awayScore > homeScore;
     const homeWins = isFinal && !Number.isNaN(awayScore) && !Number.isNaN(homeScore) && homeScore > awayScore;
+    const odds = getOddsLines(comp);
 
     return {
       id: event.id,
@@ -188,10 +229,11 @@
       status,
       isLive: state === 'in',
       broadcast: getBroadcast(comp),
-      odds: getOddsLine(comp),
-      notes: getNotesText(comp, event),
+      odds,
+      watch: getPlayersToWatch(comp),
       away: {
         abbr: getAbbr(away.team),
+        name: getDisplayName(away.team),
         score: away.score ?? '—',
         logo: getLogo(away.team),
         record: getRecord(away),
@@ -199,6 +241,7 @@
       },
       home: {
         abbr: getAbbr(home.team),
+        name: getDisplayName(home.team),
         score: home.score ?? '—',
         logo: getLogo(home.team),
         record: getRecord(home),
@@ -243,11 +286,22 @@
     const statusCls = game.status.cls ? ` ${game.status.cls}` : '';
     const awayWin = game.away.winner ? ' is-winner' : '';
     const homeWin = game.home.winner ? ' is-winner' : '';
-    const footParts = [];
-    if (game.odds) footParts.push(`<strong>Line:</strong> ${escapeHtml(game.odds)}`);
-    if (game.notes) footParts.push(escapeHtml(game.notes));
-    const footHtml = footParts.length
-      ? `<div class="scoreboard-hub-card-foot">${footParts.join('<br />')}</div>`
+
+    const oddsRows = [];
+    if (game.odds.spread) oddsRows.push(`<span><strong>Spread</strong> ${escapeHtml(game.odds.spread)}</span>`);
+    if (game.odds.moneyline) {
+      oddsRows.push(`<span><strong>ML</strong> ${escapeHtml(game.odds.moneyline.replace(/^ML\s/, ''))}</span>`);
+    }
+    if (game.odds.total) {
+      const totalVal = game.odds.total.replace(/^(Total|O\/U)\s/, '');
+      oddsRows.push(`<span><strong>Total</strong> ${escapeHtml(totalVal)}</span>`);
+    }
+    const oddsHtml = oddsRows.length
+      ? `<div class="scoreboard-hub-card-odds">${oddsRows.join('')}</div>`
+      : '';
+
+    const watchHtml = game.watch
+      ? `<div class="scoreboard-hub-card-watch"><strong>Players to watch:</strong> ${escapeHtml(game.watch)}</div>`
       : '';
 
     return `<a class="scoreboard-hub-card${liveCls}" href="${escapeHtml(game.href)}">
@@ -259,6 +313,7 @@
         ${game.away.logo ? `<img class="scoreboard-hub-team-logo" src="${escapeHtml(game.away.logo)}" alt="" loading="lazy" />` : '<span class="scoreboard-hub-team-logo"></span>'}
         <div class="scoreboard-hub-team-name">
           <div class="scoreboard-hub-team-abbr">${escapeHtml(game.away.abbr)}</div>
+          <div class="scoreboard-hub-team-full">${escapeHtml(game.away.name)}</div>
           ${game.away.record ? `<div class="scoreboard-hub-team-record">${escapeHtml(game.away.record)}</div>` : ''}
         </div>
         <span class="scoreboard-hub-team-score">${escapeHtml(String(game.away.score))}</span>
@@ -267,28 +322,35 @@
         ${game.home.logo ? `<img class="scoreboard-hub-team-logo" src="${escapeHtml(game.home.logo)}" alt="" loading="lazy" />` : '<span class="scoreboard-hub-team-logo"></span>'}
         <div class="scoreboard-hub-team-name">
           <div class="scoreboard-hub-team-abbr">${escapeHtml(game.home.abbr)}</div>
+          <div class="scoreboard-hub-team-full">${escapeHtml(game.home.name)}</div>
           ${game.home.record ? `<div class="scoreboard-hub-team-record">${escapeHtml(game.home.record)}</div>` : ''}
         </div>
         <span class="scoreboard-hub-team-score">${escapeHtml(String(game.home.score))}</span>
       </div>
-      ${footHtml}
+      ${oddsHtml}
+      ${watchHtml}
     </a>`;
   }
 
-  function initHub(root) {
-    const leagueKey = (root.dataset.league || '').toLowerCase();
+  function initPage(page) {
+    const leagueKey = (page.dataset.league || '').toLowerCase();
     const cfg = LEAGUES[leagueKey];
     if (!cfg) return;
+
+    const chrome = page.querySelector('[data-scoreboard-chrome]');
+    const grid = page.querySelector('[data-scoreboard-scores]');
+    if (!chrome || !grid) return;
 
     let selectedDate = readDateFromUrl();
     let refreshTimer = null;
     let weekLabel = '';
 
-    root.innerHTML = `
-      <div class="scoreboard-hub-toolbar">
-        <div>
-          <h2 class="scoreboard-hub-title">${escapeHtml(cfg.label)} Scoreboard</h2>
-          <div class="scoreboard-hub-week-label" data-week-label hidden></div>
+    chrome.innerHTML = `
+      <div class="scoreboard-hub-date-nav" data-date-nav role="tablist" aria-label="Select date"></div>
+      <div class="scoreboard-hub-meta-row">
+        <div class="scoreboard-hub-meta-left">
+          <span class="scoreboard-hub-week-label" data-week-label hidden></span>
+          <span class="scoreboard-hub-status" data-status aria-live="polite"></span>
         </div>
         ${
           cfg.picker === 'week'
@@ -299,19 +361,15 @@
             : ''
         }
       </div>
-      <div class="scoreboard-hub-date-nav" data-date-nav role="tablist" aria-label="Select date"></div>
-      <div class="scoreboard-hub-status" data-status aria-live="polite"></div>
-      <div class="scoreboard-hub-grid" data-grid></div>
     `;
 
-    const dateNav = root.querySelector('[data-date-nav]');
-    const grid = root.querySelector('[data-grid]');
-    const statusEl = root.querySelector('[data-status]');
-    const weekEl = root.querySelector('[data-week-label]');
+    const dateNav = chrome.querySelector('[data-date-nav]');
+    const statusEl = chrome.querySelector('[data-status]');
+    const weekEl = chrome.querySelector('[data-week-label]');
 
     function renderDateNav() {
       const ymd = formatYmd(selectedDate);
-      dateNav.innerHTML = renderDateButtons(buildDayStrip(selectedDate), ymd);
+      dateNav.innerHTML = renderDateButtons(buildWeekStrip(selectedDate), ymd);
     }
 
     async function loadScoreboard() {
@@ -348,7 +406,7 @@
           return;
         }
 
-        grid.innerHTML = games.map(renderCard).join('');
+        grid.innerHTML = `<div class="scoreboard-hub-grid">${games.map(renderCard).join('')}</div>`;
         statusEl.textContent = `${games.length} game${games.length === 1 ? '' : 's'}`;
       } catch (err) {
         console.warn('Scoreboard hub fetch failed:', err);
@@ -377,7 +435,7 @@
       scheduleRefresh();
     });
 
-    root.addEventListener('click', (e) => {
+    page.addEventListener('click', (e) => {
       const shiftBtn = e.target.closest('[data-shift]');
       if (!shiftBtn) return;
       const delta = parseInt(shiftBtn.dataset.shift, 10);
@@ -392,5 +450,20 @@
     scheduleRefresh();
   }
 
-  document.querySelectorAll('[data-scoreboard-hub]').forEach(initHub);
+  document.querySelectorAll('[data-scoreboard-page]').forEach(initPage);
+
+  // Legacy mount (single root)
+  document.querySelectorAll('[data-scoreboard-hub]:not([data-scoreboard-page] *)').forEach((root) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'scoreboard-page scoreboard-page--legacy';
+    wrap.dataset.scoreboardPage = '';
+    wrap.dataset.league = root.dataset.league || '';
+    wrap.innerHTML = `
+      <div class="scoreboard-page-chrome" data-scoreboard-chrome></div>
+      <div class="scoreboard-page-layout">
+        <div class="scoreboard-page-scores" data-scoreboard-scores></div>
+      </div>`;
+    root.replaceWith(wrap);
+    initPage(wrap);
+  });
 })();

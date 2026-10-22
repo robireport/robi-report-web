@@ -959,7 +959,7 @@
   <link rel="stylesheet" href="assets/nav-mobile.css" />
   <link rel="stylesheet" href="assets/articles-empty.css" />
 </head>
-<body>
+<body class="scoreboard-page">
 
   <!-- Navigation -->
   <nav class="nav">
@@ -995,108 +995,14 @@
   </nav>
   <div class="nav-mobile-backdrop" aria-hidden="true"></div>
 
-  <!-- Live Score Ticker -->
-  <div class="score-ticker" id="score-ticker" data-default="nfl">
-    <div class="ticker-viewport">
-      <button type="button" class="ticker-arrow ticker-arrow-left" aria-label="Scroll left">&#8249;</button>
-      <div class="ticker-track-wrap">
-        <div class="ticker-track" id="ticker-track"></div>
-      </div>
-      <button type="button" class="ticker-arrow ticker-arrow-right" aria-label="Scroll right">&#8250;</button>
-    </div>
-  </div>
 
-
-  <!-- Page Header -->
-  <header class="page-header">
-    <div class="page-header-inner">
-      <nav class="hub-breadcrumb" aria-label="Breadcrumb">
-        <a href="index.html">Robi Report</a> / <span aria-current="page">NFL</span>
-      </nav>
-      <h1>NFL</h1>
-      <p>Live scores, schedules, and storylines from around the league</p>
-    </div>
-  </header>
-
-  <section class="scoreboard-hub-section" aria-label="NFL scoreboard">
-    <div class="scoreboard-hub" data-scoreboard-hub data-league="nfl"></div>
-  </section>
-
-  <!-- 3-Column Hub -->
-  <main class="hub">
-
-    <!-- Left Sidebar -->
-    <aside class="hub-left">
-      <div class="widget widget-videos">
-        <div class="widget-header">NFL FEATURED CONTENT</div>
-        <div class="widget-body widget-videos-body">
-          <div class="video-feature">
-            <div class="video-embed-wrap">
-              <iframe
-                src="https://www.youtube.com/embed/Ztguwlw6bNk"
-                title="Making The OBVIOUS Case That Baker Mayfield IS The MVP!, Robi Report"
-                data-description="Making the obvious case that Baker Mayfield is the MVP, NFL analysis from Robi Report."
-                data-upload-date="2025-01-12T00:00:00+00:00"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
-            </div>
-            <a
-              href="https://www.youtube.com/@RobiReportt"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn btn-primary btn-block btn-youtube-more"
-            >Watch More on YouTube</a>
-          </div>
-
-          <div class="video-feature">
-            <div class="video-embed-wrap">
-              <iframe
-                src="https://www.youtube.com/embed/Hv8c9dhZPTg"
-                title="The Ravens Are TERRIBLE And We ALL Know Why, Robi Report"
-                data-description="Why the Baltimore Ravens struggled and what it means for the season, NFL analysis from Robi Report."
-                data-upload-date="2024-12-03T00:00:00+00:00"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
-            </div>
-            <a
-              href="https://www.youtube.com/@RobiReportt"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn btn-primary btn-block btn-youtube-more"
-            >Watch More on YouTube</a>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="widget">
-        <div class="subscribe-card">
-          <h3>Go Premium</h3>
-          <p>Unlock exclusive NFL analysis, film breakdowns, and insider reporting from training camp to the Super Bowl.</p>
-          <button class="btn btn-primary btn-block">Subscribe Now</button>
-        </div>
-      </div>
-
-      <div class="widget">
-        <div class="widget-header">League Shortcuts</div>
-        <div class="league-shortcuts">
-          <a href="nba.html" class="league-pill">NBA</a>
-          <a href="wnba.html" class="league-pill">WNBA</a>
-          <a href="nfl.html" class="league-pill active">NFL</a>
-          <a href="ufc.html" class="league-pill">UFC</a>
-          <a href="boxing.html" class="league-pill">Boxing</a>
-          <a href="soccer.html" class="league-pill">Soccer</a>
-          <a href="mlb.html" class="league-pill">MLB</a>
-        </div>
-      </div>
-    </aside>
-
-    <section class="hub-center">
-      <div class="articles-feed-header">
+  <div class="scoreboard-page" data-scoreboard-page data-league="nfl">
+    <h1 class="visually-hidden">NFL Scoreboard</h1>
+    <div class="scoreboard-page-chrome" data-scoreboard-chrome></div>
+    <div class="scoreboard-page-layout">
+      <div class="scoreboard-page-scores" data-scoreboard-scores></div>
+      <aside class="scoreboard-page-articles" aria-label="NFL news and analysis">
+<div class="articles-feed-header">
         <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
       </div>
 
@@ -1202,9 +1108,10 @@
           </a>
         </article>
       </div>
-    </section>
+      </aside>
+    </div>
+  </div>
 
-  </main>
 
   <!-- Footer -->
   <footer class="footer">
