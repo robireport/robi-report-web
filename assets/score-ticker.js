@@ -459,8 +459,14 @@
   function renderOrganizer(leagueKey, label) {
     const link = document.createElement('a');
     link.className = 'ticker-organizer';
-    link.href = getHubHref(leagueKey);
-    link.setAttribute('aria-label', `${label} hub`);
+    if (leagueKey === 'nba') {
+      link.href = `${getPathPrefix()}nba-scores.html`;
+      link.setAttribute('aria-label', `${label} scoreboard`);
+      link.classList.add('ticker-organizer--scoreboard');
+    } else {
+      link.href = getHubHref(leagueKey);
+      link.setAttribute('aria-label', `${label} hub`);
+    }
 
     const text = document.createElement('span');
     text.className = 'ticker-organizer-label';
