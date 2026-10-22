@@ -115,6 +115,18 @@
   background: var(--bg-card, #111827);
 }
 
+.scoreboard-hub-date-nav.is-empty {
+  display: block;
+  padding: 12px 14px;
+}
+
+.scoreboard-hub-date-empty {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+  text-align: center;
+}
+
 .scoreboard-hub-date-btn {
   flex: 1 0 auto;
   min-width: 72px;

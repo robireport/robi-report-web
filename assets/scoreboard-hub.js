@@ -59,17 +59,35 @@
     return d;
   }
 
-  /** Monday–Sunday week containing the anchor date. */
-  function buildWeekStrip(anchor) {
+  function mondayOfWeek(anchor) {
     const d = startOfLocalDay(anchor);
     const weekday = d.getDay();
     const diffToMonday = weekday === 0 ? -6 : 1 - weekday;
-    const monday = addDays(d, diffToMonday);
+    return addDays(d, diffToMonday);
+  }
+
+  /** Calendar days Mon–Sun used when scanning for scheduled games. */
+  function weekCandidateDays(anchor) {
+    const monday = mondayOfWeek(anchor);
     const days = [];
     for (let i = 0; i < DAY_COUNT; i += 1) {
       days.push(addDays(monday, i));
     }
     return days;
+  }
+
+  function weekKey(anchor) {
+    return formatYmd(mondayOfWeek(anchor));
+  }
+
+  async function fetchScoreboardJson(url, ymd) {
+    const res = await fetch(`${url}?dates=${ymd}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
+  function eventCount(data) {
+    return (data?.events || []).length;
   }
 
   function formatTimeET(isoDate) {
@@ -267,6 +285,9 @@
   }
 
   function renderDateButtons(days, selectedYmd) {
+    if (!days.length) {
+      return '<p class="scoreboard-hub-date-empty">No scheduled games this week.</p>';
+    }
     return days
       .map((day) => {
         const ymd = formatYmd(day);
@@ -279,6 +300,21 @@
         </button>`;
       })
       .join('');
+  }
+
+  function snapSelectedToGameDays(selectedDate, gameDays) {
+    if (!gameDays.length) return selectedDate;
+    const targetYmd = formatYmd(selectedDate);
+    if (gameDays.some((d) => formatYmd(d) === targetYmd)) return selectedDate;
+
+    const targetTs = startOfLocalDay(selectedDate).getTime();
+    let fallback = gameDays[0];
+    for (let i = 0; i < gameDays.length; i += 1) {
+      const day = gameDays[i];
+      fallback = day;
+      if (startOfLocalDay(day).getTime() >= targetTs) return day;
+    }
+    return fallback;
   }
 
   function renderCard(game) {
@@ -344,6 +380,9 @@
     let selectedDate = readDateFromUrl();
     let refreshTimer = null;
     let weekLabel = '';
+    let stripWeekKey = '';
+    let gameDays = [];
+    const dayCache = new Map();
 
     chrome.innerHTML = `
       <div class="scoreboard-hub-date-nav" data-date-nav role="tablist" aria-label="Select date"></div>
@@ -367,33 +406,84 @@
     const statusEl = chrome.querySelector('[data-status]');
     const weekEl = chrome.querySelector('[data-week-label]');
 
-    function renderDateNav() {
-      const ymd = formatYmd(selectedDate);
-      dateNav.innerHTML = renderDateButtons(buildWeekStrip(selectedDate), ymd);
+    async function refreshGameDayStrip(anchor) {
+      const key = weekKey(anchor);
+      if (key === stripWeekKey && gameDays.length) return;
+
+      stripWeekKey = key;
+      dayCache.clear();
+      gameDays = [];
+
+      const candidates = weekCandidateDays(anchor);
+      const results = await Promise.all(
+        candidates.map(async (day) => {
+          const ymd = formatYmd(day);
+          try {
+            const data = await fetchScoreboardJson(cfg.url, ymd);
+            if (eventCount(data) > 0) {
+              dayCache.set(ymd, data);
+              return day;
+            }
+          } catch (_) {
+            /* ignore per-day failures */
+          }
+          return null;
+        })
+      );
+
+      gameDays = results.filter(Boolean);
     }
 
-    async function loadScoreboard() {
+    function renderDateNav() {
       const ymd = formatYmd(selectedDate);
-      writeDateToUrl(ymd);
-      renderDateNav();
-      statusEl.textContent = 'Loading scores…';
+      const html = renderDateButtons(gameDays, ymd);
+      dateNav.innerHTML = html;
+      dateNav.classList.toggle('is-empty', gameDays.length === 0);
+    }
+
+    function applyWeekLabel(data) {
+      if (cfg.picker === 'week' && data?.week?.number) {
+        weekLabel = `Week ${data.week.number}`;
+        weekEl.textContent = weekLabel;
+        weekEl.hidden = false;
+      } else if (weekLabel) {
+        weekEl.hidden = false;
+      } else {
+        weekEl.hidden = true;
+      }
+    }
+
+    async function loadScoreboard(options = {}) {
+      const { rescanStrip = false } = options;
+      statusEl.textContent = rescanStrip ? 'Loading schedule…' : 'Loading scores…';
       statusEl.classList.remove('is-error');
       grid.innerHTML = '';
 
       try {
-        const res = await fetch(`${cfg.url}?dates=${ymd}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-
-        if (cfg.picker === 'week' && data.week?.number) {
-          weekLabel = `Week ${data.week.number}`;
-          weekEl.textContent = weekLabel;
-          weekEl.hidden = false;
-        } else if (weekLabel) {
-          weekEl.hidden = false;
-        } else {
-          weekEl.hidden = true;
+        if (rescanStrip || weekKey(selectedDate) !== stripWeekKey) {
+          await refreshGameDayStrip(selectedDate);
         }
+
+        selectedDate = snapSelectedToGameDays(selectedDate, gameDays);
+        const ymd = formatYmd(selectedDate);
+        writeDateToUrl(ymd);
+        renderDateNav();
+
+        if (!gameDays.length) {
+          grid.innerHTML =
+            '<div class="scoreboard-hub-empty">No games scheduled this week.</div>';
+          statusEl.textContent = '';
+          weekEl.hidden = true;
+          return;
+        }
+
+        let data = dayCache.get(ymd);
+        if (!data) {
+          data = await fetchScoreboardJson(cfg.url, ymd);
+          dayCache.set(ymd, data);
+        }
+
+        applyWeekLabel(data);
 
         const games = (data.events || [])
           .map((ev) => parseEvent(ev, cfg.sport))
@@ -421,7 +511,10 @@
       if (refreshTimer) clearInterval(refreshTimer);
       const isToday = formatYmd(selectedDate) === formatYmd(new Date());
       if (isToday) {
-        refreshTimer = setInterval(loadScoreboard, REFRESH_MS);
+        refreshTimer = setInterval(() => {
+          dayCache.delete(formatYmd(selectedDate));
+          loadScoreboard({ rescanStrip: weekKey(selectedDate) === weekKey(new Date()) });
+        }, REFRESH_MS);
       }
     }
 
@@ -431,7 +524,7 @@
       const parsed = parseYmd(btn.dataset.date);
       if (!parsed) return;
       selectedDate = startOfLocalDay(parsed);
-      loadScoreboard();
+      loadScoreboard({ rescanStrip: weekKey(selectedDate) !== stripWeekKey });
       scheduleRefresh();
     });
 
@@ -441,12 +534,12 @@
       const delta = parseInt(shiftBtn.dataset.shift, 10);
       if (Number.isNaN(delta)) return;
       selectedDate = addDays(selectedDate, delta);
-      loadScoreboard();
+      stripWeekKey = '';
+      loadScoreboard({ rescanStrip: true });
       scheduleRefresh();
     });
 
-    renderDateNav();
-    loadScoreboard();
+    loadScoreboard({ rescanStrip: true });
     scheduleRefresh();
   }
 
