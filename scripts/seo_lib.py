@@ -404,6 +404,11 @@ def build_site_redirects() -> dict[str, str]:
     redirects['/home'] = '/'
     redirects['/home.html'] = '/'
 
+    # League scoreboard hubs (clean URLs → static pages).
+    redirects['/nba'] = '/nba.html'
+    redirects['/wnba'] = '/wnba.html'
+    redirects['/nfl'] = '/nfl.html'
+
     return dict(sorted(redirects.items()))
 
 

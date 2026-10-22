@@ -1,0 +1,262 @@
+/* ESPN-style league scoreboard hub */
+.scoreboard-hub-section {
+  background: var(--bg-primary, #0a0e14);
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+.scoreboard-hub {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px 28px;
+}
+
+.scoreboard-hub-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0 12px;
+  flex-wrap: wrap;
+}
+
+.scoreboard-hub-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-primary, #f3f4f6);
+  margin: 0;
+}
+
+.scoreboard-hub-week-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent, #10b981);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.scoreboard-hub-date-nav {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  background: var(--bg-card, #111827);
+}
+
+.scoreboard-hub-date-btn {
+  flex: 1 0 auto;
+  min-width: 72px;
+  padding: 10px 12px;
+  border: none;
+  border-right: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: transparent;
+  color: var(--text-secondary, #9ca3af);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.scoreboard-hub-date-btn:last-child {
+  border-right: none;
+}
+
+.scoreboard-hub-date-btn:hover {
+  background: var(--bg-card-hover, rgba(255, 255, 255, 0.04));
+  color: var(--text-primary, #f3f4f6);
+}
+
+.scoreboard-hub-date-btn.is-active {
+  background: var(--accent, #10b981);
+  color: #fff;
+}
+
+.scoreboard-hub-date-btn .day-name {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+.scoreboard-hub-date-btn .day-num {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.scoreboard-hub-status {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+  padding: 8px 0 16px;
+  min-height: 1.25rem;
+}
+
+.scoreboard-hub-status.is-error {
+  color: #f87171;
+}
+
+.scoreboard-hub-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.scoreboard-hub-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: var(--bg-card, #111827);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.scoreboard-hub-card:hover {
+  border-color: var(--border-hover, rgba(16, 185, 129, 0.45));
+  transform: translateY(-1px);
+}
+
+.scoreboard-hub-card.is-live {
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.15);
+}
+
+.scoreboard-hub-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.scoreboard-hub-card-status {
+  color: var(--text-secondary, #9ca3af);
+}
+
+.scoreboard-hub-card-status.is-live {
+  color: #34d399;
+}
+
+.scoreboard-hub-card-status.is-final {
+  color: var(--text-muted, #6b7280);
+}
+
+.scoreboard-hub-card-network {
+  color: var(--text-muted, #6b7280);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+}
+
+.scoreboard-hub-team-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.scoreboard-hub-team-row + .scoreboard-hub-team-row {
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+}
+
+.scoreboard-hub-team-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.scoreboard-hub-team-name {
+  min-width: 0;
+}
+
+.scoreboard-hub-team-abbr {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary, #f3f4f6);
+}
+
+.scoreboard-hub-team-record {
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+  margin-top: 2px;
+}
+
+.scoreboard-hub-team-score {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+  text-align: right;
+  color: var(--text-primary, #f3f4f6);
+}
+
+.scoreboard-hub-team-row.is-winner .scoreboard-hub-team-score {
+  color: var(--accent, #10b981);
+}
+
+.scoreboard-hub-card-foot {
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #9ca3af);
+  line-height: 1.45;
+}
+
+.scoreboard-hub-card-foot strong {
+  color: var(--text-primary, #e5e7eb);
+  font-weight: 600;
+}
+
+.scoreboard-hub-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted, #6b7280);
+  background: var(--bg-card, #111827);
+  border: 1px dashed var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  font-size: 0.9375rem;
+}
+
+.scoreboard-hub-nfl-week-shift {
+  display: flex;
+  gap: 8px;
+}
+
+.scoreboard-hub-nfl-week-shift button {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  background: var(--bg-card, #111827);
+  color: var(--text-secondary, #9ca3af);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.scoreboard-hub-nfl-week-shift button:hover {
+  border-color: var(--accent, #10b981);
+  color: var(--text-primary, #f3f4f6);
+}
+
+@media (max-width: 640px) {
+  .scoreboard-hub-date-btn {
+    min-width: 64px;
+    padding: 8px 8px;
+  }
+}

@@ -927,6 +927,7 @@
     .hub-breadcrumb a:hover { color: var(--accent); }
   </style>
   <link rel="stylesheet" href="assets/score-ticker.css" />
+  <link rel="stylesheet" href="assets/scoreboard-hub.css" />
   <link rel="stylesheet" href="assets/nav-mobile.css" />
   <link rel="stylesheet" href="assets/articles-empty.css" />
 </head>
@@ -985,9 +986,13 @@
         <a href="index.html">Robi Report</a> / <span aria-current="page">NBA</span>
       </nav>
       <h1>NBA</h1>
-      <p>Breaking news, analysis, and storylines from around the league</p>
+      <p>Live scores, schedules, and storylines from around the league</p>
     </div>
   </header>
+
+  <section class="scoreboard-hub-section" aria-label="NBA scoreboard">
+    <div class="scoreboard-hub" data-scoreboard-hub data-league="nba"></div>
+  </section>
 
   <!-- 3-Column Hub -->
   <main class="hub">
@@ -1135,6 +1140,7 @@
   </footer>
 
   <script src="assets/nav-mobile.js"></script>
+  <script src="assets/scoreboard-hub.js"></script>
   <script src="assets/score-ticker.js"></script>
 </body>
 </html>
