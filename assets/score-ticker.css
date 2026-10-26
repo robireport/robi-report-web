@@ -1,6 +1,6 @@
 /* ── Live Score Ticker ── */
 :root {
-  --ticker-height: 52px;
+  --ticker-height: 48px;
   --site-header-offset: calc(var(--nav-height, 72px) + var(--ticker-height));
 }
 
@@ -45,20 +45,44 @@ a.btn-primary {
   width: 100%;
   height: var(--ticker-height);
   max-height: var(--ticker-height);
+  margin: 0;
   overflow: hidden;
   background: #ffffff;
   border-bottom: 1px solid rgba(15, 23, 42, 0.1);
   box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
-/* Ticker above fixed site nav (DOM order + offset) */
-body.has-live-ticker .nav {
+/* Ticker above fixed site nav — flush stack (ticker is in document flow). */
+body.has-live-ticker nav.nav {
   top: var(--ticker-height);
+  margin-top: 0;
+  z-index: 900;
 }
 
 /* Hub/editorial headers: ticker already occupies flow; offset fixed nav only. */
 body.has-live-ticker header.page-header {
-  padding-top: calc(var(--nav-height, 72px) + 20px);
+  padding-top: calc(var(--nav-height, 72px) + 16px);
+}
+
+body.has-live-ticker .page-header {
+  padding-top: calc(var(--nav-height, 72px) + 16px);
+}
+
+/* Ticker already in flow; offset fixed nav only (avoid double-counting ticker height). */
+body.has-live-ticker section.hero {
+  padding-top: calc(var(--nav-height, 72px) + 48px);
+}
+
+body.has-live-ticker .about-hero,
+body.has-live-ticker .shop-hero,
+body.has-live-ticker .sog-hero {
+  padding-top: calc(var(--nav-height, 72px) + 40px);
+}
+
+@media (max-width: 768px) {
+  body.has-live-ticker section.hero {
+    padding-top: calc(var(--nav-height, 72px) + 32px);
+  }
 }
 
 body.has-live-ticker .nav-mobile-backdrop.is-visible {
