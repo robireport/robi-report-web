@@ -75,8 +75,10 @@ def replace_featured_block(text: str, cfg: dict) -> str:
     if start == -1:
         return text
     # End after first widget-videos closes (League Shortcuts follows).
-    end_marker = "      </div>\n\n      <div class=\"widget\">"
-    end = text.find(end_marker, start)
+    end = text.find('<div class="widget-header">League Shortcuts</div>', start)
+    if end == -1:
+        return text
+    end = text.rfind('<div class="widget">', start, end)
     if end == -1:
         return text
     block = FEATURED_WIDGET.format(**cfg)
@@ -87,8 +89,10 @@ def remove_featured_block(text: str) -> str:
     start = text.find(ROCKETS_BLOCK_START)
     if start == -1:
         return text
-    end_marker = "      </div>\n\n      <div class=\"widget\">"
-    end = text.find(end_marker, start)
+    end = text.find('<div class="widget-header">League Shortcuts</div>', start)
+    if end == -1:
+        return text
+    end = text.rfind('<div class="widget">', start, end)
     if end == -1:
         return text
     return text[:start] + text[end:]
