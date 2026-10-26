@@ -902,7 +902,19 @@
 </head>
 <body>
 
-  <!-- Navigation -->
+    
+
+
+<div class="score-ticker" id="score-ticker" data-default="ufc">
+    <div class="ticker-viewport">
+      <button type="button" class="ticker-arrow ticker-arrow-left" aria-label="Scroll left">&#8249;</button>
+      <div class="ticker-track-wrap">
+        <div class="ticker-track" id="ticker-track"></div>
+      </div>
+      <button type="button" class="ticker-arrow ticker-arrow-right" aria-label="Scroll right">&#8250;</button>
+    </div>
+  </div>
+<!-- Navigation -->
   <nav class="nav">
     <div class="nav-inner">
       <a href="index.html" class="logo">
@@ -936,16 +948,6 @@
   </nav>
   <div class="nav-mobile-backdrop" aria-hidden="true"></div>
 
-  <!-- Live Score Ticker -->
-  <div class="score-ticker" id="score-ticker" data-default="ufc">
-    <div class="ticker-viewport">
-      <button type="button" class="ticker-arrow ticker-arrow-left" aria-label="Scroll left">&#8249;</button>
-      <div class="ticker-track-wrap">
-        <div class="ticker-track" id="ticker-track"></div>
-      </div>
-      <button type="button" class="ticker-arrow ticker-arrow-right" aria-label="Scroll right">&#8250;</button>
-    </div>
-  </div>
 
 
   <!-- Page Header -->
@@ -964,11 +966,27 @@
 
     <!-- Left Sidebar -->
     <aside class="hub-left">
-      <div class="widget">
-        <div class="subscribe-card">
-          <h3>Go Premium</h3>
-          <p>Unlock exclusive UFC analysis, fighter breakdowns, and insider reporting on every pay-per-view card.</p>
-          <button class="btn btn-primary btn-block">Subscribe Now</button>
+      <div class="widget widget-videos">
+        <div class="widget-header">UFC FEATURED CONTENT</div>
+        <div class="widget-body widget-videos-body">
+          <div class="video-feature">
+            <div class="video-embed-wrap">
+              <iframe
+                src="https://www.youtube.com/embed/e8KPKNIxEmE"
+                title="Are the Rockets and Pacers ACTUALLY Contenders?, Robi Report"
+                data-description="Featured analysis: Are the Rockets and Pacers actually contenders? From Robi Report."
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              ></iframe>
+            </div>
+            <a
+              href="https://www.youtube.com/watch?v=e8KPKNIxEmE"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-primary btn-block btn-youtube-more"
+            >Watch on YouTube</a>
+          </div>
         </div>
       </div>
 

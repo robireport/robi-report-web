@@ -78,6 +78,15 @@
   const REFRESH_MS = 60000;
 
   const ticker = document.getElementById('score-ticker');
+  if (ticker) {
+    if (ticker.parentElement !== document.body) {
+      document.body.insertBefore(ticker, document.body.firstElementChild);
+    } else if (document.body.firstElementChild !== ticker) {
+      document.body.insertBefore(ticker, document.body.firstElementChild);
+    }
+    document.body.classList.add('has-live-ticker');
+  }
+
   const track = document.getElementById('ticker-track');
   if (!ticker || !track) return;
 
