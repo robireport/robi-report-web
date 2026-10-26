@@ -96,14 +96,14 @@
 
   const SORT_PHASE = { LIVE: 0, UPCOMING: 1, FINAL: 2 };
 
-  function formatTimeET(isoDate) {
+  function formatTimePT(isoDate) {
     try {
-      return new Date(isoDate).toLocaleTimeString('en-US', {
+      const time = new Date(isoDate).toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
-        timeZone: 'America/New_York',
-        timeZoneName: 'short',
+        timeZone: 'America/Los_Angeles',
       });
+      return time ? `${time} PT` : '';
     } catch (_) {
       return '';
     }
@@ -210,7 +210,7 @@
       const live = clock ? `${clock}${detail ? ' • ' + detail : ''}` : detail || 'LIVE';
       return { text: live.toUpperCase(), cls: '' };
     }
-    const time = formatTimeET(event.date || comp?.date);
+    const time = formatTimePT(event.date || comp?.date);
     return { text: time || 'SCHEDULED', cls: 'is-scheduled' };
   }
 

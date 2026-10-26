@@ -12,67 +12,12 @@
       .replace(/"/g, '&quot;');
   }
 
-  function formatYmd(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}${m}${d}`;
+  function pacific() {
+    return global.ScoreboardPacific;
   }
 
-  function parseYmd(ymd) {
-    const cleaned = String(ymd || '').replace(/-/g, '');
-    if (!/^\d{8}$/.test(cleaned)) return null;
-    const y = parseInt(cleaned.slice(0, 4), 10);
-    const m = parseInt(cleaned.slice(4, 6), 10) - 1;
-    const d = parseInt(cleaned.slice(6, 8), 10);
-    const date = new Date(y, m, d);
-    return Number.isNaN(date.getTime()) ? null : date;
-  }
-
-  function startOfLocalDay(date) {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  }
-
-  function addDays(date, n) {
-    const d = new Date(date);
-    d.setDate(d.getDate() + n);
-    return d;
-  }
-
-  function mondayOfWeek(anchor) {
-    const d = startOfLocalDay(anchor);
-    const weekday = d.getDay();
-    const diff = weekday === 0 ? -6 : 1 - weekday;
-    return addDays(d, diff);
-  }
-
-  function weekCandidateDays(weekMonday) {
-    const days = [];
-    for (let i = 0; i < WEEK_DAYS; i += 1) {
-      days.push(addDays(weekMonday, i));
-    }
-    return days;
-  }
-
-  function formatDisplayDate(date) {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  }
-
-  function formatTimeET(isoDate) {
-    try {
-      return new Date(isoDate).toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        timeZone: 'America/New_York',
-      });
-    } catch (_) {
-      return '';
-    }
+  function formatTimePT(isoDate) {
+    return pacific()?.formatTimePT(isoDate) || '';
   }
 
   function getLogo(team) {
@@ -140,7 +85,7 @@
         scheduled: false,
       };
     }
-    const time = formatTimeET(event.date || comp?.date);
+    const time = formatTimePT(event.date || comp?.date);
     return {
       text: time || 'Scheduled',
       live: false,
@@ -256,13 +201,13 @@
     };
   }
 
-  function readDateFromUrl() {
+  function readDateFromUrl(P) {
     const params = new URLSearchParams(window.location.search);
     const raw = params.get('date');
-    if (!raw) return { date: startOfLocalDay(new Date()), fromUrl: false };
-    const parsed = parseYmd(raw);
-    if (!parsed) return { date: startOfLocalDay(new Date()), fromUrl: false, invalidUrl: true };
-    return { date: startOfLocalDay(parsed), fromUrl: true, raw };
+    if (!raw) return { date: P.startOfPacificDay(new Date()), fromUrl: false };
+    const parsed = P.parsePacificYmd(raw);
+    if (!parsed) return { date: P.startOfPacificDay(new Date()), fromUrl: false, invalidUrl: true };
+    return { date: P.startOfPacificDay(parsed), fromUrl: true, raw };
   }
 
   function writeDateToUrl(ymd) {
@@ -271,16 +216,23 @@
     window.history.replaceState({}, '', url.toString());
   }
 
-  function renderDateButtons(gameDays, selectedYmd) {
+  function renderDateButtons(gameDays, selectedYmd, P) {
     if (!gameDays.length) {
       return '<p class="nba-scoreboard-empty">No scheduled games this week. Try another week.</p>';
     }
     return gameDays
       .map((day) => {
-        const ymd = formatYmd(day);
+        const ymd = P.formatYmd(day);
         const active = ymd === selectedYmd ? ' is-active' : '';
-        const dayName = day.toLocaleDateString('en-US', { weekday: 'short' });
-        const dayNum = day.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
+        const dayName = new Date(day).toLocaleDateString('en-US', {
+          weekday: 'short',
+          timeZone: P.TZ,
+        });
+        const dayNum = new Date(day).toLocaleDateString('en-US', {
+          month: 'numeric',
+          day: 'numeric',
+          timeZone: P.TZ,
+        });
         return `<button type="button" class="nba-scoreboard-date-btn${active}" data-date="${ymd}" aria-pressed="${ymd === selectedYmd}">
           <span class="day-name">${escapeHtml(dayName)}</span>
           <span class="day-num">${escapeHtml(dayNum)}</span>
@@ -363,8 +315,14 @@
 
     if (!apiUrl || !sport) return;
 
-    const urlState = readDateFromUrl();
-    let weekMonday = mondayOfWeek(urlState.date);
+    const P = pacific();
+    if (!P) {
+      console.warn('ScoreboardPacific not loaded');
+      return;
+    }
+
+    const urlState = readDateFromUrl(P);
+    let weekMonday = P.mondayOfPacificWeek(urlState.date);
     let selectedDate = urlState.date;
     let gameDays = [];
     let dayCache = new Map();
@@ -401,15 +359,15 @@
       gameDays = [];
       scanFailures = 0;
 
-      const candidates = weekCandidateDays(weekMonday);
+      const candidates = P.weekCandidateDays(weekMonday, WEEK_DAYS);
       const results = await Promise.all(
         candidates.map(async (day) => {
-          const ymd = formatYmd(day);
+          const ymd = P.formatYmd(day);
           try {
             const data = await fetchDay(ymd);
-            const count = (data?.events || []).length;
-            if (count > 0) {
-              dayCache.set(ymd, data);
+            const events = P.filterEventsForPacificYmd(data?.events, ymd);
+            if (events.length > 0) {
+              dayCache.set(ymd, { ...data, events });
               return day;
             }
           } catch (_) {
@@ -434,13 +392,13 @@
     }
 
     function renderDateNav() {
-      const ymd = formatYmd(selectedDate);
-      dateNav.innerHTML = renderDateButtons(gameDays, ymd);
+      const ymd = P.formatYmd(selectedDate);
+      dateNav.innerHTML = renderDateButtons(gameDays, ymd, P);
       dateNav.classList.toggle('is-empty', gameDays.length === 0);
     }
 
     function buildNotices() {
-      const selectedYmd = formatYmd(selectedDate);
+      const selectedYmd = P.formatYmd(selectedDate);
       const parts = [];
 
       if (urlState.invalidUrl) {
@@ -455,10 +413,10 @@
         );
       }
 
-      const onGameDay = gameDays.some((d) => formatYmd(d) === selectedYmd);
+      const onGameDay = gameDays.some((d) => P.formatYmd(d) === selectedYmd);
       if (gameDays.length && !onGameDay) {
         parts.push(
-          `No ${leagueName} games on ${formatDisplayDate(selectedDate)}. Select a highlighted date above, or use Previous / Next week.`
+          `No ${leagueName} games on ${P.formatDisplayDatePacific(selectedDate)}. Select a highlighted date above, or use Previous / Next week.`
         );
       }
 
@@ -476,12 +434,12 @@
     }
 
     async function renderGames() {
-      const ymd = formatYmd(selectedDate);
+      const ymd = P.formatYmd(selectedDate);
       writeDateToUrl(ymd);
       renderDateNav();
       buildNotices();
 
-      const onGameDay = gameDays.some((d) => formatYmd(d) === ymd);
+      const onGameDay = gameDays.some((d) => P.formatYmd(d) === ymd);
       if (!onGameDay) {
         gridEl.innerHTML =
           '<div class="nba-scoreboard-empty" role="status">No games to display for the selected date.</div>';
@@ -496,7 +454,8 @@
       try {
         let data = dayCache.get(ymd);
         if (!data) {
-          data = await fetchDay(ymd);
+          const raw = await fetchDay(ymd);
+          data = { ...raw, events: P.filterEventsForPacificYmd(raw?.events, ymd) };
           dayCache.set(ymd, data);
         }
 
@@ -529,10 +488,10 @@
 
     function scheduleRefresh() {
       if (refreshTimer) clearInterval(refreshTimer);
-      const isToday = formatYmd(selectedDate) === formatYmd(new Date());
+      const isToday = P.formatYmd(selectedDate) === P.formatYmd(new Date());
       if (isToday) {
         refreshTimer = setInterval(async () => {
-          dayCache.delete(formatYmd(selectedDate));
+          dayCache.delete(P.formatYmd(selectedDate));
           await scanWeek();
           await renderGames();
         }, REFRESH_MS);
@@ -542,9 +501,9 @@
     dateNav.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-date]');
       if (!btn) return;
-      const parsed = parseYmd(btn.dataset.date);
+      const parsed = P.parsePacificYmd(btn.dataset.date);
       if (!parsed) return;
-      selectedDate = startOfLocalDay(parsed);
+      selectedDate = P.startOfPacificDay(parsed);
       urlState.fromUrl = false;
       urlState.invalidUrl = false;
       renderGames();
@@ -556,7 +515,7 @@
       if (!weekBtn) return;
       const delta = parseInt(weekBtn.dataset.week, 10);
       if (Number.isNaN(delta)) return;
-      weekMonday = addDays(weekMonday, delta * 7);
+      weekMonday = P.addPacificDays(weekMonday, delta * 7);
       selectedDate = weekMonday;
       urlState.fromUrl = false;
       urlState.invalidUrl = false;
