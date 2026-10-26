@@ -46,9 +46,9 @@ a.btn-primary {
   height: var(--ticker-height);
   max-height: var(--ticker-height);
   overflow: hidden;
-  background: #15171c;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+  background: #ffffff;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
 /* Ticker above fixed site nav (DOM order + offset) */
@@ -121,7 +121,7 @@ body.has-live-ticker .nav-mobile-backdrop.is-visible {
   flex-shrink: 0;
   height: var(--ticker-height);
   max-height: var(--ticker-height);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .ticker-section:last-child {
@@ -137,8 +137,8 @@ body.has-live-ticker .nav-mobile-backdrop.is-visible {
   max-height: var(--ticker-height);
   min-width: 46px;
   padding: 0 10px;
-  background: #23262e;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f3f4f6;
+  border-right: 1px solid rgba(15, 23, 42, 0.1);
   text-decoration: none;
   color: inherit;
   cursor: pointer;
@@ -146,7 +146,7 @@ body.has-live-ticker .nav-mobile-backdrop.is-visible {
 }
 
 .ticker-organizer:hover {
-  background: #2d323c;
+  background: #e5e7eb;
 }
 
 .ticker-organizer:focus-visible {
@@ -163,13 +163,13 @@ body.has-live-ticker .nav-mobile-backdrop.is-visible {
 
 .ticker-organizer--scoreboard:hover,
 .ticker-organizer--scoreboard:focus-visible {
-  background: #2a3d34;
+  background: rgba(16, 185, 129, 0.12);
 }
 
 .ticker-organizer--scoreboard:hover .ticker-organizer-label,
 .ticker-organizer--scoreboard:focus-visible .ticker-organizer-label {
-  color: #34d399;
-  text-decoration-color: #34d399;
+  color: #059669;
+  text-decoration-color: #059669;
 }
 
 .ticker-organizer-label {
@@ -177,7 +177,7 @@ body.has-live-ticker .nav-mobile-backdrop.is-visible {
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #f3f4f6;
+  color: #111827;
   text-align: center;
   line-height: 1;
   white-space: nowrap;
