@@ -47,9 +47,53 @@ a.btn-primary {
   max-height: var(--ticker-height);
   margin: 0;
   overflow: hidden;
+  display: flex;
+  align-items: stretch;
   background: #ffffff;
   border-bottom: 1px solid rgba(15, 23, 42, 0.1);
   box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+.ticker-sport-filter {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 10px 0 12px;
+  border-right: 1px solid rgba(15, 23, 42, 0.1);
+  background: #f3f4f6;
+  z-index: 3;
+}
+
+.ticker-sport-select {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 32px;
+  max-width: 118px;
+  padding: 0 28px 0 10px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 6px;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234b5563' d='M2.5 4.5 6 8l3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  color: #111827;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ticker-sport-select:hover {
+  border-color: rgba(15, 23, 42, 0.22);
+}
+
+.ticker-sport-select:focus-visible {
+  outline: 2px solid rgba(16, 185, 129, 0.55);
+  outline-offset: 1px;
 }
 
 /* Ticker above fixed site nav — flush stack (ticker is in document flow). */
@@ -107,7 +151,8 @@ body.has-live-ticker .nav-mobile-backdrop.is-visible {
 
 .ticker-viewport {
   position: relative;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   height: var(--ticker-height);
   max-height: var(--ticker-height);
   overflow: hidden;
@@ -415,6 +460,16 @@ a.score-card:focus-visible {
 .ticker-loading .ticker-organizer { opacity: 0.5; }
 
 @media (max-width: 900px) {
+  .ticker-sport-filter {
+    padding: 0 8px 0 10px;
+  }
+
+  .ticker-sport-select {
+    max-width: 96px;
+    font-size: 0.625rem;
+    padding-right: 24px;
+  }
+
   .ticker-organizer {
     min-width: 40px;
     padding: 0 8px;
