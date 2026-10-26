@@ -1,7 +1,7 @@
 /* Robi Report — NBA Scoreboard Hub (light editorial theme, page-local) */
 body.scores-page {
   --nav-height: 72px;
-  --ticker-height: 52px;
+  --ticker-height: 48px;
   --accent: #10b981;
   --accent-hover: #34d399;
   --accent-glow: rgba(16, 185, 129, 0.28);
@@ -206,7 +206,7 @@ body.scores-page .nav-toggle {
 
 /* ── Scoreboard main ── */
 .nba-scores-main {
-  padding-top: calc(var(--nav-height) + var(--ticker-height));
+  padding-top: calc(var(--nav-height) + 16px);
   min-height: 100vh;
   background: var(--bg-primary);
 }
