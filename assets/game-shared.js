@@ -51,15 +51,16 @@
   function formatGameTime(iso) {
     if (!iso) return '';
     try {
-      return new Date(iso).toLocaleString('en-US', {
+      const text = new Date(iso).toLocaleString('en-US', {
         weekday: 'short',
         month: 'short',
         day: 'numeric',
         year: 'numeric',
         hour: 'numeric',
         minute: '2-digit',
-        timeZoneName: 'short',
+        timeZone: 'America/Los_Angeles',
       });
+      return text ? `${text} PT` : '';
     } catch (_) {
       return '';
     }
