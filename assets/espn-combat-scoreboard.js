@@ -12,71 +12,12 @@
       .replace(/"/g, '&quot;');
   }
 
-  function formatYmd(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}${m}${d}`;
-  }
-
-  function parseYmd(ymd) {
-    const cleaned = String(ymd || '').replace(/-/g, '');
-    if (!/^\d{8}$/.test(cleaned)) return null;
-    const y = parseInt(cleaned.slice(0, 4), 10);
-    const m = parseInt(cleaned.slice(4, 6), 10) - 1;
-    const d = parseInt(cleaned.slice(6, 8), 10);
-    const date = new Date(y, m, d);
-    return Number.isNaN(date.getTime()) ? null : date;
-  }
-
-  function startOfLocalDay(date) {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  }
-
-  function addDays(date, n) {
-    const d = new Date(date);
-    d.setDate(d.getDate() + n);
-    return d;
-  }
-
-  function mondayOfWeek(anchor) {
-    const d = startOfLocalDay(anchor);
-    const weekday = d.getDay();
-    const diff = weekday === 0 ? -6 : 1 - weekday;
-    return addDays(d, diff);
-  }
-
-  function weekCandidateDays(weekMonday) {
-    const days = [];
-    for (let i = 0; i < WEEK_DAYS; i += 1) {
-      days.push(addDays(weekMonday, i));
-    }
-    return days;
-  }
-
-  function formatDisplayDate(date) {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
+  function pacific() {
+    return global.ScoreboardPacific;
   }
 
   function formatEventDate(iso) {
-    try {
-      return new Date(iso).toLocaleString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        timeZone: 'America/New_York',
-        timeZoneName: 'short',
-      });
-    } catch (_) {
-      return '';
-    }
+    return pacific()?.formatEventDateTimePT(iso) || '';
   }
 
   function getStatus(event) {
@@ -166,16 +107,22 @@
     const sport = config.sport;
     const leagueName = config.leagueName || 'Events';
 
+    const P = pacific();
+    if (!P) {
+      console.warn('ScoreboardPacific not loaded');
+      return;
+    }
+
     const urlState = (() => {
       const params = new URLSearchParams(window.location.search);
       const raw = params.get('date');
-      if (!raw) return { date: startOfLocalDay(new Date()), invalidUrl: false };
-      const parsed = parseYmd(raw);
-      if (!parsed) return { date: startOfLocalDay(new Date()), invalidUrl: true };
-      return { date: startOfLocalDay(parsed), invalidUrl: false };
+      if (!raw) return { date: P.startOfPacificDay(new Date()), invalidUrl: false };
+      const parsed = P.parsePacificYmd(raw);
+      if (!parsed) return { date: P.startOfPacificDay(new Date()), invalidUrl: true };
+      return { date: P.startOfPacificDay(parsed), invalidUrl: false };
     })();
 
-    let weekMonday = mondayOfWeek(urlState.date);
+    let weekMonday = P.mondayOfPacificWeek(urlState.date);
     let selectedDate = urlState.date;
     let eventDays = [];
     let dayCache = new Map();
@@ -208,7 +155,7 @@
     }
 
     function renderDateButtons() {
-      const selectedYmd = formatYmd(selectedDate);
+      const selectedYmd = P.formatYmd(selectedDate);
       if (!eventDays.length) {
         dateNav.innerHTML =
           '<p class="nba-scoreboard-empty">No events this week. Try another week.</p>';
@@ -218,10 +165,17 @@
       dateNav.classList.remove('is-empty');
       dateNav.innerHTML = eventDays
         .map((day) => {
-          const ymd = formatYmd(day);
+          const ymd = P.formatYmd(day);
           const active = ymd === selectedYmd ? ' is-active' : '';
-          const dayName = day.toLocaleDateString('en-US', { weekday: 'short' });
-          const dayNum = day.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
+          const dayName = new Date(day).toLocaleDateString('en-US', {
+            weekday: 'short',
+            timeZone: P.TZ,
+          });
+          const dayNum = new Date(day).toLocaleDateString('en-US', {
+            month: 'numeric',
+            day: 'numeric',
+            timeZone: P.TZ,
+          });
           return `<button type="button" class="nba-scoreboard-date-btn${active}" data-date="${ymd}" aria-pressed="${ymd === selectedYmd}">
             <span class="day-name">${escapeHtml(dayName)}</span>
             <span class="day-num">${escapeHtml(dayNum)}</span>
@@ -234,15 +188,15 @@
       dayCache.clear();
       eventDays = [];
       scanFailures = 0;
-      const candidates = weekCandidateDays(weekMonday);
+      const candidates = P.weekCandidateDays(weekMonday, WEEK_DAYS);
       const results = await Promise.all(
         candidates.map(async (day) => {
-          const ymd = formatYmd(day);
+          const ymd = P.formatYmd(day);
           try {
             const data = await fetchDay(ymd);
-            const count = (data?.events || []).length;
-            if (count > 0) {
-              dayCache.set(ymd, data);
+            const events = P.filterEventsForPacificYmd(data?.events, ymd);
+            if (events.length > 0) {
+              dayCache.set(ymd, { ...data, events });
               return day;
             }
           } catch (_) {
@@ -264,11 +218,11 @@
           `Some days could not be loaded (${scanFailures} of ${WEEK_DAYS}). The schedule may be incomplete.`
         );
       }
-      const ymd = formatYmd(selectedDate);
-      const onDay = eventDays.some((d) => formatYmd(d) === ymd);
+      const ymd = P.formatYmd(selectedDate);
+      const onDay = eventDays.some((d) => P.formatYmd(d) === ymd);
       if (eventDays.length && !onDay) {
         parts.push(
-          `No ${leagueName} events on ${formatDisplayDate(selectedDate)}. Pick a highlighted date or change weeks.`
+          `No ${leagueName} events on ${P.formatDisplayDatePacific(selectedDate)}. Pick a highlighted date or change weeks.`
         );
       }
       if (!eventDays.length) {
@@ -284,7 +238,7 @@
     }
 
     async function renderEvents() {
-      const ymd = formatYmd(selectedDate);
+      const ymd = P.formatYmd(selectedDate);
       const url = new URL(window.location.href);
       url.searchParams.set('date', ymd);
       window.history.replaceState({}, '', url.toString());
@@ -292,7 +246,7 @@
       renderDateButtons();
       buildNotices();
 
-      const onDay = eventDays.some((d) => formatYmd(d) === ymd);
+      const onDay = eventDays.some((d) => P.formatYmd(d) === ymd);
       if (!onDay) {
         gridEl.innerHTML =
           '<div class="nba-scoreboard-empty" role="status">No events for the selected date.</div>';
@@ -305,7 +259,8 @@
       try {
         let data = dayCache.get(ymd);
         if (!data) {
-          data = await fetchDay(ymd);
+          const raw = await fetchDay(ymd);
+          data = { ...raw, events: P.filterEventsForPacificYmd(raw?.events, ymd) };
           dayCache.set(ymd, data);
         }
         const events = data.events || [];
@@ -332,7 +287,7 @@
       await scanWeek();
       await renderEvents();
       if (refreshTimer) clearInterval(refreshTimer);
-      const isToday = formatYmd(selectedDate) === formatYmd(new Date());
+      const isToday = P.formatYmd(selectedDate) === P.formatYmd(new Date());
       if (isToday) {
         refreshTimer = setInterval(loadAll, REFRESH_MS);
       }
@@ -341,9 +296,9 @@
     dateNav.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-date]');
       if (!btn) return;
-      const parsed = parseYmd(btn.dataset.date);
+      const parsed = P.parsePacificYmd(btn.dataset.date);
       if (!parsed) return;
-      selectedDate = startOfLocalDay(parsed);
+      selectedDate = P.startOfPacificDay(parsed);
       urlState.invalidUrl = false;
       renderEvents();
     });
@@ -353,7 +308,7 @@
       if (!weekBtn) return;
       const delta = parseInt(weekBtn.dataset.week, 10);
       if (Number.isNaN(delta)) return;
-      weekMonday = addDays(weekMonday, delta * 7);
+      weekMonday = P.addPacificDays(weekMonday, delta * 7);
       selectedDate = weekMonday;
       urlState.invalidUrl = false;
       loadAll();
