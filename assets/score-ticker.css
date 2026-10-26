@@ -56,6 +56,11 @@ body.has-live-ticker .nav {
   top: var(--ticker-height);
 }
 
+/* Hub/editorial headers: ticker already occupies flow; offset fixed nav only. */
+body.has-live-ticker header.page-header {
+  padding-top: calc(var(--nav-height, 72px) + 20px);
+}
+
 body.has-live-ticker .nav-mobile-backdrop.is-visible {
   top: var(--site-header-offset);
   height: calc(100dvh - var(--site-header-offset));
