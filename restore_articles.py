@@ -221,16 +221,11 @@ def editorial_spotlight_html(a: dict, now: datetime | None = None) -> str:
     if a.get('story_tag') and a['story_tag'].upper() != a['league']:
         kicker_bits.append(esc(a['story_tag']))
     kicker = ' · '.join(kicker_bits)
-    credit_block = (
-        f'          <figcaption class="editorial-photo-credit">{esc(a["photo_credit"])}</figcaption>\n'
-        if a.get('photo_credit')
-        else ''
-    )
     return f'''        <article class="editorial-spotlight">
           <a href="{esc(a["href"])}" class="editorial-spotlight-link">
             <figure class="editorial-spotlight-media">
               <img src="{esc(img)}" alt="{esc(a["alt"])}" loading="lazy" />
-{credit_block}            </figure>
+            </figure>
             <div class="editorial-spotlight-body">
               <p class="editorial-kicker">{kicker}</p>
               <h3 class="editorial-spotlight-title">{esc(a["title"])}</h3>
@@ -457,7 +452,7 @@ def patch_index(all_articles: dict[str, dict]) -> None:
     text = path.read_text(encoding='utf-8')
     replacement = index_featured_html(all_articles)
     text = re.sub(
-        r'  <!-- Featured Content -->\s*<section class="featured articles-feed" id="(?:featured|latest-articles)">.*?</section>',
+        r'  <!-- Featured Content -->\s*<section class="featured articles-feed(?: editorial-board)?" id="(?:featured|latest-articles)">.*?</section>',
         '  <!-- Featured Content -->\n' + replacement,
         text,
         count=1,
