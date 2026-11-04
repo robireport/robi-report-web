@@ -3,7 +3,11 @@
 import html
 import re
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+PT = ZoneInfo('America/Los_Angeles')
 
 ROOT = Path(__file__).parent
 ARTICLES_DIR = ROOT / 'articles'
@@ -61,6 +65,11 @@ def parse_article(path: Path) -> dict:
         re.S,
     )
     body_m = re.search(r'<div class="article-body">\s*<p>(.*?)</p>', text, re.S)
+    cap_m = re.search(
+        r'<figcaption class="article-hero-caption">(.*?)</figcaption>',
+        text,
+        re.S,
+    )
 
     title = html.unescape(re.sub(r'\s+', ' ', title_m.group(1))).strip() if title_m else path.stem
     tag_raw = html.unescape(tag_m.group(1)).strip() if tag_m else 'News'
@@ -81,6 +90,9 @@ def parse_article(path: Path) -> dict:
 
     hero_src = img_m.group(1) if img_m else ''
     alt = html.unescape(img_m.group(2)).strip() if img_m else title
+    photo_credit = (
+        html.unescape(re.sub(r'\s+', ' ', cap_m.group(1))).strip() if cap_m else ''
+    )
     excerpt_raw = body_m.group(1) if body_m else ''
     excerpt = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', '', html.unescape(excerpt_raw))).strip()
     if len(excerpt) > 160:
@@ -100,6 +112,7 @@ def parse_article(path: Path) -> dict:
         'read_time': read_time,
         'hero_src': hero_src,
         'alt': alt,
+        'photo_credit': photo_credit,
         'excerpt': excerpt,
     }
 
@@ -112,6 +125,120 @@ def resize_wix(url: str, w: int, h: int) -> str:
 
 def esc(s: str) -> str:
     return html.escape(s, quote=True)
+
+
+def parse_iso_dt(date_iso: str) -> datetime | None:
+    if not date_iso:
+        return None
+    try:
+        normalized = date_iso.replace('Z', '+00:00')
+        dt = datetime.fromisoformat(normalized)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(PT)
+    except ValueError:
+        return None
+
+
+def relative_time_label(date_iso: str, now: datetime | None = None) -> str:
+    now = now or datetime.now(PT)
+    dt = parse_iso_dt(date_iso)
+    if not dt:
+        return ''
+    delta = now - dt
+    if delta.total_seconds() < 0:
+        return dt.strftime('%b %d, %Y') + ' PT'
+    seconds = int(delta.total_seconds())
+    if seconds < 60:
+        return 'Just now'
+    minutes = seconds // 60
+    if minutes < 60:
+        suffix = 's' if minutes != 1 else ''
+        return f'{minutes} minute{suffix} ago'
+    hours = minutes // 60
+    if hours < 24:
+        suffix = 's' if hours != 1 else ''
+        return f'{hours} hour{suffix} ago'
+    days = hours // 24
+    if days < 7:
+        suffix = 's' if days != 1 else ''
+        return f'{days} day{suffix} ago'
+    return dt.strftime('%b %d, %Y') + ' PT'
+
+
+def is_live_story(date_iso: str, now: datetime | None = None) -> bool:
+    now = now or datetime.now(PT)
+    dt = parse_iso_dt(date_iso)
+    if not dt:
+        return False
+    return (now - dt) <= timedelta(hours=12)
+
+
+def editorial_badge_html(a: dict, now: datetime | None = None) -> str:
+    if is_live_story(a.get('date_iso', ''), now):
+        return '<span class="editorial-badge editorial-badge--live">LIVE</span>'
+    label = esc(a.get('league') or a.get('story_tag') or 'News')
+    return f'<span class="editorial-badge">{label}</span>'
+
+
+def editorial_time_html(a: dict, now: datetime | None = None) -> str:
+    date_iso = a.get('date_iso') or ''
+    dt = parse_iso_dt(date_iso)
+    title = dt.strftime('%b %d, %Y %I:%M %p PT') if dt else ''
+    label = relative_time_label(date_iso, now)
+    if not label:
+        return ''
+    dt_attr = esc(date_iso)
+    title_attr = esc(title)
+    return (
+        f'<time class="editorial-time" datetime="{dt_attr}" '
+        f'data-published="{dt_attr}" title="{title_attr}">{esc(label)}</time>'
+    )
+
+
+def editorial_left_item_html(a: dict, now: datetime | None = None) -> str:
+    return f'''          <li class="editorial-list-item">
+            <a href="{esc(a["href"])}" class="editorial-list-link">
+              {editorial_badge_html(a, now)}
+              <span class="editorial-list-headline">{esc(a["title"])}</span>
+              {editorial_time_html(a, now)}
+            </a>
+          </li>'''
+
+
+def editorial_sidebar_item_html(a: dict, now: datetime | None = None) -> str:
+    return f'''          <li class="editorial-sidebar-item">
+            <a href="{esc(a["href"])}" class="editorial-sidebar-link">
+              <span class="editorial-sidebar-headline">{esc(a["title"])}</span>
+              {editorial_time_html(a, now)}
+            </a>
+          </li>'''
+
+
+def editorial_spotlight_html(a: dict, now: datetime | None = None) -> str:
+    img = resize_wix(a['hero_src'], 1200, 675)
+    kicker_bits = [esc(a['league'])]
+    if a.get('story_tag') and a['story_tag'].upper() != a['league']:
+        kicker_bits.append(esc(a['story_tag']))
+    kicker = ' · '.join(kicker_bits)
+    credit_block = (
+        f'          <figcaption class="editorial-photo-credit">{esc(a["photo_credit"])}</figcaption>\n'
+        if a.get('photo_credit')
+        else ''
+    )
+    return f'''        <article class="editorial-spotlight">
+          <a href="{esc(a["href"])}" class="editorial-spotlight-link">
+            <figure class="editorial-spotlight-media">
+              <img src="{esc(img)}" alt="{esc(a["alt"])}" loading="lazy" />
+{credit_block}            </figure>
+            <div class="editorial-spotlight-body">
+              <p class="editorial-kicker">{kicker}</p>
+              <h3 class="editorial-spotlight-title">{esc(a["title"])}</h3>
+              <p class="editorial-spotlight-dek">{esc(a["excerpt"])}</p>
+              {editorial_time_html(a, now)}
+            </div>
+          </a>
+        </article>'''
 
 
 def lead_html(a: dict) -> str:
@@ -242,37 +369,50 @@ def index_featured_html(all_articles: dict[str, dict]) -> str:
     </div>
   </section>'''
 
-    lead = card_html(ordered[0], featured=True)
-    side = ordered[1:3]
-    rest = ordered[3:]
-    side_cards = '\n\n'.join(card_html(a) for a in side)
-    rest_cards = '\n\n'.join(card_html(a) for a in rest)
+    now = datetime.now(PT)
+    lead = ordered[0]
+    left_items = ordered[1:7]
+    right_items = sorted(
+        [a for a in ordered if a['rel'] != lead['rel']],
+        key=lambda x: x.get('date_iso') or '',
+        reverse=True,
+    )[:8]
 
-    side_block = (
-        f'''      <div class="content-grid-lead-side">
-{side_cards}
+    left_rows = '\n'.join(editorial_left_item_html(a, now) for a in left_items)
+    right_rows = '\n'.join(editorial_sidebar_item_html(a, now) for a in right_items)
+    spotlight = editorial_spotlight_html(lead, now)
+
+    left_col = (
+        f'''      <div class="editorial-board-col editorial-board-col--left">
+        <ul class="editorial-headline-list">
+{left_rows}
+        </ul>
       </div>'''
-        if side
+        if left_items
         else ''
     )
-    rest_block = (
-        f'''    <div class="content-grid-rest">
-{rest_cards}
-    </div>'''
-        if rest
+    right_col = (
+        f'''      <aside class="editorial-board-col editorial-board-col--right" aria-labelledby="editorial-latest-heading">
+        <h3 class="editorial-sidebar-label" id="editorial-latest-heading">LATEST</h3>
+        <ul class="editorial-sidebar-list">
+{right_rows}
+        </ul>
+        <a href="#browse-leagues" class="editorial-view-more">VIEW MORE &gt;</a>
+      </aside>'''
+        if right_items
         else ''
     )
 
-    return f'''  <section class="featured articles-feed" id="latest-articles">
+    return f'''  <section class="featured articles-feed editorial-board" id="latest-articles">
     <div class="articles-feed-header">
       <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
     </div>
-    <div class="content-grid">
-      <div class="content-grid-lead">
-{lead}
-{side_block}
+    <div class="editorial-board-grid">
+{left_col}
+      <div class="editorial-board-col editorial-board-col--center">
+{spotlight}
       </div>
-{rest_block}
+{right_col}
     </div>
   </section>'''
 

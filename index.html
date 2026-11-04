@@ -589,153 +589,7 @@
       gap: 10px;
     }
 
-    .content-grid {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .content-grid-lead {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-      gap: 24px;
-      align-items: start;
-    }
-
-    .content-grid-lead-side {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      min-width: 0;
-    }
-
-    .content-grid-rest {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-    }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      transition: all var(--transition);
-      cursor: pointer;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-hover);
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .card > a {
-      display: block;
-      color: inherit;
-    }
-
-    .card-featured {
-      min-width: 0;
-    }
-
-    .card-image {
-      position: relative;
-      aspect-ratio: 16 / 10;
-      overflow: hidden;
-    }
-
-    .card-featured .card-image {
-      aspect-ratio: 16 / 9;
-    }
-
-    .card-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.4s ease;
-    }
-
-    .card:hover .card-image img {
-      transform: scale(1.05);
-    }
-
-    .card-tag {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      padding: 4px 10px;
-      background: rgba(17, 24, 39, 0.72);
-      backdrop-filter: blur(8px);
-      border-radius: 100px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #ffffff;
-    }
-
-    .card-tag.live {
-      background: rgba(16, 185, 129, 0.9);
-      color: #000000;
-    }
-
-    .card-body {
-      padding: 20px 22px 24px;
-      min-width: 0;
-      width: 100%;
-    }
-
-    .card-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-weight: 500;
-      margin-bottom: 10px;
-      flex-wrap: nowrap;
-      white-space: nowrap;
-    }
-
-    .card-meta .dot {
-      width: 3px;
-      height: 3px;
-      background: var(--text-muted);
-      border-radius: 50%;
-    }
-
-    .card-body h3 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      line-height: 1.4;
-      letter-spacing: -0.01em;
-      margin-bottom: 8px;
-      transition: color var(--transition);
-    }
-
-    .card:hover .card-body h3 {
-      color: var(--accent-hover);
-    }
-
-    .card-featured .card-body h3 {
-      font-size: 1.35rem;
-    }
-
-    .card-body p {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      line-height: 1.55;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
+    /* Latest articles editorial board — assets/home-editorial.css */
 
     /* ── Footer ── */
     .footer {
@@ -837,14 +691,6 @@
         gap: 40px;
       }
 
-      .content-grid-lead {
-        grid-template-columns: 1fr;
-      }
-
-      .content-grid-rest {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
       .footer-top {
         grid-template-columns: 1fr 1fr;
       }
@@ -859,10 +705,6 @@
       .hero {
         padding-top: calc(var(--nav-height) + var(--ticker-height) + 48px);
         padding-bottom: 72px;
-      }
-
-      .content-grid-rest {
-        grid-template-columns: 1fr;
       }
 
       .section-header {
@@ -885,6 +727,7 @@
   <link rel="stylesheet" href="assets/nav-mobile.css" />
   <link rel="stylesheet" href="assets/articles-empty.css" />
   <link rel="stylesheet" href="assets/hero-video-carousel.css" />
+  <link rel="stylesheet" href="assets/home-editorial.css" />
 </head>
 <body class="has-live-ticker">        
 
@@ -1034,350 +877,127 @@
   </section>
 
   <!-- Featured Content -->
-  <section class="featured articles-feed" id="latest-articles">
+  <section class="featured articles-feed editorial-board" id="latest-articles">
     <div class="articles-feed-header">
       <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
     </div>
-    <div class="content-grid">
-      <div class="content-grid-lead">
-      <article class="card card-featured">
-        <a href="articles/nba/blazers-nuggets-denver-118-110/">
-        <div class="card-image">
-          <img src="https://robireport.com/assets/images/articles/nba/blazers-deni-avdija-denver.png" alt="Portland Trail Blazers forward Deni Avdija drives to the net against the Denver Nuggets at Ball Arena" />
-          <span class="card-tag">Analysis</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NBA</span> <span class="dot"></span><span>12 min read</span> <span class="dot"></span><span>November 3, 2026</span>
-          </div>
-          <h3>Portland Makes a Statement in Denver: The Blazers&#x27; Depth and Defense Deliver a 118-110 Victory</h3>
-          <p>Deni Avdija led the way with 28 points, but it was Portland&#x27;s collective effort that made the difference in a statement road win against the Nuggets.</p>
-        </div>
-        </a>
-      </article>
-      <div class="content-grid-lead-side">
-      <article class="card">
-        <a href="articles/wnba/awa-fam-breakout-mercury/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_92bdd51c27b24b3184d22ff3a9fdd605~mv2.png/v1/fill/w_600,h_375,al_c,q_90/5535a3_92bdd51c27b24b3184d22ff3a9fdd605~mv2.png" alt="Awa Fam&#x27;s Breakout Game Can&#x27;t Save Storm in Narrow Loss to Mercury" />
-          <span class="card-tag">WNBA</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>WNBA</span> <span class="dot"></span><span>4 min read</span> <span class="dot"></span><span>June 04, 2026</span>
-          </div>
-          <h3>Awa Fam&#x27;s Breakout Game Can&#x27;t Save Storm in Narrow Loss to Mercury</h3>
-          <p>The Seattle Storm lost to the Phoenix Mercury 72-68 on Wednesday night at Climate Pledge Arena, but the most significant development of the evening had...</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/wnba/mystics-storm-physicality/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_be94ef4b67c941c2af478a4204717007~mv2.png/v1/fill/w_600,h_375,al_c,q_90/5535a3_be94ef4b67c941c2af478a4204717007~mv2.png" alt="Washington Mystics Hand Seattle Storm a Lesson in Physicality" />
-          <span class="card-tag">WNBA</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>WNBA</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>May 28, 2026</span>
-          </div>
-          <h3>Washington Mystics Hand Seattle Storm a Lesson in Physicality</h3>
-          <p>Three days earlier, the Seattle Storm had rolled through the Washington Mystics 97-85, holding them to their second consecutive loss and making the result...</p>
-        </div>
-        </a>
-      </article>
+    <div class="editorial-board-grid">
+      <div class="editorial-board-col editorial-board-col--left">
+        <ul class="editorial-headline-list">
+          <li class="editorial-list-item">
+            <a href="articles/wnba/awa-fam-breakout-mercury/" class="editorial-list-link">
+              <span class="editorial-badge">WNBA</span>
+              <span class="editorial-list-headline">Awa Fam&#x27;s Breakout Game Can&#x27;t Save Storm in Narrow Loss to Mercury</span>
+              <time class="editorial-time" datetime="2026-06-04" data-published="2026-06-04" title="Jun 03, 2026 05:00 PM PT">Jun 03, 2026 PT</time>
+            </a>
+          </li>
+          <li class="editorial-list-item">
+            <a href="articles/wnba/mystics-storm-physicality/" class="editorial-list-link">
+              <span class="editorial-badge">WNBA</span>
+              <span class="editorial-list-headline">Washington Mystics Hand Seattle Storm a Lesson in Physicality</span>
+              <time class="editorial-time" datetime="2026-05-28" data-published="2026-05-28" title="May 27, 2026 05:00 PM PT">May 27, 2026 PT</time>
+            </a>
+          </li>
+          <li class="editorial-list-item">
+            <a href="articles/wnba/awa-fam-storm-debut/" class="editorial-list-link">
+              <span class="editorial-badge">WNBA</span>
+              <span class="editorial-list-headline">Awa Fam&#x27;s WNBA Debut Was Exactly What the Seattle Storm Needed</span>
+              <time class="editorial-time" datetime="2026-05-27" data-published="2026-05-27" title="May 26, 2026 05:00 PM PT">May 26, 2026 PT</time>
+            </a>
+          </li>
+          <li class="editorial-list-item">
+            <a href="articles/nba/curry-under-armour/" class="editorial-list-link">
+              <span class="editorial-badge">NBA</span>
+              <span class="editorial-list-headline">Superstar Stephen Curry and Under Armour Have Parted Ways</span>
+              <time class="editorial-time" datetime="2025-11-15" data-published="2025-11-15" title="Nov 14, 2025 04:00 PM PT">Nov 14, 2025 PT</time>
+            </a>
+          </li>
+          <li class="editorial-list-item">
+            <a href="articles/soccer/emma-hayes-shebelieves-roster/" class="editorial-list-link">
+              <span class="editorial-badge">SOCCER</span>
+              <span class="editorial-list-headline">Emma Hayes Announces Team USA 2025 SheBelieves Cup Roster</span>
+              <time class="editorial-time" datetime="2025-02-12" data-published="2025-02-12" title="Feb 11, 2025 04:00 PM PT">Feb 11, 2025 PT</time>
+            </a>
+          </li>
+          <li class="editorial-list-item">
+            <a href="articles/nba/basketball-sucks-fix/" class="editorial-list-link">
+              <span class="editorial-badge">NBA</span>
+              <span class="editorial-list-headline">Basketball Sucks (Don&#x27;t Worry, I Can Fix It)</span>
+              <time class="editorial-time" datetime="2023-09-08" data-published="2023-09-08" title="Sep 07, 2023 05:00 PM PT">Sep 07, 2023 PT</time>
+            </a>
+          </li>
+        </ul>
       </div>
+      <div class="editorial-board-col editorial-board-col--center">
+        <article class="editorial-spotlight">
+          <a href="articles/nba/blazers-nuggets-denver-118-110/" class="editorial-spotlight-link">
+            <figure class="editorial-spotlight-media">
+              <img src="https://robireport.com/assets/images/articles/nba/blazers-deni-avdija-denver.png" alt="Portland Trail Blazers forward Deni Avdija drives to the net against the Denver Nuggets at Ball Arena" loading="lazy" />
+          <figcaption class="editorial-photo-credit">Portland Trail Blazers forward Deni Avdija drives to the net in the fourth quarter against the Denver Nuggets at Ball Arena | IMAGN IMAGES via Reuters Connect</figcaption>
+            </figure>
+            <div class="editorial-spotlight-body">
+              <p class="editorial-kicker">NBA · Analysis</p>
+              <h3 class="editorial-spotlight-title">Portland Makes a Statement in Denver: The Blazers&#x27; Depth and Defense Deliver a 118-110 Victory</h3>
+              <p class="editorial-spotlight-dek">Deni Avdija led the way with 28 points, but it was Portland&#x27;s collective effort that made the difference in a statement road win against the Nuggets.</p>
+              <time class="editorial-time" datetime="2026-11-03" data-published="2026-11-03" title="Nov 02, 2026 04:00 PM PT">1 day ago</time>
+            </div>
+          </a>
+        </article>
       </div>
-    <div class="content-grid-rest">
-      <article class="card">
-        <a href="articles/wnba/awa-fam-storm-debut/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_9c3240e524d14af18aa33efaa9a07bbc~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_9c3240e524d14af18aa33efaa9a07bbc~mv2.jpg" alt="Awa Fam&#x27;s WNBA Debut Was Exactly What the Seattle Storm Needed" />
-          <span class="card-tag">WNBA</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>WNBA</span> <span class="dot"></span><span>4 min read</span> <span class="dot"></span><span>May 27, 2026</span>
-          </div>
-          <h3>Awa Fam&#x27;s WNBA Debut Was Exactly What the Seattle Storm Needed</h3>
-          <p>Awa Fam has been defying age-based expectations for most of her basketball life.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/nba/curry-under-armour/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_a5206b3b3acb477ab63af6443ac20695~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_a5206b3b3acb477ab63af6443ac20695~mv2.jpg" alt="Superstar Stephen Curry and Under Armour Have Parted Ways" />
-          <span class="card-tag">NBA</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NBA</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>November 15, 2025</span>
-          </div>
-          <h3>Superstar Stephen Curry and Under Armour Have Parted Ways</h3>
-          <p>According to ESPN reporter Shams Charania, &quot;Golden State Warriors star Stephen Curry and Under Armour have parted ways.&quot; Under Armour failing to boost sales...</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/soccer/emma-hayes-shebelieves-roster/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_bfd0fea401e54ecd92941055cf66bd77~mv2.png/v1/fill/w_600,h_375,al_c,q_90/5535a3_bfd0fea401e54ecd92941055cf66bd77~mv2.png" alt="Emma Hayes Announces Team USA 2025 SheBelieves Cup Roster" />
-          <span class="card-tag">SOCCER</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>SOCCER</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>February 12, 2025</span>
-          </div>
-          <h3>Emma Hayes Announces Team USA 2025 SheBelieves Cup Roster</h3>
-          <p>Team USA&#x27;s head coach Emma Hayes has announced their roster just two weeks before the opening day of their matchup against Columbia in the SheBelieves Cup.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/nba/basketball-sucks-fix/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_a5199decb9014cf9b5d0e816483e8fbb~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_a5199decb9014cf9b5d0e816483e8fbb~mv2.jpg" alt="Basketball Sucks, featured illustration" />
-          <span class="card-tag">NBA</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NBA</span> <span class="dot"></span><span>6 min read</span> <span class="dot"></span><span>September 8, 2023</span>
-          </div>
-          <h3>Basketball Sucks (Don&#x27;t Worry, I Can Fix It)</h3>
-          <p>An inarguable argument by Joel H. Cohen:</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/nfl/2023-draft-winners-losers/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_1241fbf8c7d64640adbdc6b57b89d056~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_1241fbf8c7d64640adbdc6b57b89d056~mv2.jpg" alt="Opinion: 2023 NFL Draft Winners and Losers" />
-          <span class="card-tag">NFL</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NFL</span> <span class="dot"></span><span>4 min read</span> <span class="dot"></span><span>May 03, 2023</span>
-          </div>
-          <h3>Opinion: 2023 NFL Draft Winners and Losers</h3>
-          <p>Texans: The Texans had one of the most aggressive first rounds I have ever seen.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/boxing/how-to-fix-boxing/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_332563c700274fc88327d2df3c0b6f94~mv2.png/v1/fill/w_600,h_375,al_c,q_90/5535a3_332563c700274fc88327d2df3c0b6f94~mv2.png" alt="How to Fix Professional Boxing" />
-          <span class="card-tag">BOXING</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>BOXING</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>June 30, 2022</span>
-          </div>
-          <h3>How to Fix Professional Boxing</h3>
-          <p>The nature of boxing is one of the world&#x27;s most entertaining/competitive sports ever created, and yet it is still nowhere near its potential.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/nfl/devondre-campbell-pbu/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_c5f5d533c13b4be9b6d1c53b37ff300e~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_c5f5d533c13b4be9b6d1c53b37ff300e~mv2.jpg" alt="De&#x27;vondre Campbell&#x27;s Heroic PBU Advances Green Bay to 2" />
-          <span class="card-tag">NFL</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NFL</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>September 26, 2022</span>
-          </div>
-          <h3>De&#x27;vondre Campbell&#x27;s Heroic PBU Advances Green Bay to 2</h3>
-          <p>De&#x27;vondre Campbell leaps up and deflects Brady&#x27;s last-second 2-point conversion attempt to Russell Gage, sealing the game at 14-12.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/nfl/bills-titans-blowout/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_d5d0cfc808c34ab18c5f1224fd23b5ee~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_d5d0cfc808c34ab18c5f1224fd23b5ee~mv2.jpg" alt="Buffalo Bills Defeat the Titans in a 41-7 Blowout Victory" />
-          <span class="card-tag">NFL</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NFL</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>September 20, 2022</span>
-          </div>
-          <h3>Buffalo Bills Defeat the Titans in a 41-7 Blowout Victory</h3>
-          <p>Josh Allen and Stephon Diggs celebrating win over Tennessee Tennesse&#x27;s secondary failed to slow down the wildly explosive Ken Dorsey-led offense.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/nfl/improving-the-nfl/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_0d314c2cf26c4b95914a7eadfd8a12fd~mv2.png/v1/fill/w_600,h_375,al_c,q_90/5535a3_0d314c2cf26c4b95914a7eadfd8a12fd~mv2.png" alt="Improving the NFL" />
-          <span class="card-tag">NFL</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NFL</span> <span class="dot"></span><span>4 min read</span> <span class="dot"></span><span>June 30, 2022</span>
-          </div>
-          <h3>Improving the NFL</h3>
-          <p>Enough with the yellow flags: Let the players play First off, NFL players and fans really do appreciate the NFL taking steps to protect the quarterback...</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/ufc/ufc-business-model/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_e31c1f0180784ef38ad02e5260d0a3a5~mv2.png/v1/fill/w_600,h_375,al_c,q_90/5535a3_e31c1f0180784ef38ad02e5260d0a3a5~mv2.png" alt="UFC Business Model: Utterly Brilliant or Beyond Exploitative" />
-          <span class="card-tag">UFC</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>UFC</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>June 30, 2022</span>
-          </div>
-          <h3>UFC Business Model: Utterly Brilliant or Beyond Exploitative</h3>
-          <p>Over the past decade, the Ultimate Fighting Championship mixed martial arts company experienced tremendous growth in popularity.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/boxing/muhammad-ali-tribute/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_07fec1c912104ab09085671ff682f5a4~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_07fec1c912104ab09085671ff682f5a4~mv2.jpg" alt="Celebrating The Life of Muhammad Ali: &quot;Don&#x27;t Count The Days, Make The Days Count&quot;" />
-          <span class="card-tag">BOXING</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>BOXING</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>June 04, 2022</span>
-          </div>
-          <h3>Celebrating The Life of Muhammad Ali: &quot;Don&#x27;t Count The Days, Make The Days Count&quot;</h3>
-          <p>Six years ago today, Muhammad Ali passed away after a lengthy battle with Parkinson&#x27;s disease that lasted 32 years.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/nfl/2022-draft-winners-losers/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_74984f04a200408c8adba37f678289d7~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_74984f04a200408c8adba37f678289d7~mv2.jpg" alt="2022 NFL Draft Winners and Losers" />
-          <span class="card-tag">NFL</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NFL</span> <span class="dot"></span><span>4 min read</span> <span class="dot"></span><span>May 05, 2022</span>
-          </div>
-          <h3>2022 NFL Draft Winners and Losers</h3>
-          <p>On Thursday night NFL fans everywhere anxiously sat and watched their favorite holiday unfold, Draft Day.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/nfl/deebo-samuel-breakdown/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_0b9150a288af4050a1e864b057fd4248~mv2.png/v1/fill/w_600,h_375,al_c,q_90/5535a3_0b9150a288af4050a1e864b057fd4248~mv2.png" alt="Deebo Samuel &amp; San Francisco 49ers Breakdown" />
-          <span class="card-tag">NFL</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NFL</span> <span class="dot"></span><span>7 min read</span> <span class="dot"></span><span>April 28, 2022</span>
-          </div>
-          <h3>Deebo Samuel &amp; San Francisco 49ers Breakdown</h3>
-          <p>One of the most exciting times on the NFL calendar, this week is sure to bring lots of twists and turns to a league that has grown stagnant since the...</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/nfl/free-agency-winners/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_c6d09c4553c246f9b2751f57d98db6e6~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_c6d09c4553c246f9b2751f57d98db6e6~mv2.jpg" alt="NFL: Free Agencies Biggest Winners" />
-          <span class="card-tag">NFL</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NFL</span> <span class="dot"></span><span>7 min read</span> <span class="dot"></span><span>April 09, 2022</span>
-          </div>
-          <h3>NFL: Free Agencies Biggest Winners</h3>
-          <p>NFL Free Agency can be a touchy subject.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/mlb/mariners-2022-campaign/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_059a0602a965455aa08e4810a538ebd9~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_059a0602a965455aa08e4810a538ebd9~mv2.jpg" alt="Optimism High as Mariners Begin 2022 Campaign" />
-          <span class="card-tag">MLB</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>MLB</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>April 07, 2022</span>
-          </div>
-          <h3>Optimism High as Mariners Begin 2022 Campaign</h3>
-          <p>With the 2022 Major League Baseball season beginning, it&#x27;s no secret what&#x27;s on the table for the Seattle Mariners.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/ufc/ufc-270-ngannou-gane/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_57c3359a3f2d4aeb89a4c510492cc692~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_57c3359a3f2d4aeb89a4c510492cc692~mv2.jpg" alt="UFC 270: Ngannou vs Gane" />
-          <span class="card-tag">UFC</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>UFC</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>January 23, 2022</span>
-          </div>
-          <h3>UFC 270: Ngannou vs Gane</h3>
-          <p>Francis Ngannou remains the heavyweight champion and defeated Ciryl Gane by unanimous decision.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/nfl/demaryius-thomas/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_08fe6c4e9bee47ca8119dd704831ad5d~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_08fe6c4e9bee47ca8119dd704831ad5d~mv2.jpg" alt="Breaking News: Demaryius Thomas Dead at 33" />
-          <span class="card-tag">NFL</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>NFL</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>December 10, 2021</span>
-          </div>
-          <h3>Breaking News: Demaryius Thomas Dead at 33</h3>
-          <p>Demaryius Thomas was found dead in his home on December 9th.</p>
-        </div>
-        </a>
-      </article>
-
-      <article class="card">
-        <a href="articles/boxing/fury-wilder-trilogy/">
-        <div class="card-image">
-          <img src="https://static.wixstatic.com/media/5535a3_ff16aef97dd94733b984af2b85d9ab3a~mv2.jpg/v1/fill/w_600,h_375,al_c,q_90/5535a3_ff16aef97dd94733b984af2b85d9ab3a~mv2.jpg" alt="Tyson Fury vs. Deontay Wilder: The Trilogy" />
-          <span class="card-tag">BOXING</span>
-        </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span>BOXING</span> <span class="dot"></span><span>3 min read</span> <span class="dot"></span><span>October 09, 2021</span>
-          </div>
-          <h3>Tyson Fury vs. Deontay Wilder: The Trilogy</h3>
-          <p>The Gypsy King and the Bronze Bomber are set to meet in the ring once again.</p>
-        </div>
-        </a>
-      </article>
-    </div>
+      <aside class="editorial-board-col editorial-board-col--right" aria-labelledby="editorial-latest-heading">
+        <h3 class="editorial-sidebar-label" id="editorial-latest-heading">LATEST</h3>
+        <ul class="editorial-sidebar-list">
+          <li class="editorial-sidebar-item">
+            <a href="articles/wnba/awa-fam-breakout-mercury/" class="editorial-sidebar-link">
+              <span class="editorial-sidebar-headline">Awa Fam&#x27;s Breakout Game Can&#x27;t Save Storm in Narrow Loss to Mercury</span>
+              <time class="editorial-time" datetime="2026-06-04" data-published="2026-06-04" title="Jun 03, 2026 05:00 PM PT">Jun 03, 2026 PT</time>
+            </a>
+          </li>
+          <li class="editorial-sidebar-item">
+            <a href="articles/wnba/mystics-storm-physicality/" class="editorial-sidebar-link">
+              <span class="editorial-sidebar-headline">Washington Mystics Hand Seattle Storm a Lesson in Physicality</span>
+              <time class="editorial-time" datetime="2026-05-28" data-published="2026-05-28" title="May 27, 2026 05:00 PM PT">May 27, 2026 PT</time>
+            </a>
+          </li>
+          <li class="editorial-sidebar-item">
+            <a href="articles/wnba/awa-fam-storm-debut/" class="editorial-sidebar-link">
+              <span class="editorial-sidebar-headline">Awa Fam&#x27;s WNBA Debut Was Exactly What the Seattle Storm Needed</span>
+              <time class="editorial-time" datetime="2026-05-27" data-published="2026-05-27" title="May 26, 2026 05:00 PM PT">May 26, 2026 PT</time>
+            </a>
+          </li>
+          <li class="editorial-sidebar-item">
+            <a href="articles/nba/curry-under-armour/" class="editorial-sidebar-link">
+              <span class="editorial-sidebar-headline">Superstar Stephen Curry and Under Armour Have Parted Ways</span>
+              <time class="editorial-time" datetime="2025-11-15" data-published="2025-11-15" title="Nov 14, 2025 04:00 PM PT">Nov 14, 2025 PT</time>
+            </a>
+          </li>
+          <li class="editorial-sidebar-item">
+            <a href="articles/soccer/emma-hayes-shebelieves-roster/" class="editorial-sidebar-link">
+              <span class="editorial-sidebar-headline">Emma Hayes Announces Team USA 2025 SheBelieves Cup Roster</span>
+              <time class="editorial-time" datetime="2025-02-12" data-published="2025-02-12" title="Feb 11, 2025 04:00 PM PT">Feb 11, 2025 PT</time>
+            </a>
+          </li>
+          <li class="editorial-sidebar-item">
+            <a href="articles/nba/basketball-sucks-fix/" class="editorial-sidebar-link">
+              <span class="editorial-sidebar-headline">Basketball Sucks (Don&#x27;t Worry, I Can Fix It)</span>
+              <time class="editorial-time" datetime="2023-09-08" data-published="2023-09-08" title="Sep 07, 2023 05:00 PM PT">Sep 07, 2023 PT</time>
+            </a>
+          </li>
+          <li class="editorial-sidebar-item">
+            <a href="articles/nfl/2023-draft-winners-losers/" class="editorial-sidebar-link">
+              <span class="editorial-sidebar-headline">Opinion: 2023 NFL Draft Winners and Losers</span>
+              <time class="editorial-time" datetime="2023-05-03" data-published="2023-05-03" title="May 02, 2023 05:00 PM PT">May 02, 2023 PT</time>
+            </a>
+          </li>
+          <li class="editorial-sidebar-item">
+            <a href="articles/nfl/devondre-campbell-pbu/" class="editorial-sidebar-link">
+              <span class="editorial-sidebar-headline">De&#x27;vondre Campbell&#x27;s Heroic PBU Advances Green Bay to 2</span>
+              <time class="editorial-time" datetime="2022-09-26" data-published="2022-09-26" title="Sep 25, 2022 05:00 PM PT">Sep 25, 2022 PT</time>
+            </a>
+          </li>
+        </ul>
+        <a href="#browse-leagues" class="editorial-view-more">VIEW MORE &gt;</a>
+      </aside>
     </div>
   </section>
 
@@ -1441,6 +1061,7 @@
   <script src="assets/nav-mobile.js"></script>
   <script src="assets/score-ticker.js"></script>
   <script src="assets/hero-video-carousel.js"></script>
+  <script src="assets/home-editorial.js"></script>
 </body>
 </html>
 
