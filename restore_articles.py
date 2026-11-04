@@ -55,7 +55,11 @@ def parse_article(path: Path) -> dict:
     title_m = re.search(r'<h1 class="article-title">(.*?)</h1>', text, re.S)
     tag_m = re.search(r'<span class="article-tag">(.*?)</span>', text, re.S)
     meta_m = re.search(r'<div class="article-meta"[^>]*>(.*?)</div>', text, re.S)
-    img_m = re.search(r'<figure class="article-hero">\s*<img src="([^"]+)" alt="([^"]*)"', text, re.S)
+    img_m = re.search(
+        r'<figure class="article-hero">.*?<img src="([^"]+)" alt="([^"]*)"',
+        text,
+        re.S,
+    )
     body_m = re.search(r'<div class="article-body">\s*<p>(.*?)</p>', text, re.S)
 
     title = html.unescape(re.sub(r'\s+', ' ', title_m.group(1))).strip() if title_m else path.stem
