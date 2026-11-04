@@ -66,6 +66,11 @@
   padding-top: 80px;
 }
 
+/* Lead card spans two rows but should not stretch empty space below copy */
+.featured.articles-feed .content-grid .card-featured {
+  align-self: start;
+}
+
 .featured.articles-feed .articles-empty {
   max-width: var(--max-width);
   margin: 0 auto;
