@@ -242,15 +242,37 @@ def index_featured_html(all_articles: dict[str, dict]) -> str:
     </div>
   </section>'''
 
-    cards = [card_html(ordered[0], featured=True)]
-    cards.extend(card_html(a) for a in ordered[1:])
-    grid = '\n\n'.join(cards)
+    lead = card_html(ordered[0], featured=True)
+    side = ordered[1:3]
+    rest = ordered[3:]
+    side_cards = '\n\n'.join(card_html(a) for a in side)
+    rest_cards = '\n\n'.join(card_html(a) for a in rest)
+
+    side_block = (
+        f'''      <div class="content-grid-lead-side">
+{side_cards}
+      </div>'''
+        if side
+        else ''
+    )
+    rest_block = (
+        f'''    <div class="content-grid-rest">
+{rest_cards}
+    </div>'''
+        if rest
+        else ''
+    )
+
     return f'''  <section class="featured articles-feed" id="latest-articles">
     <div class="articles-feed-header">
       <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
     </div>
     <div class="content-grid">
-{grid}
+      <div class="content-grid-lead">
+{lead}
+{side_block}
+      </div>
+{rest_block}
     </div>
   </section>'''
 

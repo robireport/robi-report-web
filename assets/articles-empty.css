@@ -66,9 +66,47 @@
   padding-top: 80px;
 }
 
-/* Lead card spans two rows but should not stretch empty space below copy */
-.featured.articles-feed .content-grid .card-featured {
-  align-self: start;
+/* Homepage lead row: featured + side stack, then full-width card rows */
+.featured.articles-feed .content-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.featured.articles-feed .content-grid-lead {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.featured.articles-feed .content-grid-lead-side {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.featured.articles-feed .content-grid-rest {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .featured.articles-feed .content-grid-lead {
+    grid-template-columns: 1fr;
+  }
+
+  .featured.articles-feed .content-grid-rest {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .featured.articles-feed .content-grid-rest {
+    grid-template-columns: 1fr;
+  }
 }
 
 .featured.articles-feed .articles-empty {

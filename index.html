@@ -644,6 +644,26 @@
     .content-grid {
       max-width: var(--max-width);
       margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .content-grid-lead {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .content-grid-lead-side {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      min-width: 0;
+    }
+
+    .content-grid-rest {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 24px;
@@ -672,9 +692,7 @@
     }
 
     .card-featured {
-      grid-column: span 2;
-      grid-row: span 2;
-      align-self: start;
+      min-width: 0;
     }
 
     .card-image {
@@ -876,13 +894,12 @@
         gap: 16px;
       }
 
-      .content-grid {
-        grid-template-columns: repeat(2, 1fr);
+      .content-grid-lead {
+        grid-template-columns: 1fr;
       }
 
-      .card-featured {
-        grid-column: span 2;
-        grid-row: span 1;
+      .content-grid-rest {
+        grid-template-columns: repeat(2, 1fr);
       }
 
       .footer-top {
@@ -910,12 +927,8 @@
         gap: 32px 64px;
       }
 
-      .content-grid {
+      .content-grid-rest {
         grid-template-columns: 1fr;
-      }
-
-      .card-featured {
-        grid-column: span 1;
       }
 
       .section-header {
@@ -1095,6 +1108,7 @@
       <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
     </div>
     <div class="content-grid">
+      <div class="content-grid-lead">
       <article class="card card-featured">
         <a href="articles/nba/blazers-nuggets-denver-118-110/">
         <div class="card-image">
@@ -1110,7 +1124,7 @@
         </div>
         </a>
       </article>
-
+      <div class="content-grid-lead-side">
       <article class="card">
         <a href="articles/wnba/awa-fam-breakout-mercury/">
         <div class="card-image">
@@ -1142,7 +1156,9 @@
         </div>
         </a>
       </article>
-
+      </div>
+      </div>
+    <div class="content-grid-rest">
       <article class="card">
         <a href="articles/wnba/awa-fam-storm-debut/">
         <div class="card-image">
@@ -1430,6 +1446,7 @@
         </div>
         </a>
       </article>
+    </div>
     </div>
   </section>
 
