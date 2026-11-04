@@ -33,10 +33,10 @@ FEATURED_WIDGET = """      <div class="widget widget-videos">
 HUBS = {
     "nba.html": {
         "label": "NBA",
-        "video_id": "e8KPKNIxEmE",
-        "title": "Are the Rockets and Pacers ACTUALLY Contenders?, Robi Report",
-        "description": "Featured analysis: Are the Rockets and Pacers actually contenders? From Robi Report.",
-        "upload_date": "2026-10-01T00:00:00+00:00",
+        "video_id": "h53wQkd35Uc",
+        "title": "Deni Avdija Is REALLY Good., Robi Report",
+        "description": "Featured NBA analysis: Deni Avdija Is REALLY Good. From Robi Report on YouTube.",
+        "upload_date": "2026-11-01T00:00:00+00:00",
         "schema": True,
     },
     "wnba.html": {
