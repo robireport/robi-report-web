@@ -899,6 +899,7 @@
   <link rel="stylesheet" href="assets/score-ticker.css" />
   <link rel="stylesheet" href="assets/nav-mobile.css" />
   <link rel="stylesheet" href="assets/articles-empty.css" />
+  <link rel="stylesheet" href="assets/hub-feed.css" />
 </head>
 <body class="has-live-ticker">
 
@@ -953,10 +954,7 @@
   <!-- Page Header -->
   <header class="page-header">
     <div class="page-header-inner">
-      <nav class="hub-breadcrumb" aria-label="Breadcrumb">
-        <a href="index.html">Robi Report</a> / <span aria-current="page">MLB</span>
-      </nav>
-      <h1>MLB</h1>
+<h1>MLB</h1>
       <p>Trade deadline drama, pennant races, and daily coverage from around the diamond</p>
     </div>
   </header>
@@ -980,27 +978,26 @@
       </div>
     </aside>
 
-    <section class="hub-center">
+    <section class="hub-center hub-feed">
       <div class="articles-feed-header">
         <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
       </div>
 
-      <article class="lead-story">
-        <a href="articles/mlb/mariners-2022-campaign/">
-        <div class="lead-story-image">
-          <img src="https://static.wixstatic.com/media/5535a3_059a0602a965455aa08e4810a538ebd9~mv2.jpg/v1/fill/w_960,h_540,al_c,q_90/5535a3_059a0602a965455aa08e4810a538ebd9~mv2.jpg" alt="Optimism High as Mariners Begin 2022 Campaign" />
-        </div>
-        <div class="lead-story-body">
-          <span class="story-tag">News</span>
-          <h2>Optimism High as Mariners Begin 2022 Campaign</h2>
-          <p class="subtitle">With the 2022 Major League Baseball season beginning, it&#x27;s no secret what&#x27;s on the table for the Seattle Mariners.</p>
-          <div class="author-meta">
-            <strong>Matthew Robi</strong> <span class="dot"></span><span>April 07, 2022</span> <span class="dot"></span><span>3 min read</span>
-          </div>
-        </div>
-        </a>
-      </article>
-
+      <div class="hub-feed-list">
+        <article class="hub-feed-item">
+          <a href="articles/mlb/mariners-2022-campaign/" class="hub-feed-link">
+            <div class="hub-feed-thumb">
+              <img src="https://static.wixstatic.com/media/5535a3_059a0602a965455aa08e4810a538ebd9~mv2.jpg/v1/fill/w_440,h_280,al_c,q_90/5535a3_059a0602a965455aa08e4810a538ebd9~mv2.jpg" alt="Optimism High as Mariners Begin 2022 Campaign" loading="lazy" />
+            </div>
+            <div class="hub-feed-body">
+              <p class="hub-feed-category">SPORTS | MLB</p>
+              <time class="hub-feed-time" datetime="2022-04-07">April 7, 2022 at 9:01 am PT</time>
+              <h3 class="hub-feed-title">Optimism High as Mariners Begin 2022 Campaign</h3>
+              <p class="hub-feed-excerpt">With the 2022 Major League Baseball season beginning, it&#x27;s no secret what&#x27;s on the table for the Seattle Mariners.</p>
+            </div>
+          </a>
+        </article>
+      </div>
     </section>
 
   </main>

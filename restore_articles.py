@@ -236,6 +236,55 @@ def editorial_spotlight_html(a: dict, now: datetime | None = None) -> str:
         </article>'''
 
 
+def hub_feed_published_dt(a: dict) -> datetime | None:
+    date_iso = a.get('date_iso') or ''
+    if not date_iso:
+        return None
+    if 'T' not in date_iso and re.match(r'^\d{4}-\d{2}-\d{2}$', date_iso):
+        day = datetime.fromisoformat(date_iso)
+        return day.replace(tzinfo=PT, hour=9, minute=1)
+    return parse_iso_dt(date_iso)
+
+
+def hub_feed_time_html(a: dict) -> str:
+    dt = hub_feed_published_dt(a)
+    if dt:
+        hour = dt.strftime('%I').lstrip('0') or '12'
+        minute = dt.strftime('%M')
+        ampm = dt.strftime('%p').lower()
+        label = f'{dt.strftime("%B")} {dt.day}, {dt.year} at {hour}:{minute} {ampm} PT'
+        dt_attr = esc(a.get('date_iso') or '')
+        return f'<time class="hub-feed-time" datetime="{dt_attr}">{esc(label)}</time>'
+    if a.get('date_label'):
+        return f'<time class="hub-feed-time">{esc(a["date_label"])}</time>'
+    return ''
+
+
+def hub_feed_category(a: dict) -> str:
+    league = (a.get('league') or a.get('sport') or 'News').upper()
+    return f'SPORTS | {league}'
+
+
+def hub_feed_row_html(a: dict) -> str:
+    img = resize_wix(a['hero_src'], 440, 280)
+    excerpt = a.get('excerpt') or ''
+    if len(excerpt) > 220:
+        excerpt = excerpt[:217].rsplit(' ', 1)[0] + '...'
+    return f'''        <article class="hub-feed-item">
+          <a href="{esc(a["href"])}" class="hub-feed-link">
+            <div class="hub-feed-thumb">
+              <img src="{esc(img)}" alt="{esc(a["alt"])}" loading="lazy" />
+            </div>
+            <div class="hub-feed-body">
+              <p class="hub-feed-category">{esc(hub_feed_category(a))}</p>
+              {hub_feed_time_html(a)}
+              <h3 class="hub-feed-title">{esc(a["title"])}</h3>
+              <p class="hub-feed-excerpt">{esc(excerpt)}</p>
+            </div>
+          </a>
+        </article>'''
+
+
 def lead_html(a: dict) -> str:
     img = resize_wix(a['hero_src'], 960, 540)
     meta_bits = [f'<strong>{esc(a["author"])}</strong>']
@@ -324,17 +373,16 @@ def hub_center_html(articles: list[dict], sport: str) -> str:
     lead_rel = LEAD_ORDER.get(sport)
     lead = by_rel.get(lead_rel) if lead_rel in by_rel else articles[0]
     rest = [a for a in articles if a['rel'] != lead['rel']]
-    rest.sort(key=lambda x: x['date_iso'], reverse=True)
+    rest.sort(key=lambda x: x.get('date_iso') or '', reverse=True)
+    ordered = [lead, *rest]
 
-    rows = '\n'.join(news_row_html(a) for a in rest)
-    stack = f'\n      <div class="news-stack">\n{rows}\n      </div>' if rest else ''
+    rows = '\n'.join(hub_feed_row_html(a) for a in ordered)
+    stack = f'\n      <div class="hub-feed-list">\n{rows}\n      </div>'
 
-    return f'''    <section class="hub-center">
+    return f'''    <section class="hub-center hub-feed">
       <div class="articles-feed-header">
         <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
       </div>
-
-{lead_html(lead)}
 {stack}
     </section>'''
 

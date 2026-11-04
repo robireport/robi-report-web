@@ -899,6 +899,7 @@
   <link rel="stylesheet" href="assets/score-ticker.css" />
   <link rel="stylesheet" href="assets/nav-mobile.css" />
   <link rel="stylesheet" href="assets/articles-empty.css" />
+  <link rel="stylesheet" href="assets/hub-feed.css" />
 </head>
 <body class="has-live-ticker">
 
@@ -953,10 +954,7 @@
   <!-- Page Header -->
   <header class="page-header">
     <div class="page-header-inner">
-      <nav class="hub-breadcrumb" aria-label="Breadcrumb">
-        <a href="index.html">Robi Report</a> / <span aria-current="page">Soccer</span>
-      </nav>
-      <h1>Soccer</h1>
+<h1>Soccer</h1>
       <p>Breaking news, analysis, and storylines from the world's game</p>
     </div>
   </header>
@@ -980,27 +978,26 @@
       </div>
     </aside>
 
-    <section class="hub-center">
+    <section class="hub-center hub-feed">
       <div class="articles-feed-header">
         <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
       </div>
 
-      <article class="lead-story">
-        <a href="articles/soccer/emma-hayes-shebelieves-roster/">
-        <div class="lead-story-image">
-          <img src="https://static.wixstatic.com/media/5535a3_bfd0fea401e54ecd92941055cf66bd77~mv2.png/v1/fill/w_960,h_540,al_c,q_90/5535a3_bfd0fea401e54ecd92941055cf66bd77~mv2.png" alt="Emma Hayes Announces Team USA 2025 SheBelieves Cup Roster" />
-        </div>
-        <div class="lead-story-body">
-          <span class="story-tag">News</span>
-          <h2>Emma Hayes Announces Team USA 2025 SheBelieves Cup Roster</h2>
-          <p class="subtitle">Team USA&#x27;s head coach Emma Hayes has announced their roster just two weeks before the opening day of their matchup against Columbia in the SheBelieves Cup.</p>
-          <div class="author-meta">
-            <strong>Matthew Robi</strong> <span class="dot"></span><span>February 12, 2025</span> <span class="dot"></span><span>3 min read</span>
-          </div>
-        </div>
-        </a>
-      </article>
-
+      <div class="hub-feed-list">
+        <article class="hub-feed-item">
+          <a href="articles/soccer/emma-hayes-shebelieves-roster/" class="hub-feed-link">
+            <div class="hub-feed-thumb">
+              <img src="https://static.wixstatic.com/media/5535a3_bfd0fea401e54ecd92941055cf66bd77~mv2.png/v1/fill/w_440,h_280,al_c,q_90/5535a3_bfd0fea401e54ecd92941055cf66bd77~mv2.png" alt="Emma Hayes Announces Team USA 2025 SheBelieves Cup Roster" loading="lazy" />
+            </div>
+            <div class="hub-feed-body">
+              <p class="hub-feed-category">SPORTS | SOCCER</p>
+              <time class="hub-feed-time" datetime="2025-02-12">February 12, 2025 at 9:01 am PT</time>
+              <h3 class="hub-feed-title">Emma Hayes Announces Team USA 2025 SheBelieves Cup Roster</h3>
+              <p class="hub-feed-excerpt">Team USA&#x27;s head coach Emma Hayes has announced their roster just two weeks before the opening day of their matchup against Columbia in the SheBelieves Cup.</p>
+            </div>
+          </a>
+        </article>
+      </div>
     </section>
 
   </main>
