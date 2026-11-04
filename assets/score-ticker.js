@@ -77,6 +77,17 @@
   const COMBAT_LEAGUES = new Set(['ufc', 'boxing']);
   const REFRESH_MS = 60000;
 
+  const SPORT_FILTER_OPTIONS = [
+    { value: 'all', label: 'Top Events' },
+    { value: 'nba', label: 'NBA' },
+    { value: 'wnba', label: 'WNBA' },
+    { value: 'nfl', label: 'NFL' },
+    { value: 'mlb', label: 'MLB' },
+    { value: 'epl', label: 'Soccer' },
+    { value: 'ufc', label: 'UFC' },
+    { value: 'boxing', label: 'Boxing' },
+  ];
+
   const ticker = document.getElementById('score-ticker');
   if (ticker) {
     if (ticker.parentElement !== document.body) {
@@ -90,7 +101,10 @@
   const track = document.getElementById('ticker-track');
   if (!ticker || !track) return;
 
-  let activeFilter = (ticker.dataset.default || 'all').toLowerCase();
+  const defaultFilterRaw = (ticker.dataset.default || 'all').toLowerCase();
+  let activeFilter = SPORT_FILTER_OPTIONS.some((o) => o.value === defaultFilterRaw)
+    ? defaultFilterRaw
+    : 'all';
   let refreshTimer = null;
   let cache = {};
   let isDragging = false;
@@ -542,6 +556,41 @@
     }
   }
 
+  function mountSportFilter() {
+    if (ticker.querySelector('.ticker-sport-filter')) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'ticker-sport-filter';
+
+    const select = document.createElement('select');
+    select.className = 'ticker-sport-select';
+    select.setAttribute('aria-label', 'Filter live scores by sport');
+
+    SPORT_FILTER_OPTIONS.forEach((opt) => {
+      const option = document.createElement('option');
+      option.value = opt.value;
+      option.textContent = opt.label;
+      select.appendChild(option);
+    });
+
+    select.value = activeFilter;
+
+    select.addEventListener('change', () => {
+      activeFilter = select.value;
+      track.scrollLeft = 0;
+      refresh();
+    });
+
+    wrap.appendChild(select);
+
+    const viewport = ticker.querySelector('.ticker-viewport');
+    if (viewport) {
+      ticker.insertBefore(wrap, viewport);
+    } else {
+      ticker.prepend(wrap);
+    }
+  }
+
   function scrollTickerBy(delta) {
     edgeScrollSpeed = 0;
     track.scrollBy({ left: delta, behavior: 'smooth' });
@@ -640,6 +689,7 @@
     track.scrollLeft = scrollStart - (e.touches[0].pageX - dragStartX);
   }, { passive: true });
 
+  mountSportFilter();
   refresh();
   refreshTimer = setInterval(refresh, REFRESH_MS);
 

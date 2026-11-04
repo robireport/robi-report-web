@@ -1,7 +1,7 @@
 /* Robi Report — NBA Scoreboard Hub (light editorial theme, page-local) */
 body.scores-page {
   --nav-height: 72px;
-  --ticker-height: 52px;
+  --ticker-height: 48px;
   --accent: #10b981;
   --accent-hover: #34d399;
   --accent-glow: rgba(16, 185, 129, 0.28);
@@ -52,12 +52,17 @@ body.scores-page .nav {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 900;
   height: var(--nav-height);
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
+}
+
+/* Ticker sits above nav (score-ticker.css); scores-page nav must not pin to top: 0. */
+body.scores-page.has-live-ticker .nav {
+  top: var(--ticker-height);
 }
 
 body.scores-page .nav-inner {
@@ -190,11 +195,18 @@ body.scores-page .nav-toggle {
   body.scores-page .nav-toggle {
     display: block;
   }
+
+  body.scores-page.has-live-ticker .nav-links {
+    top: var(--site-header-offset);
+    height: calc(100dvh - var(--site-header-offset));
+    max-height: calc(100dvh - var(--site-header-offset));
+    min-height: calc(100dvh - var(--site-header-offset));
+  }
 }
 
 /* ── Scoreboard main ── */
 .nba-scores-main {
-  padding-top: calc(var(--nav-height) + var(--ticker-height));
+  padding-top: calc(var(--nav-height) + 16px);
   min-height: 100vh;
   background: var(--bg-primary);
 }
