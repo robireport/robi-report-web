@@ -899,6 +899,7 @@
   <link rel="stylesheet" href="assets/score-ticker.css" />
   <link rel="stylesheet" href="assets/nav-mobile.css" />
   <link rel="stylesheet" href="assets/articles-empty.css" />
+  <link rel="stylesheet" href="assets/hub-feed.css" />
 </head>
 <body class="has-live-ticker">
 
@@ -953,10 +954,7 @@
   <!-- Page Header -->
   <header class="page-header">
     <div class="page-header-inner">
-      <nav class="hub-breadcrumb" aria-label="Breadcrumb">
-        <a href="index.html">Robi Report</a> / <span aria-current="page">UFC</span>
-      </nav>
-      <h1>UFC</h1>
+<h1>UFC</h1>
       <p>Breaking news, analysis, and storylines from the octagon</p>
     </div>
   </header>
@@ -980,38 +978,36 @@
       </div>
     </aside>
 
-    <section class="hub-center">
+    <section class="hub-center hub-feed">
       <div class="articles-feed-header">
         <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
       </div>
 
-      <article class="lead-story">
-        <a href="articles/ufc/ufc-business-model/">
-        <div class="lead-story-image">
-          <img src="https://static.wixstatic.com/media/5535a3_e31c1f0180784ef38ad02e5260d0a3a5~mv2.png/v1/fill/w_960,h_540,al_c,q_90/5535a3_e31c1f0180784ef38ad02e5260d0a3a5~mv2.png" alt="UFC Business Model: Utterly Brilliant or Beyond Exploitative" />
-        </div>
-        <div class="lead-story-body">
-          <span class="story-tag">Opinion</span>
-          <h2>UFC Business Model: Utterly Brilliant or Beyond Exploitative</h2>
-          <p class="subtitle">Over the past decade, the Ultimate Fighting Championship mixed martial arts company experienced tremendous growth in popularity.</p>
-          <div class="author-meta">
-            <strong>Matthew Robi</strong> <span class="dot"></span><span>June 30, 2022</span> <span class="dot"></span><span>3 min read</span>
-          </div>
-        </div>
-        </a>
-      </article>
-
-      <div class="news-stack">
-        <article class="news-row">
-          <a href="articles/ufc/ufc-270-ngannou-gane/" class="news-row-link">
-          <div class="news-row-thumb">
-            <img src="https://static.wixstatic.com/media/5535a3_57c3359a3f2d4aeb89a4c510492cc692~mv2.jpg/v1/fill/w_280,h_210,al_c,q_90/5535a3_57c3359a3f2d4aeb89a4c510492cc692~mv2.jpg" alt="UFC 270: Ngannou vs Gane" />
-          </div>
-          <div class="news-row-body">
-            <h3>UFC 270: Ngannou vs Gane</h3>
-            <p>Francis Ngannou remains the heavyweight champion and defeated Ciryl Gane by unanimous decision.</p>
-            <div class="news-row-meta">News · 3 min read</div>
-          </div>
+      <div class="hub-feed-list">
+        <article class="hub-feed-item">
+          <a href="articles/ufc/ufc-business-model/" class="hub-feed-link">
+            <div class="hub-feed-thumb">
+              <img src="https://static.wixstatic.com/media/5535a3_e31c1f0180784ef38ad02e5260d0a3a5~mv2.png/v1/fill/w_440,h_280,al_c,q_90/5535a3_e31c1f0180784ef38ad02e5260d0a3a5~mv2.png" alt="UFC Business Model: Utterly Brilliant or Beyond Exploitative" loading="lazy" />
+            </div>
+            <div class="hub-feed-body">
+              <p class="hub-feed-category">SPORTS | UFC</p>
+              <time class="hub-feed-time" datetime="2022-06-30">June 30, 2022 at 9:01 am PT</time>
+              <h3 class="hub-feed-title">UFC Business Model: Utterly Brilliant or Beyond Exploitative</h3>
+              <p class="hub-feed-excerpt">Over the past decade, the Ultimate Fighting Championship mixed martial arts company experienced tremendous growth in popularity.</p>
+            </div>
+          </a>
+        </article>
+        <article class="hub-feed-item">
+          <a href="articles/ufc/ufc-270-ngannou-gane/" class="hub-feed-link">
+            <div class="hub-feed-thumb">
+              <img src="https://static.wixstatic.com/media/5535a3_57c3359a3f2d4aeb89a4c510492cc692~mv2.jpg/v1/fill/w_440,h_280,al_c,q_90/5535a3_57c3359a3f2d4aeb89a4c510492cc692~mv2.jpg" alt="UFC 270: Ngannou vs Gane" loading="lazy" />
+            </div>
+            <div class="hub-feed-body">
+              <p class="hub-feed-category">SPORTS | UFC</p>
+              <time class="hub-feed-time" datetime="2022-01-23">January 23, 2022 at 9:01 am PT</time>
+              <h3 class="hub-feed-title">UFC 270: Ngannou vs Gane</h3>
+              <p class="hub-feed-excerpt">Francis Ngannou remains the heavyweight champion and defeated Ciryl Gane by unanimous decision.</p>
+            </div>
           </a>
         </article>
       </div>
