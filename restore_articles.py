@@ -263,6 +263,10 @@ def index_featured_html(all_articles: dict[str, dict]) -> str:
         else ''
     )
 
+    # Keep content-grid-lead / content-grid-lead-side / content-grid-rest.
+    # Homepage CSS sets the lead and rest wrappers to display:contents and
+    # places the side stack in column 3, rows 1-2, so later cards sit under
+    # the featured story instead of below the taller side column.
     return f'''  <section class="featured articles-feed" id="latest-articles">
     <div class="articles-feed-header">
       <h2>LATEST ANALYSIS &amp; ARTICLES</h2>
