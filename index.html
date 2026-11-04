@@ -73,6 +73,28 @@
     },
     {
       "@type": "VideoObject",
+      "name": "Deni Avdija Is REALLY Good., Robi Report",
+      "description": "Featured NBA analysis: Deni Avdija Is REALLY Good. From Robi Report on YouTube.",
+      "uploadDate": "2026-11-01T00:00:00+00:00",
+      "thumbnailUrl": "https://i.ytimg.com/vi/h53wQkd35Uc/hqdefault.jpg",
+      "embedUrl": "https://www.youtube.com/embed/h53wQkd35Uc",
+      "contentUrl": "https://www.youtube.com/watch?v=h53wQkd35Uc",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Robi Report",
+        "logo": {
+          "@type": "ImageObject",
+          "@id": "https://robireport.com/#brand-logo",
+          "url": "https://robireport.com/assets/images/emerald-r-logo.png",
+          "contentUrl": "https://robireport.com/assets/images/emerald-r-logo.png",
+          "width": 1024,
+          "height": 1024,
+          "caption": "Robi Report — emerald R mark on white"
+        }
+      }
+    },
+    {
+      "@type": "VideoObject",
       "name": "Featured feedback from NBA Finals MVP Jaylen Brown",
       "description": "Exclusive featured feedback from NBA Finals MVP Jaylen Brown on Robi Report's Standard of Greatness series.",
       "uploadDate": "2025-06-10T00:00:00+00:00",
@@ -445,34 +467,6 @@
 
     .hero-content .hero-actions {
       margin-bottom: 0;
-    }
-
-    .hero-video-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-      width: 100%;
-    }
-
-    .hero-video-wrapper {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      border: 1px solid var(--border-hover);
-      box-shadow:
-        0 24px 48px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(16, 185, 129, 0.08);
-      background: var(--bg-card);
-    }
-
-    .hero-video-wrapper iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
     }
 
     .hero-stats {
@@ -889,11 +883,6 @@
         gap: 40px;
       }
 
-      .hero-video-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-
       .content-grid-lead {
         grid-template-columns: 1fr;
       }
@@ -916,11 +905,6 @@
       .hero {
         padding-top: calc(var(--nav-height) + var(--ticker-height) + 48px);
         padding-bottom: 72px;
-      }
-
-      .hero-video-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
       }
 
       .hero-stats {
@@ -951,6 +935,7 @@
   <link rel="stylesheet" href="assets/nav-mobile.css" />
   <link rel="stylesheet" href="assets/cosigned.css" />
   <link rel="stylesheet" href="assets/articles-empty.css" />
+  <link rel="stylesheet" href="assets/hero-video-carousel.css" />
 </head>
 <body class="has-live-ticker">        
 
@@ -1014,28 +999,65 @@
           </div>
         </div>
         <div class="hero-video">
-          <div class="hero-video-grid">
-            <div class="hero-video-wrapper">
-              <iframe
-                src="https://www.youtube.com/embed/TdXr8Ka2weo"
-                title="Jaylen Brown: The Price of Thinking For Yourself (EP 6, Series Finale)"
-                data-description="Jaylen Brown: The Price of Thinking For Yourself, the series finale of Robi Report's Standard of Greatness philosophy series."
-                data-upload-date="2025-06-10T00:00:00+00:00"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
+          <div class="hero-video-carousel" id="hero-video-carousel">
+            <div class="hero-video-carousel-shell">
+              <button type="button" class="hero-video-nav hero-video-nav--prev" id="hero-video-prev" aria-label="Previous featured video">&#8249;</button>
+              <div
+                class="hero-video-carousel-viewport"
+                id="hero-video-viewport"
+                tabindex="0"
+                role="region"
+                aria-roledescription="carousel"
+                aria-label="Featured Robi Report videos"
+              >
+                <div class="hero-video-carousel-track" id="hero-video-track">
+                  <div class="hero-video-slide" id="hero-video-slide-0">
+                    <div class="hero-video-wrapper">
+                      <iframe
+                        src="https://www.youtube.com/embed/TdXr8Ka2weo"
+                        title="Jaylen Brown: The Price of Thinking For Yourself (EP 6, Series Finale)"
+                        data-description="Jaylen Brown: The Price of Thinking For Yourself, the series finale of Robi Report's Standard of Greatness philosophy series."
+                        data-upload-date="2025-06-10T00:00:00+00:00"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen
+                      ></iframe>
+                    </div>
+                  </div>
+                  <div class="hero-video-slide" id="hero-video-slide-1">
+                    <div class="hero-video-wrapper">
+                      <iframe
+                        data-src="https://www.youtube.com/embed/FmJ0Pm0SXXw"
+                        title="Joel Cohen &amp; Matthew Robi - The Occasionally Accurate Annals of Football"
+                        data-description="Joel Cohen and Matthew Robi discuss football history and culture in The Occasionally Accurate Annals of Football, an original Robi Report video."
+                        data-upload-date="2024-08-15T00:00:00+00:00"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen
+                      ></iframe>
+                    </div>
+                  </div>
+                  <div class="hero-video-slide" id="hero-video-slide-2">
+                    <div class="hero-video-wrapper">
+                      <iframe
+                        data-src="https://www.youtube.com/embed/h53wQkd35Uc"
+                        title="Deni Avdija Is REALLY Good., Robi Report"
+                        data-description="Featured NBA analysis: Deni Avdija Is REALLY Good. From Robi Report on YouTube."
+                        data-upload-date="2026-11-01T00:00:00+00:00"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen
+                      ></iframe>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="hero-video-nav hero-video-nav--next" id="hero-video-next" aria-label="Next featured video">&#8250;</button>
             </div>
-            <div class="hero-video-wrapper">
-              <iframe
-                src="https://www.youtube.com/embed/FmJ0Pm0SXXw"
-                title="Joel Cohen &amp; Matthew Robi - The Occasionally Accurate Annals of Football"
-                data-description="Joel Cohen and Matthew Robi discuss football history and culture in The Occasionally Accurate Annals of Football, an original Robi Report video."
-                data-upload-date="2024-08-15T00:00:00+00:00"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
+            <div class="hero-video-dots" id="hero-video-dots" role="tablist" aria-label="Choose featured video">
+              <button type="button" class="hero-video-dot is-active" role="tab" aria-selected="true" aria-controls="hero-video-slide-0" aria-label="Jaylen Brown: The Price of Thinking For Yourself"></button>
+              <button type="button" class="hero-video-dot" role="tab" aria-selected="false" aria-controls="hero-video-slide-1" aria-label="Joel Cohen and Matthew Robi on football history"></button>
+              <button type="button" class="hero-video-dot" role="tab" aria-selected="false" aria-controls="hero-video-slide-2" aria-label="Deni Avdija Is REALLY Good"></button>
             </div>
           </div>
         </div>
@@ -1509,6 +1531,7 @@
 
   <script src="assets/nav-mobile.js"></script>
   <script src="assets/score-ticker.js"></script>
+  <script src="assets/hero-video-carousel.js"></script>
 </body>
 </html>
 
