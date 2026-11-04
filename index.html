@@ -393,8 +393,7 @@
 
     /* ── Hero ── */
     .hero {
-      min-height: 100vh;
-      padding: calc(var(--nav-height) + var(--ticker-height) + 80px) 24px 100px;
+      padding: calc(var(--nav-height) + var(--ticker-height) + 80px) 24px 0;
       background: var(--gradient-hero);
       position: relative;
       overflow: hidden;
@@ -479,10 +478,12 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 48px 96px;
-      margin-top: 64px;
-      padding-top: 48px;
+      align-items: center;
+      gap: 8px 72px;
+      margin-top: 8px;
+      padding: 8px 0;
       border-top: 1px solid var(--border);
+      line-height: 1.15;
     }
 
     .hero-badge {
@@ -590,6 +591,7 @@
       font-size: 1.75rem;
       font-weight: 800;
       letter-spacing: -0.02em;
+      line-height: 1.1;
       color: var(--text-primary);
     }
 
@@ -597,6 +599,7 @@
       font-size: 0.85rem;
       color: var(--text-muted);
       font-weight: 500;
+      line-height: 1.25;
     }
 
     /* ── Featured Section ── */
@@ -644,16 +647,17 @@
     .content-grid {
       max-width: var(--max-width);
       margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .content-grid-lead {
       display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 24px;
       align-items: start;
+    }
+
+    /* Wrappers stay in the markup (restore_articles.py). They do not
+       generate boxes, so cards share one grid with the side stack. */
+    .content-grid-lead,
+    .content-grid-rest {
+      display: contents;
     }
 
     .content-grid-lead-side {
@@ -661,12 +665,9 @@
       flex-direction: column;
       gap: 24px;
       min-width: 0;
-    }
-
-    .content-grid-rest {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      align-self: start;
     }
 
     .card {
@@ -693,6 +694,8 @@
 
     .card-featured {
       min-width: 0;
+      grid-column: 1 / span 2;
+      grid-row: 1;
     }
 
     .card-image {
@@ -894,12 +897,14 @@
         gap: 16px;
       }
 
-      .content-grid-lead {
-        grid-template-columns: 1fr;
+      .content-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .content-grid-rest {
-        grid-template-columns: repeat(2, 1fr);
+      .card-featured,
+      .content-grid-lead-side {
+        grid-column: 1 / -1;
+        grid-row: auto;
       }
 
       .footer-top {
@@ -915,7 +920,7 @@
 
       .hero {
         padding-top: calc(var(--nav-height) + var(--ticker-height) + 48px);
-        padding-bottom: 72px;
+        padding-bottom: 0;
       }
 
       .hero-video-grid {
@@ -924,11 +929,13 @@
       }
 
       .hero-stats {
-        gap: 32px 64px;
+        gap: 8px 40px;
+        margin-top: 8px;
+        padding: 8px 0;
       }
 
-      .content-grid-rest {
-        grid-template-columns: 1fr;
+      .content-grid {
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .section-header {
