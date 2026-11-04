@@ -26,7 +26,7 @@ HUBS = {
 
 # Prefer lead story per hub (relative path under articles/)
 LEAD_ORDER = {
-    'nba': 'articles/nba/curry-under-armour.html',
+    'nba': 'articles/nba/blazers-nuggets-denver-118-110.html',
     'wnba': 'articles/wnba/awa-fam-breakout-mercury.html',
     'nfl': 'articles/nfl/2023-draft-winners-losers.html',
     'ufc': 'articles/ufc/ufc-business-model.html',
@@ -36,6 +36,7 @@ LEAD_ORDER = {
 }
 
 INDEX_FEATURED_ORDER = [
+    'articles/nba/blazers-nuggets-denver-118-110.html',
     'articles/wnba/awa-fam-breakout-mercury.html',
     'articles/wnba/mystics-storm-physicality.html',
     'articles/wnba/awa-fam-storm-debut.html',
