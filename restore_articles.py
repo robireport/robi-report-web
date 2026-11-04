@@ -392,7 +392,7 @@ def index_featured_html(all_articles: dict[str, dict]) -> str:
         <ul class="editorial-sidebar-list">
 {right_rows}
         </ul>
-        <a href="#browse-leagues" class="editorial-view-more">VIEW MORE &gt;</a>
+        <a href="nba.html" class="editorial-view-more">VIEW MORE &gt;</a>
       </aside>'''
         if right_items
         else ''
