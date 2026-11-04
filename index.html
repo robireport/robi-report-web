@@ -393,7 +393,7 @@
 
     /* ── Hero ── */
     .hero {
-      padding: calc(var(--nav-height) + var(--ticker-height) + 80px) 24px 32px;
+      padding: calc(var(--nav-height) + var(--ticker-height) + 80px) 24px 0;
       background: var(--gradient-hero);
       position: relative;
       overflow: hidden;
@@ -478,10 +478,12 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 28px 80px;
-      margin-top: 24px;
-      padding-top: 16px;
+      align-items: center;
+      gap: 8px 72px;
+      margin-top: 8px;
+      padding: 8px 0;
       border-top: 1px solid var(--border);
+      line-height: 1.15;
     }
 
     .hero-badge {
@@ -546,7 +548,7 @@
 
     /* ── Browse by League ── */
     .league-nav {
-      padding: 56px 24px 0;
+      padding: 12px 24px 0;
       background: var(--bg-primary);
     }
 
@@ -589,6 +591,7 @@
       font-size: 1.75rem;
       font-weight: 800;
       letter-spacing: -0.02em;
+      line-height: 1.1;
       color: var(--text-primary);
     }
 
@@ -596,6 +599,7 @@
       font-size: 0.85rem;
       color: var(--text-muted);
       font-weight: 500;
+      line-height: 1.25;
     }
 
     /* ── Featured Section ── */
@@ -916,7 +920,7 @@
 
       .hero {
         padding-top: calc(var(--nav-height) + var(--ticker-height) + 48px);
-        padding-bottom: 28px;
+        padding-bottom: 0;
       }
 
       .hero-video-grid {
@@ -925,7 +929,9 @@
       }
 
       .hero-stats {
-        gap: 32px 64px;
+        gap: 8px 40px;
+        margin-top: 8px;
+        padding: 8px 0;
       }
 
       .content-grid {
