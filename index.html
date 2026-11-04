@@ -92,27 +92,6 @@
           "caption": "Robi Report — emerald R mark on white"
         }
       }
-    },
-    {
-      "@type": "VideoObject",
-      "name": "Featured feedback from NBA Finals MVP Jaylen Brown",
-      "description": "Exclusive featured feedback from NBA Finals MVP Jaylen Brown on Robi Report's Standard of Greatness series.",
-      "uploadDate": "2025-06-10T00:00:00+00:00",
-      "thumbnailUrl": "https://robireport.com/assets/images/emerald-r-logo.png",
-      "contentUrl": "https://robireport.com/assets/jaylen-brown-feedback.mp4",
-      "publisher": {
-        "@type": "Organization",
-        "name": "Robi Report",
-        "logo": {
-          "@type": "ImageObject",
-          "@id": "https://robireport.com/#brand-logo",
-          "url": "https://robireport.com/assets/images/emerald-r-logo.png",
-          "contentUrl": "https://robireport.com/assets/images/emerald-r-logo.png",
-          "width": 1024,
-          "height": 1024,
-          "caption": "Robi Report — emerald R mark on white"
-        }
-      }
     }
   ]
 }
@@ -415,8 +394,7 @@
 
     /* ── Hero ── */
     .hero {
-      min-height: 100vh;
-      padding: calc(var(--nav-height) + var(--ticker-height) + 80px) 24px 100px;
+      padding: calc(var(--nav-height) + var(--ticker-height) + 80px) 24px 64px;
       background: var(--gradient-hero);
       position: relative;
       overflow: hidden;
@@ -467,16 +445,6 @@
 
     .hero-content .hero-actions {
       margin-bottom: 0;
-    }
-
-    .hero-stats {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 48px 96px;
-      margin-top: 64px;
-      padding-top: 48px;
-      border-top: 1px solid var(--border);
     }
 
     .hero-badge {
@@ -577,20 +545,6 @@
     .league-pill:hover {
       border-color: var(--accent);
       color: var(--text-primary);
-    }
-
-    .stat-item strong {
-      display: block;
-      font-size: 1.75rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-    }
-
-    .stat-item span {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 500;
     }
 
     /* ── Featured Section ── */
@@ -907,10 +861,6 @@
         padding-bottom: 72px;
       }
 
-      .hero-stats {
-        gap: 32px 64px;
-      }
-
       .content-grid-rest {
         grid-template-columns: 1fr;
       }
@@ -933,7 +883,6 @@
   </style>
   <link rel="stylesheet" href="assets/score-ticker.css" />
   <link rel="stylesheet" href="assets/nav-mobile.css" />
-  <link rel="stylesheet" href="assets/cosigned.css" />
   <link rel="stylesheet" href="assets/articles-empty.css" />
   <link rel="stylesheet" href="assets/hero-video-carousel.css" />
 </head>
@@ -1060,46 +1009,6 @@
               <button type="button" class="hero-video-dot" role="tab" aria-selected="false" aria-controls="hero-video-slide-2" aria-label="Deni Avdija Is REALLY Good"></button>
             </div>
           </div>
-        </div>
-      </div>
-
-      <section class="sog-cosigned sog-cosigned--in-hero" aria-labelledby="cosigned-heading">
-        <div class="sog-cosigned-inner">
-          <div class="sog-cosigned-header">
-            <h2 id="cosigned-heading">Co-Signed By The Greats</h2>
-          </div>
-          <div class="sog-cosigned-card">
-            <div class="sog-cosigned-media">
-              <div class="sog-cosigned-video-wrap">
-                <video
-                  class="sog-cosigned-video"
-                  controls
-                  playsinline
-                  preload="metadata"
-                  aria-label="Featured feedback from NBA Finals MVP Jaylen Brown"
-                  data-description="Exclusive featured feedback from NBA Finals MVP Jaylen Brown on Robi Report's Standard of Greatness series."
-                  data-upload-date="2025-06-10T00:00:00+00:00"
-                >
-                  <source src="assets/jaylen-brown-feedback.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            </div>
-            <div class="sog-cosigned-callout">
-              <span class="sog-cosigned-badge">&ldquo;Featured Feedback from NBA Finals MVP Jaylen Brown&rdquo;</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div class="hero-stats">
-        <div class="stat-item">
-          <strong>1 Million+</strong>
-          <span>Impressions</span>
-        </div>
-        <div class="stat-item">
-          <strong>24/7</strong>
-          <span>Live coverage</span>
         </div>
       </div>
     </div>
