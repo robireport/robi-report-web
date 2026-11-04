@@ -130,3 +130,69 @@
     aspect-ratio: 16 / 10;
   }
 }
+
+/* ── Featured video sidebar (2× width + scaled chrome) ── */
+.hub {
+  grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+  gap: 36px;
+}
+
+.hub-left {
+  min-width: 0;
+}
+
+.widget.widget-videos {
+  margin-bottom: 24px;
+}
+
+.widget.widget-videos .widget-header {
+  padding: 22px 28px;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+}
+
+.widget.widget-videos .widget-videos-body {
+  padding: 24px 28px 28px;
+}
+
+.widget.widget-videos .video-embed-wrap {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  margin-bottom: 24px;
+  border-radius: 12px;
+}
+
+.widget.widget-videos .video-embed-wrap iframe {
+  border-radius: 12px;
+}
+
+.widget.widget-videos .btn-youtube-more {
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  min-height: 52px;
+  border-radius: var(--radius-md, 12px);
+}
+
+.hub-left .league-shortcuts {
+  padding: 16px 20px 20px;
+  gap: 10px;
+}
+
+.hub-left .league-pill {
+  padding: 8px 14px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 1100px) {
+  .hub {
+    grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hub {
+    grid-template-columns: 1fr;
+  }
+}
