@@ -30,7 +30,7 @@ HUBS = {
 
 # Prefer lead story per hub (relative path under articles/)
 LEAD_ORDER = {
-    'nba': 'articles/nba/blazers-nuggets-denver-118-110.html',
+    'nba': 'articles/nba/lakers-blazers-luka-doncic-124-118.html',
     'wnba': 'articles/wnba/awa-fam-breakout-mercury.html',
     'nfl': 'articles/nfl/2023-draft-winners-losers.html',
     'ufc': 'articles/ufc/ufc-business-model.html',
@@ -40,6 +40,7 @@ LEAD_ORDER = {
 }
 
 INDEX_FEATURED_ORDER = [
+    'articles/nba/lakers-blazers-luka-doncic-124-118.html',
     'articles/nba/blazers-nuggets-denver-118-110.html',
     'articles/wnba/awa-fam-breakout-mercury.html',
     'articles/wnba/mystics-storm-physicality.html',
@@ -486,7 +487,7 @@ def patch_hub(path: Path, sport: str, articles: list[dict]) -> None:
     text = path.read_text(encoding='utf-8')
     replacement = hub_center_html(articles, sport)
     text = re.sub(
-        r'    <section class="hub-center">.*?</section>',
+        r'    <section class="hub-center[^"]*">.*?</section>',
         replacement,
         text,
         count=1,
